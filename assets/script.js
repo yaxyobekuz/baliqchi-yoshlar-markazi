@@ -2,7 +2,7 @@
 // SOZLAMA: Apps Script Web App URL-ini bu yerga qo'ying
 // Deploy → New deployment → Web app → Anyone → URL
 // ============================================================
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/REPLACE_WITH_YOUR_DEPLOYMENT_ID/exec";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxOsfh4if4NsK4pYWgmHDYIGM9Z2vR8YeLI8QcQqata_zdJrAlTNuO1fObLt4WMpVZB/exec";
 
 // ---------- i18n ----------
 const SUPPORTED = ["uz", "ru", "en"];

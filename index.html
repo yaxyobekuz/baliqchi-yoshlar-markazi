@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title data-i18n="meta_title">Baliqchi tumani - Iqtidorli yoshlar ro'yxati</title>
+  <meta name="description" data-i18n="meta_desc" content="" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              blue: '#0099B5',
+              'blue-dark': '#007A91',
+              green: '#1EB53A',
+              red: '#CE1126',
+              ink: '#0F172A',
+              muted: '#64748B',
+              soft: '#F1F5F9'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif']
+          },
+          boxShadow: {
+            soft: '0 10px 40px -10px rgba(15, 23, 42, 0.12)',
+            ring: '0 0 0 6px rgba(0, 153, 181, 0.12)'
+          }
+        }
+      }
+    };
+  </script>
+
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body class="font-sans bg-white text-brand-ink antialiased">
+
+  <!-- NAVBAR -->
+  <header class="fixed top-0 inset-x-0 z-40 bg-white/85 backdrop-blur border-b border-slate-200/60">
+    <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <a href="#top" class="flex items-center gap-3">
+        <img src="assets/emblem-of-uzbekistan.png" alt="O'zbekiston gerbi" class="w-10 h-10 object-contain" />
+        <span class="leading-tight">
+          <span class="block text-sm font-semibold text-brand-ink" data-i18n="nav_brand">Baliqchi tumani hokimligi</span>
+          <span class="block text-[11px] text-brand-muted" data-i18n="nav_sub">Iqtidorli yoshlar markazi</span>
+        </span>
+      </a>
+
+      <div class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600">
+        <a href="#about" class="hover:text-brand-blue transition" data-i18n="nav_about">Loyiha haqida</a>
+        <a href="#benefits" class="hover:text-brand-blue transition" data-i18n="nav_benefits">Imkoniyatlar</a>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <!-- Language dropdown -->
+        <div id="lang-dropdown" class="relative">
+          <button id="lang-toggle" type="button"
+            class="flex items-center gap-2 text-xs font-semibold text-slate-700 bg-white border border-slate-200 rounded-full px-3 py-1.5 hover:border-brand-blue hover:text-brand-blue transition">
+            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg>
+            <span id="lang-current">UZ</span>
+            <svg class="w-3 h-3 transition" id="lang-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <ul id="lang-menu"
+            class="hidden absolute right-0 mt-2 w-36 bg-white rounded-2xl shadow-soft border border-slate-100 overflow-hidden text-sm font-medium z-50">
+            <li><button data-lang="uz" class="lang-option w-full flex items-center justify-between px-4 py-2.5 hover:bg-brand-soft transition">
+              <span>O'zbekcha</span><span class="text-xs text-brand-muted">UZ</span>
+            </button></li>
+            <li><button data-lang="ru" class="lang-option w-full flex items-center justify-between px-4 py-2.5 hover:bg-brand-soft transition border-t border-slate-100">
+              <span>Русский</span><span class="text-xs text-brand-muted">RU</span>
+            </button></li>
+            <li><button data-lang="en" class="lang-option w-full flex items-center justify-between px-4 py-2.5 hover:bg-brand-soft transition border-t border-slate-100">
+              <span>English</span><span class="text-xs text-brand-muted">EN</span>
+            </button></li>
+          </ul>
+        </div>
+
+        <a href="#register" class="hidden sm:inline-flex items-center gap-2 bg-brand-blue text-white text-sm font-semibold px-4 py-2 rounded-full hover:bg-brand-blue-dark transition shadow-soft">
+          <span data-i18n="nav_register">Ro'yxatdan o'tish</span>
+          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="top" class="pt-16">
+
+    <!-- HERO -->
+    <section class="relative overflow-hidden">
+      <div class="absolute inset-0 -z-10 hero-bg"></div>
+
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-28 grid lg:grid-cols-12 gap-10 items-center">
+        <div class="lg:col-span-7 reveal">
+          <span class="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-brand-blue bg-brand-blue/10 px-3 py-1.5 rounded-full">
+            <span class="w-1.5 h-1.5 rounded-full bg-brand-blue animate-pulse"></span>
+            <span data-i18n="hero_badge">Davlat loyihasi</span>
+          </span>
+          <h1 class="mt-5 text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-brand-ink leading-[1.05]">
+            <span data-i18n="hero_title_1">Iqtidoring - </span>
+            <span class="text-brand-blue" data-i18n="hero_title_2">kelajaging tayanchi</span>
+          </h1>
+          <p class="mt-6 text-lg text-slate-600 max-w-xl leading-relaxed" data-i18n="hero_subtitle">
+            Baliqchi tumanida yashovchi iqtidorli yoshlarni qo'llab-quvvatlash markazi. Sertifikatingni ro'yxatdan o'tkaz va o'z imkoniyatlaringni kengaytir.
+          </p>
+          <div class="mt-8 flex flex-wrap items-center gap-3">
+            <a href="#register" class="inline-flex items-center gap-2 bg-brand-blue text-white font-semibold px-6 py-3.5 rounded-full hover:bg-brand-blue-dark transition shadow-soft hover:scale-[1.02]">
+              <span data-i18n="hero_cta_primary">Ro'yxatdan o'tish</span>
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+            </a>
+            <a href="#about" class="inline-flex items-center gap-2 text-brand-ink font-semibold px-6 py-3.5 rounded-full border border-slate-200 hover:border-brand-blue hover:text-brand-blue transition">
+              <span data-i18n="hero_cta_secondary">Batafsil</span>
+            </a>
+          </div>
+
+          <!-- stats -->
+          <dl class="mt-12 grid grid-cols-3 gap-6 max-w-lg">
+            <div>
+              <dt class="text-2xl sm:text-3xl font-bold text-brand-ink" data-i18n="hero_stat_1_n">200+</dt>
+              <dd class="text-xs text-brand-muted mt-1" data-i18n="hero_stat_1_l">Ro'yxatga olingan yoshlar</dd>
+            </div>
+            <div>
+              <dt class="text-2xl sm:text-3xl font-bold text-brand-ink" data-i18n="hero_stat_2_n">15+</dt>
+              <dd class="text-xs text-brand-muted mt-1" data-i18n="hero_stat_2_l">Hamkor tashkilotlar</dd>
+            </div>
+            <div>
+              <dt class="text-2xl sm:text-3xl font-bold text-brand-ink" data-i18n="hero_stat_3_n">100%</dt>
+              <dd class="text-xs text-brand-muted mt-1" data-i18n="hero_stat_3_l">Bepul ishtirok</dd>
+            </div>
+          </dl>
+        </div>
+
+        <div class="lg:col-span-5 reveal reveal-delay-1">
+          <div class="relative">
+            <!-- youth photo card -->
+            <div class="relative rounded-3xl overflow-hidden shadow-soft border border-slate-100 bg-white">
+              <img src="assets/yoshlar-rasmi.jpg" alt="Iqtidorli yoshlar" class="w-full h-auto aspect-[5/4] object-cover" />
+              <div class="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-brand-ink/40 to-transparent"></div>
+              <div class="absolute -bottom-4 -right-4 bg-brand-ink text-white text-xs font-semibold px-3 py-2 rounded-full shadow-soft">
+                EST. 2025
+              </div>
+            </div>
+
+            <!-- floating mini cards -->
+            <div class="hidden sm:flex absolute -left-6 top-10 bg-white rounded-2xl shadow-soft border border-slate-100 px-4 py-3 items-center gap-3 float-a">
+              <img src="assets/ielts-logog-2000x1200.png" alt="IELTS" class="w-12 h-7 object-contain" />
+              <span class="text-xs font-semibold text-brand-ink">7.5 / 8.0</span>
+            </div>
+            <div class="hidden sm:flex absolute -right-4 bottom-16 bg-white rounded-2xl shadow-soft border border-slate-100 px-4 py-3 items-center gap-3 float-b">
+              <span class="w-9 h-9 rounded-full bg-brand-green/10 text-brand-green flex items-center justify-center font-bold text-sm">C1</span>
+              <span class="text-xs font-semibold text-brand-ink">Advanced</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section id="about" class="py-20 lg:py-28 bg-brand-soft/40">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-14 items-center">
+        <div class="reveal">
+          <span class="text-xs font-bold uppercase tracking-widest text-brand-blue" data-i18n="about_eyebrow">Loyiha haqida</span>
+          <h2 class="mt-3 text-3xl sm:text-4xl font-bold tracking-tight text-brand-ink" data-i18n="about_title">Har bir iqtidor - millat boyligi</h2>
+          <p class="mt-6 text-slate-600 leading-relaxed" data-i18n="about_p1">…</p>
+          <p class="mt-4 text-slate-600 leading-relaxed" data-i18n="about_p2">…</p>
+          <blockquote class="mt-8 border-l-4 border-brand-blue pl-5 italic text-brand-ink/80" data-i18n="about_quote">…</blockquote>
+        </div>
+
+        <div class="reveal reveal-delay-1">
+          <div class="grid grid-cols-2 gap-4">
+            <div class="aspect-[4/5] rounded-3xl bg-gradient-to-br from-brand-blue to-brand-blue-dark text-white p-6 flex flex-col justify-between shadow-soft">
+              <svg class="w-10 h-10 opacity-90" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+              <div>
+                <div class="text-3xl font-bold">5+</div>
+                <div class="text-xs opacity-80 mt-1">Yo'nalishlar / Направления / Tracks</div>
+              </div>
+            </div>
+            <div class="aspect-[4/5] rounded-3xl bg-white border border-slate-100 p-6 flex flex-col justify-between shadow-soft">
+              <svg class="w-10 h-10 text-brand-green" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
+              <div>
+                <div class="text-3xl font-bold text-brand-ink">A1 - C2</div>
+                <div class="text-xs text-brand-muted mt-1">IELTS · TOEFL · Goethe · HSK</div>
+              </div>
+            </div>
+            <div class="aspect-[4/5] rounded-3xl bg-white border border-slate-100 p-6 flex flex-col justify-between shadow-soft -mt-10">
+              <svg class="w-10 h-10 text-brand-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              <div>
+                <div class="text-3xl font-bold text-brand-ink">21+</div>
+                <div class="text-xs text-brand-muted mt-1">Maktablar / Школы / Schools</div>
+              </div>
+            </div>
+            <div class="aspect-[4/5] rounded-3xl bg-brand-ink text-white p-6 flex flex-col justify-between shadow-soft -mt-10">
+              <svg class="w-10 h-10 opacity-90" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              <div>
+                <div class="text-3xl font-bold">∞</div>
+                <div class="text-xs opacity-80 mt-1">Imkoniyatlar / Возможности</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BENEFITS -->
+    <section id="benefits" class="py-20 lg:py-28">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-2xl reveal">
+          <span class="text-xs font-bold uppercase tracking-widest text-brand-blue" data-i18n="benefits_eyebrow">Imkoniyatlar</span>
+          <h2 class="mt-3 text-3xl sm:text-4xl font-bold tracking-tight text-brand-ink" data-i18n="benefits_title">Nima yutasiz?</h2>
+          <p class="mt-4 text-slate-600 leading-relaxed" data-i18n="benefits_subtitle">…</p>
+        </div>
+
+        <div class="mt-12 grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          <article class="reveal group bg-white rounded-2xl border border-slate-100 p-6 hover:shadow-soft hover:-translate-y-1 transition">
+            <div class="w-12 h-12 rounded-xl bg-brand-blue/10 text-brand-blue flex items-center justify-center group-hover:bg-brand-blue group-hover:text-white transition">
+              <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+            </div>
+            <h3 class="mt-5 font-semibold text-brand-ink" data-i18n="benefit_1_title">Ta'lim grantlari</h3>
+            <p class="mt-2 text-sm text-slate-600 leading-relaxed" data-i18n="benefit_1_desc">…</p>
+          </article>
+
+          <article class="reveal reveal-delay-1 group bg-white rounded-2xl border border-slate-100 p-6 hover:shadow-soft hover:-translate-y-1 transition">
+            <div class="w-12 h-12 rounded-xl bg-brand-green/10 text-brand-green flex items-center justify-center group-hover:bg-brand-green group-hover:text-white transition">
+              <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <h3 class="mt-5 font-semibold text-brand-ink" data-i18n="benefit_2_title">Shaxsiy mentorlik</h3>
+            <p class="mt-2 text-sm text-slate-600 leading-relaxed" data-i18n="benefit_2_desc">…</p>
+          </article>
+
+          <article class="reveal reveal-delay-2 group bg-white rounded-2xl border border-slate-100 p-6 hover:shadow-soft hover:-translate-y-1 transition">
+            <div class="w-12 h-12 rounded-xl bg-brand-red/10 text-brand-red flex items-center justify-center group-hover:bg-brand-red group-hover:text-white transition">
+              <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            </div>
+            <h3 class="mt-5 font-semibold text-brand-ink" data-i18n="benefit_3_title">Xalqaro tadbirlar</h3>
+            <p class="mt-2 text-sm text-slate-600 leading-relaxed" data-i18n="benefit_3_desc">…</p>
+          </article>
+
+          <article class="reveal reveal-delay-3 group bg-white rounded-2xl border border-slate-100 p-6 hover:shadow-soft hover:-translate-y-1 transition">
+            <div class="w-12 h-12 rounded-xl bg-brand-ink/10 text-brand-ink flex items-center justify-center group-hover:bg-brand-ink group-hover:text-white transition">
+              <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+            </div>
+            <h3 class="mt-5 font-semibold text-brand-ink" data-i18n="benefit_4_title">Karyera yo'naltirish</h3>
+            <p class="mt-2 text-sm text-slate-600 leading-relaxed" data-i18n="benefit_4_desc">…</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA + FORM -->
+    <section id="register" class="py-20 lg:py-28 bg-gradient-to-b from-white to-brand-soft/60">
+      <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center max-w-2xl mx-auto reveal">
+          <span class="text-xs font-bold uppercase tracking-widest text-brand-blue" data-i18n="form_eyebrow">Ro'yxatdan o'tish</span>
+          <h2 class="mt-3 text-3xl sm:text-4xl font-bold tracking-tight text-brand-ink" data-i18n="form_title">Ma'lumotlaringizni qoldiring</h2>
+          <p class="mt-4 text-slate-600 leading-relaxed" data-i18n="form_subtitle">…</p>
+        </div>
+
+        <form id="registration-form" class="mt-12 bg-white rounded-3xl shadow-soft border border-slate-100 p-6 sm:p-10 reveal reveal-delay-1" novalidate>
+          <div class="grid sm:grid-cols-2 gap-5">
+            <div class="sm:col-span-2">
+              <label class="block text-sm font-semibold text-brand-ink" data-i18n="form_label_fish">F.I.Sh</label>
+              <input name="fish" type="text" required minlength="5" data-i18n-ph="form_ph_fish" placeholder=""
+                class="mt-2 w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/10 outline-none transition" />
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold text-brand-ink" data-i18n="form_label_phone">Telefon raqami</label>
+              <input name="phone" type="tel" required data-i18n-ph="form_ph_phone" placeholder=""
+                class="mt-2 w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/10 outline-none transition" />
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold text-brand-ink" data-i18n="form_label_school">Maktab / Sinf</label>
+              <input name="school" type="text" required data-i18n-ph="form_ph_school" placeholder=""
+                class="mt-2 w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/10 outline-none transition" />
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold text-brand-ink" data-i18n="form_label_exam">Imtihon turi</label>
+              <select name="exam" required
+                class="mt-2 w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/10 outline-none transition">
+                <option value="" data-i18n="form_exam_placeholder">Tanlang...</option>
+                <option value="IELTS">IELTS</option>
+                <option value="TOEFL">TOEFL</option>
+                <option value="Milliy sertifikat" data-i18n="form_exam_national">Milliy sertifikat</option>
+                <option value="C2">C2</option>
+                <option value="C1">C1</option>
+                <option value="B2">B2</option>
+                <option value="Goethe">Goethe</option>
+                <option value="HSK">HSK</option>
+                <option value="OTHER" data-i18n="form_exam_other">Boshqa</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold text-brand-ink" data-i18n="form_label_score">Natija / Ball</label>
+              <input name="score" type="text" required data-i18n-ph="form_ph_score" placeholder=""
+                class="mt-2 w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/10 outline-none transition" />
+            </div>
+          </div>
+
+          <div class="mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div id="form-status" class="text-sm font-medium hidden"></div>
+            <button id="submit-btn" type="submit"
+              class="inline-flex items-center justify-center gap-2 bg-brand-blue text-white font-semibold px-7 py-3.5 rounded-full hover:bg-brand-blue-dark transition shadow-soft hover:scale-[1.02] disabled:opacity-60 disabled:hover:scale-100 sm:ml-auto">
+              <span class="btn-label" data-i18n="form_submit">Yuborish</span>
+              <svg class="w-4 h-4 btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+              <svg class="w-4 h-4 btn-spin hidden animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="bg-brand-ink text-slate-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 grid md:grid-cols-3 gap-10">
+      <div>
+        <div class="flex items-center gap-3">
+          <img src="assets/emblem-of-uzbekistan.png" alt="O'zbekiston gerbi" class="w-10 h-10 object-contain bg-white/10 rounded-full p-1" />
+          <span class="font-semibold text-white" data-i18n="footer_about_title">Baliqchi tumani hokimligi</span>
+        </div>
+        <p class="mt-4 text-sm text-slate-400 leading-relaxed max-w-xs" data-i18n="footer_about_desc">…</p>
+      </div>
+      <div>
+        <div class="text-xs font-semibold uppercase tracking-widest text-slate-500" data-i18n="footer_contact_title">Aloqa</div>
+        <ul class="mt-4 space-y-2 text-sm">
+          <li class="flex items-center gap-2"><svg class="w-4 h-4 text-brand-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><span data-i18n="footer_address">Andijon viloyati, Baliqchi tumani</span></li>
+          <li class="flex items-center gap-2"><svg class="w-4 h-4 text-brand-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.37 1.9.72 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.35 1.85.59 2.81.72A2 2 0 0 1 22 16.92z"/></svg><span data-i18n="footer_phone">+998 74 000 00 00</span></li>
+          <li class="flex items-center gap-2"><svg class="w-4 h-4 text-brand-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg><span data-i18n="footer_email">info@baliqchi.uz</span></li>
+        </ul>
+      </div>
+      <div>
+        <div class="text-xs font-semibold uppercase tracking-widest text-slate-500" data-i18n="footer_links_title">Sahifa</div>
+        <ul class="mt-4 space-y-2 text-sm">
+          <li><a class="hover:text-white transition" href="#about" data-i18n="nav_about">Loyiha haqida</a></li>
+          <li><a class="hover:text-white transition" href="#benefits" data-i18n="nav_benefits">Imkoniyatlar</a></li>
+          <li><a class="hover:text-white transition" href="#register" data-i18n="nav_register">Ro'yxatdan o'tish</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="border-t border-white/10">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 text-xs text-slate-500 text-center" data-i18n="footer_copy">
+        © 2025 Baliqchi tumani hokimligi. Barcha huquqlar himoyalangan.
+      </div>
+    </div>
+  </footer>
+
+  <!-- TOAST -->
+  <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 hidden">
+    <div class="bg-brand-ink text-white text-sm font-medium px-5 py-3 rounded-full shadow-soft flex items-center gap-2">
+      <svg id="toast-icon" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+      <span id="toast-msg">OK</span>
+    </div>
+  </div>
+
+  <script src="assets/translations.js"></script>
+  <script src="assets/script.js"></script>
+</body>
+</html>

@@ -48,6 +48,9 @@ function setupSheet() {
   sheet.setFrozenRows(1);
   sheet.setColumnWidths(1, HEADERS.length, 160);
   sheet.setColumnWidth(2, 240); // F.I.Sh kengroq
+
+  // Telefon ustuni (C) — Plain text format, "+998..." formula deb talqin qilinmasligi uchun
+  sheet.getRange("C2:C").setNumberFormat("@");
 }
 
 /**
@@ -83,7 +86,12 @@ function doPost(e) {
       String(data.lang || "uz").slice(0, 4)
     ];
 
-    sheet.appendRow(row);
+    const nextRow = sheet.getLastRow() + 1;
+    const range = sheet.getRange(nextRow, 1, 1, row.length);
+    // Telefon (3-ustun) — formula sifatida talqin qilinmasligi uchun Plain text
+    sheet.getRange(nextRow, 3).setNumberFormat("@");
+    range.setValues([row]);
+
     return jsonResponse({ ok: true });
   } catch (err) {
     return jsonResponse({ ok: false, error: String(err) });

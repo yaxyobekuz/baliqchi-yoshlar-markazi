@@ -1,21 +1,5 @@
-/**
- * Baliqchi tumani - Iqtidorli yoshlar ro'yxati
- * Google Apps Script Web App backend.
- *
- * SOZLASH:
- *   1. sheets.google.com da yangi spreadsheet yarating.
- *   2. URL'dan ID nusxalang: docs.google.com/spreadsheets/d/<<<ID>>>/edit
- *   3. Quyidagi SPREADSHEET_ID konstantasiga qo'ying.
- *   4. Extensions → Apps Script → bu kodni paste qiling → Save.
- *   5. Bir marta `setupSheet` funksiyasini ishga tushiring (sarlavhalar qo'shadi).
- *   6. Deploy → New deployment → Type: Web app
- *        - Execute as: Me
- *        - Who has access: Anyone
- *      → Deploy → URL ni nusxalang → assets/script.js → APPS_SCRIPT_URL ga qo'ying.
- *   7. Forma kodini o'zgartirsangiz "Manage deployments" → New version yarating.
- */
 
-const SPREADSHEET_ID = "REPLACE_WITH_YOUR_SPREADSHEET_ID";
+const SPREADSHEET_ID = "11llr8WBRzh3vDbAhHXp7cxIzcSNi3MSIGMDXDbUhVJo";
 const SHEET_NAME = "Arizalar";
 
 const HEADERS = [
@@ -64,7 +48,7 @@ function doPost(e) {
 
     const data = JSON.parse(e.postData.contents);
 
-    if (!data.fish || !data.phone || !data.school || !data.exam || !data.score) {
+    if (!data.fish || !data.phone || !data.exam || !data.score) {
       return jsonResponse({ ok: false, error: "Missing fields" });
     }
 

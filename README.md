@@ -9,12 +9,14 @@ to'g'ridan-to'g'ri **Google Sheets** ga (Google Apps Script Web App orqali) tush
 
 ```
 form/
-├── index.html                # Asosiy sahifa (forma)
+├── index.html                # Asosiy sahifa (landing + forma, 3 tilli)
+├── register.html             # Ikki tabli ro'yxatga olish (markaz + yosh)
 ├── dashboard.html            # Statistika paneli (ichki foydalanish)
 ├── assets/
 │   ├── translations.js       # 3 tilli matnlar
 │   ├── style.css             # Animatsiyalar va qo'shimcha stillar
 │   ├── script.js             # i18n, scroll-reveal, forma yuborish
+│   ├── register.js           # register.html: tablar, to'garaklar, logotip
 │   ├── dashboard.css         # Panel dizayn tokenlari (yorug'/qorong'i)
 │   └── dashboard.js          # Ma'lumot olish, filtrlar, SVG grafiklar
 └── apps-script/
@@ -37,8 +39,10 @@ form/
 5. Funksiyalar ro'yxatidan `setupSheet` ni tanlab **Run** bosing - birinchi marta
    ruxsatlar so'raydi: **Authorize → Advanced → Go to project (unsafe) → Allow**.
    Bu spreadsheetda "Arizalar" sahifasi va sarlavhalar paydo qiladi.
-6. Test qilish uchun `testPost` funksiyasini ham bir marta ishga tushiring -
-   "Arizalar" sahifasida test qator paydo bo'lishi kerak.
+6. `register.html` ham kerak bo'lsa, `setupRegisterSheets` ni ishga tushiring -
+   "Yoshlar" va "Markazlar" sahifalari yaratiladi.
+7. Test qilish uchun `testApplicationPost`, `testYouthPost` va `testCenterPost`
+   funksiyalarini ishga tushiring - har biri o'z sahifasiga qator yozadi.
 
 ## 3-qadam - Web App sifatida deploy qilish
 
@@ -113,14 +117,67 @@ Sanani frontend (`CERT_YEAR` - `assets/script.js`) ham, backend
 Yilni o'zgartirsangiz, ikkala joyda ham yangilang.
 Ro'yxatni o'zgartirish uchun `assets/script.js` dagi `RESULT_OPTIONS` ni tahrirlang.
 
-## Sheetdagi ustunlar
+## Ro'yxatga olish sahifasi (`register.html`)
 
+Header + main + footer. Mainda ikkita forma, tab orqali almashadi
+(klaviatura: ←/→, Home/End; tanlov URL hashida: `#markaz` / `#yosh`).
+
+### 1-tab - "O'quv markazni kiritish" → `Markazlar` sahifasi
+
+| Maydon | Tip | Talab |
+|---|---|---|
+| O'quv markaz nomi | text | min 2 belgi |
+| Logotipi | file | ixtiyoriy · PNG/JPG/SVG · 5 MB gacha |
+| Umumiy hodimlari soni | number | 1 - 2000 |
+| To'garaklar nomi + o'quvchi soni | qo'shiladigan qatorlar | kamida 1 ta, nomlar takrorlanmaydi |
+| Ijtimoiy reyestrdagi oila farzandlari | number | 0 dan |
+
+Logotip yuborishdan oldin brauzerda 512px gacha kichraytiriladi, so'ng Apps Script
+uni **Drive** dagi `Baliqchi - markaz logotiplari` papkasiga saqlab, havolasini
+jadvalga yozadi. Shu sabab Apps Script'ga Drive ruxsati kerak - birinchi
+deploydan keyin qayta avtorizatsiya so'raydi.
+
+### 2-tab - "Iqtidorli yoshni ro'yxatdan o'tkazish" → `Yoshlar` sahifasi
+
+`index.html` dagi forma bilan bir xil tartibdagi 8 maydon, oxirida qo'shimcha
+**"O'quv markazni tanlash"** maydoni. Yozuvlar alohida (`Yoshlar`) jadvalga tushadi. Uning variantlari
+`Markazlar` sahifasidagi nomlardan JSONP orqali olinadi
+(`?action=centers`, kalit talab qilinmaydi); ro'yxatga "Markazga a'zo emas"
+varianti ham qo'shiladi.
+
+`register.html` mustaqil: `assets/register.js` dan boshqa hech narsaga bog'liq
+emas. Qoidalar (maktab 1-61, sinf 5-11, 2026 sanasi, natija ro'yxatlari) shu
+faylning boshida - `index.html` dagi `assets/script.js` da ham o'z nusxasi bor,
+shart o'zgarsa ikkalasini ham yangilang.
+
+## Sahifalar va jadvallar
+
+Har bir sahifa mustaqil - o'z so'rovi, o'z jadvali. Bitta Apps Script
+deployment uchchalasiga xizmat qiladi, POST'dagi `type` maydoni yo'naltiradi.
+
+| Sahifa | POST `type` | Sheets sahifasi | O'rnatish funksiyasi |
+|---|---|---|---|
+| `index.html` | yo'q | `Arizalar` | `setupSheet` |
+| `register.html` 2-tab | `youth` | `Yoshlar` | `setupRegisterSheets` |
+| `register.html` 1-tab | `center` | `Markazlar` | `setupRegisterSheets` |
+
+`dashboard.html` **faqat `Arizalar`** dan o'qiydi (`?action=data`), ya'ni
+`index.html` formasining natijalarini ko'rsatadi.
+
+### Ustunlar
+
+**`Arizalar`** (index.html):
 `Vaqt | Maktab raqami | Sinfi | O'quvchining ismi-sharifi | Xorijiy til nomi | Sertifikat turi | Sertifikat berilgan sana | Sertifikat natijasi | Telefon raqami | Sayt tili`
 
-> ⚠️ Ustunlar o'zgargani uchun Apps Script kodini yangilagandan so'ng
-> `setupSheet` ni **qayta ishga tushirish** kerak (eski sarlavhalar tozalanadi).
-> Ichida eski arizalar bo'lsa, avval ularni boshqa sahifaga nusxalab oling -
-> `setupSheet` sahifani butunlay tozalaydi.
+**`Yoshlar`** (register.html 2-tab) - yuqoridagi + `O'quv markazi`:
+`… | Telefon raqami | O'quv markazi | Sayt tili`
+
+**`Markazlar`** (register.html 1-tab):
+`Vaqt | O'quv markaz nomi | Logotip | Xodimlar soni | To'garaklar soni | To'garaklar (nom va o'quvchi soni) | Jami o'quvchilar | Ijtimoiy reyestrdagi oila farzandlari`
+
+> ⚠️ `setupSheet` va `setupRegisterSheets` o'z sahifalarini **tozalaydi**.
+> `setupSheet` faqat `Arizalar` ga, `setupRegisterSheets` faqat `Yoshlar` va
+> `Markazlar` ga tegadi - bir-biriga ta'sir qilmaydi.
 
 ## Statistika paneli (`dashboard.html`)
 
@@ -150,7 +207,8 @@ yashirilgan; har 2 daqiqada jim yangilanadi.
 
 1. `apps-script/Code.gs` dagi `ACCESS_KEY` ni o'zgartiring (standart: `baliqchi-2026`).
 2. Apps Script'ni **qayta deploy qiling** (Deploy → Manage deployments →
-   ✏️ → New version), aks holda yangi `doGet` ishlamaydi.
+   ✏️ → New version), aks holda yangi `doGet` ishlamaydi. Bu `register.html`
+   dagi markazlar ro'yxati uchun ham kerak.
 3. `dashboard.html` ni oching va o'sha kalitni kiriting - u brauzerda saqlanadi.
 
 Tekshirish: `<WEB_APP_URL>?action=data&key=baliqchi-2026` - brauzerda JSON chiqishi kerak.

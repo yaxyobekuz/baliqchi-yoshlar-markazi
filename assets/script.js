@@ -82,6 +82,8 @@ const RESULT_OPTIONS = {
   IELTS: ["5.5", "6.0", "6.5", "7.0", "7.5", "8.0", "8.5", "9.0"]
 };
 
+const SAT_RANGE = { min: 1400, max: 1600, step: 10 };
+
 const schoolSelect = document.getElementById("f-school");
 const gradeSelect = document.getElementById("f-grade");
 const fishInput = document.getElementById("f-fish");
@@ -174,6 +176,12 @@ function renderDynamicFields() {
   renderSchoolOptions();
   renderGradeOptions();
   renderResultField();
+
+  if (resultSatInput) {
+    resultSatInput.min = SAT_RANGE.min;
+    resultSatInput.max = SAT_RANGE.max;
+    resultSatInput.step = SAT_RANGE.step;
+  }
 
   if (certDateInput) {
     const today = todayISO();

@@ -199,6 +199,11 @@ function saveYouth(data, sheetName, headers, withCenter) {
   if (withCenter) row.push(String(data.center || "").slice(0, 120));
   row.push(String(data.lang || "uz").slice(0, 4));
 
+  // Xuddi shunday qator allaqachon bo'lsa - qayta yozilmaydi
+  if (youthRowExists(sheet, row, headers.length)) {
+    return jsonResponse({ ok: true, duplicate: true, sheet: sheetName });
+  }
+
   const nextRow = sheet.getLastRow() + 1;
   sheet.getRange(nextRow, COL_DATE_ISSUED).setNumberFormat("dd.MM.yyyy");
   sheet.getRange(nextRow, COL_RESULT).setNumberFormat("@");
@@ -225,6 +230,12 @@ function saveCenter(data) {
   const sheet = ensureSheet(ss, CENTER_SHEET, CENTER_HEADERS);
 
   const name = String(data.name).trim().slice(0, 120);
+
+  // Shu nomli markaz allaqachon bo'lsa - qayta yozilmaydi (logotip ham yuklanmaydi)
+  if (centerNameExists(sheet, name)) {
+    return jsonResponse({ ok: true, duplicate: true, sheet: CENTER_SHEET });
+  }
+
   const logoUrl = data.logo ? saveLogo(data.logo, name) : "";
   const summary = clubs.map(function (c) {
     return String(c.name).trim() + " (" + Number(c.count) + ")";
@@ -270,6 +281,56 @@ function saveLogo(logo, centerName) {
 function getLogoFolder() {
   const found = DriveApp.getFoldersByName(LOGO_FOLDER);
   return found.hasNext() ? found.next() : DriveApp.createFolder(LOGO_FOLDER);
+}
+
+// ============================================================
+//  DUBLIKAT TEKSHIRUVI
+// ============================================================
+
+/**
+ * Yangi qator jadvalda allaqachon bormi?
+ * "Vaqt" (1-ustun) hisobga olinmaydi - u har safar boshqacha bo'ladi.
+ * Qolgan barcha ustunlar mos kelsagina dublikat deb hisoblanadi.
+ */
+function youthRowExists(sheet, row, width) {
+  const lastRow = sheet.getLastRow();
+  if (lastRow < 2) return false;
+
+  const values = sheet.getRange(2, 2, lastRow - 1, width - 1).getValues();
+  const target = row.slice(1).map(normalizeCell);
+
+  return values.some(function (existing) {
+    const current = existing.map(normalizeCell);
+    return current.every(function (cell, i) { return cell === target[i]; });
+  });
+}
+
+/** Shu nomli markaz bormi? (katta/kichik harf va ortiqcha bo'shliqlar hisobga olinmaydi) */
+function centerNameExists(sheet, name) {
+  const lastRow = sheet.getLastRow();
+  if (lastRow < 2) return false;
+
+  const key = normalizeName(name);
+  if (!key) return false;
+
+  const values = sheet.getRange(2, 2, lastRow - 1, 1).getValues();
+  return values.some(function (r) { return normalizeName(r[0]) === key; });
+}
+
+/**
+ * Solishtirish uchun yagona ko'rinish.
+ * Sana Date bo'lib qaytadi, raqam esa 36 yoki "36" bo'lishi mumkin -
+ * shuning uchun hammasi matnga keltiriladi.
+ */
+function normalizeCell(value) {
+  if (value instanceof Date) {
+    return Utilities.formatDate(value, Session.getScriptTimeZone(), "yyyy-MM-dd");
+  }
+  return String(value == null ? "" : value).trim().replace(/\s+/g, " ").toLowerCase();
+}
+
+function normalizeName(value) {
+  return String(value == null ? "" : value).trim().replace(/\s+/g, " ").toLowerCase();
 }
 
 // ============================================================

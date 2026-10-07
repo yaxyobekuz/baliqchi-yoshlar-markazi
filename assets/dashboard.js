@@ -310,7 +310,7 @@ const VIEWS = {
     kind: "youth",
     heroLabel: "Ro'yxatdan o'tgan yoshlar",
     tableTitle: "Barcha yozuvlar",
-    tableSub: "Arizalar va Yoshlar sahifalari birgalikda"
+    tableSub: "Uchala sahifa bo'yicha umumiy statistika"
   },
   applications: {
     label: "Arizalar",
@@ -1221,6 +1221,49 @@ function resultItems(subset, certId) {
   return known.concat(extra);
 }
 
+/**
+ * "Umumiy" ko'rinishi uchun markazlar kesimi.
+ * Yoshlar grafiklaridan keyin qo'shiladi - shunda bitta sahifada
+ * uchala manba (Arizalar, Yoshlar, Markazlar) bo'yicha statistika turadi.
+ * Markaz filtrlari (sertifikat, sinf, maktab...) markazlarga tegishli emas,
+ * shuning uchun faqat sana oralig'i qo'llanadi.
+ */
+function overviewCenterSpecs() {
+  const from = rangeStart();
+  const rows = from
+    ? state.data.centers.filter((c) => c.ts && c.ts >= from)
+    : state.data.centers;
+  if (!rows.length) return [];
+
+  const specs = [];
+
+  const subjects = subjectTotals(rows);
+  const subjItems = topN(subjects, 8);
+  const subjTotal = [...subjects.values()].reduce((s, v) => s + v, 0);
+  specs.push({
+    id: "ov-subjects",
+    title: "To'garak fanlari",
+    sub: `${fmt(rows.length)} ta markaz bo'yicha`,
+    chart: (h) => drawHBars(h, subjItems, { title: "Fanlar", unit: "o'quvchi" }),
+    table: (h) => h.replaceChildren(buildTable(["Fan", "O'quvchilar", "Ulush"],
+      subjItems.map((d) => [d.label, fmt(d.value), pct(d.value, subjTotal)]), [false, true, true]))
+  });
+
+  const byStudents = rows.slice().sort((a, b) => b.students - a.students).slice(0, 8)
+    .map((c) => ({ label: c.name, value: c.students }));
+  const studentsTotal = rows.reduce((s, c) => s + c.students, 0);
+  specs.push({
+    id: "ov-centers",
+    title: "Eng yirik markazlar",
+    sub: "O'quvchilar soni bo'yicha birinchi 8 ta",
+    chart: (h) => drawHBars(h, byStudents, { title: "Markazlar", unit: "o'quvchi" }),
+    table: (h) => h.replaceChildren(buildTable(["Markaz", "O'quvchilar", "Ulush"],
+      byStudents.map((d) => [d.label, fmt(d.value), pct(d.value, studentsTotal)]), [false, true, true]))
+  });
+
+  return specs;
+}
+
 function centerChartSpecs(rows) {
   const specs = [];
 
@@ -1601,7 +1644,7 @@ function renderAll({ animate = false } = {}) {
     : youthChartSpecs(state.filtered, {
         dualTrend: state.view === "overview",
         withCenters: state.view === "youth"
-      }));
+      }).concat(state.view === "overview" ? overviewCenterSpecs() : []));
   renderTable();
 
   if (animate) {

@@ -44,18 +44,45 @@ const i18n = {
     form_eyebrow: "Ro'yxatdan o'tish",
     form_title: "Ma'lumotlaringizni qoldiring",
     form_subtitle: "Forma to'ldirilgandan so'ng, markaz mutaxassislari siz bilan qisqa muddatda bog'lanadi.",
-    form_label_fish: "F.I.Sh",
-    form_ph_fish: "Masalan: Karimov Akmal Otabekovich",
+
+    form_opt_select: "Tanlang...",
+
+    form_label_school: "Maktab raqami",
+    form_school_item: "{n}-maktab",
+
+    form_label_grade: "Sinfi",
+    form_grade_item: "{n}-sinf",
+
+    form_label_fish: "O'quvchining ismi-sharifi",
+    form_ph_fish: "Masalan: Raxmonaliyev Abubakir Komiljon o'g'li",
+
+    form_label_language: "Xorijiy til nomi",
+    form_lang_en: "Ingliz tili",
+    form_lang_de: "Nemis tili",
+    form_lang_fr: "Fransuz tili",
+    form_lang_ko: "Koreys tili",
+    form_lang_ja: "Yapon tili",
+    form_lang_zh: "Xitoy tili",
+    form_lang_ar: "Arab tili",
+    form_lang_tr: "Turk tili",
+    form_lang_ru: "Rus tili",
+    form_lang_other: "Boshqa",
+
+    form_label_cert_type: "Sertifikat turi",
+    form_cert_cefr: "CEFR (Milliy sertifikat)",
+
+    form_label_cert_date: "Sertifikat berilgan sana",
+    form_err_cert_date: "Sertifikat 2026-yilda berilgan bo'lishi kerak (bugungi kundan oshmasin).",
+
+    form_label_result: "Sertifikat natijasi",
+    form_result_pick_type: "Avval sertifikat turini tanlang",
+    form_ph_result_sat: "1400 - 1600",
+
     form_label_phone: "Telefon raqami",
     form_ph_phone: "+998 __ ___ __ __",
-    form_label_school: "Maktab / Sinf",
-    form_ph_school: "Masalan: 21-maktab, 11-sinf",
-    form_label_exam: "Imtihon turi",
-    form_exam_placeholder: "Tanlang...",
-    form_exam_national: "Milliy sertifikat",
-    form_exam_other: "Boshqa",
-    form_label_score: "Natija / Ball",
-    form_ph_score: "Masalan: 7.5 yoki B2",
+    form_err_phone: "Telefon raqamini to'liq kiriting (9 ta raqam).",
+
+
     form_submit: "Yuborish",
     form_sending: "Yuborilmoqda…",
     form_success: "Rahmat! Ma'lumotlaringiz qabul qilindi.",
@@ -116,18 +143,45 @@ const i18n = {
     form_eyebrow: "Регистрация",
     form_title: "Оставьте свои данные",
     form_subtitle: "После заполнения формы специалисты центра свяжутся с вами в кратчайшие сроки.",
-    form_label_fish: "Ф.И.О",
-    form_ph_fish: "Например: Каримов Акмал Отабекович",
+
+    form_opt_select: "Выберите...",
+
+    form_label_school: "Номер школы",
+    form_school_item: "школа №{n}",
+
+    form_label_grade: "Класс",
+    form_grade_item: "{n} класс",
+
+    form_label_fish: "Ф.И.О ученика",
+    form_ph_fish: "Например: Рахмоналиев Абубакир Комилжон угли",
+
+    form_label_language: "Иностранный язык",
+    form_lang_en: "Английский язык",
+    form_lang_de: "Немецкий язык",
+    form_lang_fr: "Французский язык",
+    form_lang_ko: "Корейский язык",
+    form_lang_ja: "Японский язык",
+    form_lang_zh: "Китайский язык",
+    form_lang_ar: "Арабский язык",
+    form_lang_tr: "Турецкий язык",
+    form_lang_ru: "Русский язык",
+    form_lang_other: "Другое",
+
+    form_label_cert_type: "Тип сертификата",
+    form_cert_cefr: "CEFR (Национальный сертификат)",
+
+    form_label_cert_date: "Дата выдачи сертификата",
+    form_err_cert_date: "Сертификат должен быть выдан в 2026 году (не позднее сегодняшнего дня).",
+
+    form_label_result: "Результат сертификата",
+    form_result_pick_type: "Сначала выберите тип сертификата",
+    form_ph_result_sat: "1400 - 1600",
+
     form_label_phone: "Номер телефона",
     form_ph_phone: "+998 __ ___ __ __",
-    form_label_school: "Школа / Класс",
-    form_ph_school: "Например: школа №21, 11 класс",
-    form_label_exam: "Тип экзамена",
-    form_exam_placeholder: "Выберите...",
-    form_exam_national: "Национальный сертификат",
-    form_exam_other: "Другое",
-    form_label_score: "Результат / Балл",
-    form_ph_score: "Например: 7.5 или B2",
+    form_err_phone: "Введите полный номер телефона (9 цифр).",
+
+
     form_submit: "Отправить",
     form_sending: "Отправляется…",
     form_success: "Спасибо! Ваши данные приняты.",
@@ -188,18 +242,45 @@ const i18n = {
     form_eyebrow: "Registration",
     form_title: "Leave your details",
     form_subtitle: "After you submit the form, our specialists will contact you shortly.",
-    form_label_fish: "Full name",
-    form_ph_fish: "e.g. Karimov Akmal Otabekovich",
+
+    form_opt_select: "Select...",
+
+    form_label_school: "School number",
+    form_school_item: "School #{n}",
+
+    form_label_grade: "Grade",
+    form_grade_item: "Grade {n}",
+
+    form_label_fish: "Student's full name",
+    form_ph_fish: "e.g. Raxmonaliyev Abubakir Komiljon o'g'li",
+
+    form_label_language: "Foreign language",
+    form_lang_en: "English",
+    form_lang_de: "German",
+    form_lang_fr: "French",
+    form_lang_ko: "Korean",
+    form_lang_ja: "Japanese",
+    form_lang_zh: "Chinese",
+    form_lang_ar: "Arabic",
+    form_lang_tr: "Turkish",
+    form_lang_ru: "Russian",
+    form_lang_other: "Other",
+
+    form_label_cert_type: "Certificate type",
+    form_cert_cefr: "CEFR (National certificate)",
+
+    form_label_cert_date: "Certificate issue date",
+    form_err_cert_date: "The certificate must be issued in 2026 (not later than today).",
+
+    form_label_result: "Certificate result",
+    form_result_pick_type: "Select the certificate type first",
+    form_ph_result_sat: "1400 - 1600",
+
     form_label_phone: "Phone number",
     form_ph_phone: "+998 __ ___ __ __",
-    form_label_school: "School / Class",
-    form_ph_school: "e.g. School #21, grade 11",
-    form_label_exam: "Exam type",
-    form_exam_placeholder: "Select...",
-    form_exam_national: "National certificate",
-    form_exam_other: "Other",
-    form_label_score: "Score / Result",
-    form_ph_score: "e.g. 7.5 or B2",
+    form_err_phone: "Please enter the full phone number (9 digits).",
+
+
     form_submit: "Submit",
     form_sending: "Sending…",
     form_success: "Thank you! Your details have been received.",

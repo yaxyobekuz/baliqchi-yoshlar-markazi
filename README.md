@@ -79,17 +79,45 @@ npx serve .
 
 ## Forma maydonlari
 
-| Maydon | Tip | Talab |
+Maydonlar aynan quyidagi tartibda:
+
+| # | Maydon | Tip | Talab |
+|---|---|---|---|
+| 1 | Maktab raqami | select | `1` - `61` (`script.js` dagi `SCHOOL_MAX`) |
+| 2 | Sinfi | select | `5` - `11` (`GRADE_MIN` / `GRADE_MAX`) |
+| 3 | O'quvchining ismi-sharifi | text | min 5 ta belgi |
+| 4 | Xorijiy til nomi | select | Ingliz / Nemis / Fransuz / Koreys / Yapon / Xitoy / Arab / Turk / Rus / Boshqa |
+| 5 | Sertifikat turi | select | CEFR (Milliy sertifikat) / IELTS / SAT |
+| 6 | Sertifikat berilgan sana | date | faqat **2026-yil**, bugungi kundan oshmasin |
+| 7 | Sertifikat natijasi | select / number | turga bog'liq (pastda) |
+| 8 | Telefon raqami | tel | maska `+998 __ ___ __ __`, 9 ta raqam |
+
+### Sertifikat natijasi - turga bog'liq
+
+7-maydon 5-maydonga qarab o'zgaradi:
+
+| Sertifikat turi | Natija maydoni | Variantlar |
 |---|---|---|
-| F.I.Sh | text | min 5 ta belgi |
-| Telefon | tel | maska `+998 __ ___ __ __` |
-| Maktab / Sinf | text | majburiy |
-| Imtihon turi | select | IELTS / TOEFL / C2 / C1 / B2 / B1 / Goethe / HSK / Boshqa |
-| Natija / Ball | text | masalan `7.5` yoki `B2` |
+| CEFR | select | `B2`, `C1`, `C2` |
+| IELTS | select | `5.5` ... `9.0` (0.5 qadam) |
+| SAT | number | `1400` - `1600` (10 qadam) |
+
+Qabul shartlari: **CEFR B2+**, **IELTS 5.5 (B2)+**, **SAT 1400+**,
+sertifikat **2026-yilda** berilgan bo'lishi shart.
+
+Sanani frontend (`CERT_YEAR` - `assets/script.js`) ham, backend
+(`CERT_YEAR` / `isValidCertDate` - `apps-script/Code.gs`) ham tekshiradi.
+Yilni o'zgartirsangiz, ikkala joyda ham yangilang.
+Ro'yxatni o'zgartirish uchun `assets/script.js` dagi `RESULT_OPTIONS` ni tahrirlang.
 
 ## Sheetdagi ustunlar
 
-`Vaqt | F.I.Sh | Telefon | Maktab / Sinf | Imtihon turi | Natija / Ball | Til`
+`Vaqt | Maktab raqami | Sinfi | O'quvchining ismi-sharifi | Xorijiy til nomi | Sertifikat turi | Sertifikat berilgan sana | Sertifikat natijasi | Telefon raqami | Sayt tili`
+
+> ⚠️ Ustunlar o'zgargani uchun Apps Script kodini yangilagandan so'ng
+> `setupSheet` ni **qayta ishga tushirish** kerak (eski sarlavhalar tozalanadi).
+> Ichida eski arizalar bo'lsa, avval ularni boshqa sahifaga nusxalab oling -
+> `setupSheet` sahifani butunlay tozalaydi.
 
 ## Yangi versiya chiqarish
 

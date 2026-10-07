@@ -262,46 +262,120 @@
 
         <form id="registration-form" class="mt-12 bg-white rounded-3xl shadow-soft border border-slate-100 p-6 sm:p-10 reveal reveal-delay-1" novalidate>
           <div class="grid sm:grid-cols-2 gap-5">
-            <div class="sm:col-span-2">
-              <label class="block text-sm font-semibold text-brand-ink" data-i18n="form_label_fish">F.I.Sh</label>
-              <input name="fish" type="text" required minlength="5" data-i18n-ph="form_ph_fish" placeholder=""
-                class="mt-2 w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/10 outline-none transition" />
-            </div>
 
+            <!-- 1. Maktab raqami -->
             <div>
-              <label class="block text-sm font-semibold text-brand-ink" data-i18n="form_label_phone">Telefon raqami</label>
-              <input name="phone" type="tel" required data-i18n-ph="form_ph_phone" placeholder=""
-                class="mt-2 w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/10 outline-none transition" />
-            </div>
-
-            <div>
-              <label class="block text-sm font-semibold text-brand-ink" data-i18n="form_label_school">Maktab / Sinf</label>
-              <input name="school" type="text" data-i18n-ph="form_ph_school" placeholder=""
-                class="mt-2 w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/10 outline-none transition" />
-            </div>
-
-            <div>
-              <label class="block text-sm font-semibold text-brand-ink" data-i18n="form_label_exam">Imtihon turi</label>
-              <select name="exam" required
+              <label for="f-school" class="block text-sm font-semibold text-brand-ink">
+                <span data-i18n="form_label_school">Maktab raqami</span>
+                <span class="text-brand-red">*</span>
+              </label>
+              <select id="f-school" name="school" required
                 class="mt-2 w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/10 outline-none transition">
-                <option value="" data-i18n="form_exam_placeholder">Tanlang...</option>
-                <option value="IELTS">IELTS</option>
-                <option value="TOEFL">TOEFL</option>
-                <option value="Milliy sertifikat" data-i18n="form_exam_national">Milliy sertifikat</option>
-                <option value="C2">C2</option>
-                <option value="C1">C1</option>
-                <option value="B2">B2</option>
-                <option value="Goethe">Goethe</option>
-                <option value="HSK">HSK</option>
-                <option value="OTHER" data-i18n="form_exam_other">Boshqa</option>
+                <option value="" data-i18n="form_opt_select">Tanlang...</option>
               </select>
             </div>
 
+            <!-- 2. Sinfi -->
             <div>
-              <label class="block text-sm font-semibold text-brand-ink" data-i18n="form_label_score">Natija / Ball</label>
-              <input name="score" type="text" required data-i18n-ph="form_ph_score" placeholder=""
+              <label for="f-grade" class="block text-sm font-semibold text-brand-ink">
+                <span data-i18n="form_label_grade">Sinfi</span>
+                <span class="text-brand-red">*</span>
+              </label>
+              <select id="f-grade" name="grade" required
+                class="mt-2 w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/10 outline-none transition">
+                <option value="" data-i18n="form_opt_select">Tanlang...</option>
+              </select>
+            </div>
+
+            <!-- 3. O'quvchining ismi-sharifi -->
+            <div class="sm:col-span-2">
+              <label for="f-fish" class="block text-sm font-semibold text-brand-ink">
+                <span data-i18n="form_label_fish">O'quvchining ismi-sharifi</span>
+                <span class="text-brand-red">*</span>
+              </label>
+              <input id="f-fish" name="fish" type="text" required minlength="5" autocomplete="name"
+                data-i18n-ph="form_ph_fish" placeholder=""
                 class="mt-2 w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/10 outline-none transition" />
             </div>
+
+            <!-- 4. Xorijiy til nomi -->
+            <div>
+              <label for="f-language" class="block text-sm font-semibold text-brand-ink">
+                <span data-i18n="form_label_language">Xorijiy til nomi</span>
+                <span class="text-brand-red">*</span>
+              </label>
+              <select id="f-language" name="language" required
+                class="mt-2 w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/10 outline-none transition">
+                <option value="" data-i18n="form_opt_select">Tanlang...</option>
+                <option value="Ingliz tili" data-i18n="form_lang_en">Ingliz tili</option>
+                <option value="Nemis tili" data-i18n="form_lang_de">Nemis tili</option>
+                <option value="Fransuz tili" data-i18n="form_lang_fr">Fransuz tili</option>
+                <option value="Koreys tili" data-i18n="form_lang_ko">Koreys tili</option>
+                <option value="Yapon tili" data-i18n="form_lang_ja">Yapon tili</option>
+                <option value="Xitoy tili" data-i18n="form_lang_zh">Xitoy tili</option>
+                <option value="Arab tili" data-i18n="form_lang_ar">Arab tili</option>
+                <option value="Turk tili" data-i18n="form_lang_tr">Turk tili</option>
+                <option value="Rus tili" data-i18n="form_lang_ru">Rus tili</option>
+                <option value="Boshqa" data-i18n="form_lang_other">Boshqa</option>
+              </select>
+            </div>
+
+            <!-- 5. Sertifikat turi -->
+            <div>
+              <label for="f-cert-type" class="block text-sm font-semibold text-brand-ink">
+                <span data-i18n="form_label_cert_type">Sertifikat turi</span>
+                <span class="text-brand-red">*</span>
+              </label>
+              <select id="f-cert-type" name="certType" required
+                class="mt-2 w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/10 outline-none transition">
+                <option value="" data-i18n="form_opt_select">Tanlang...</option>
+                <option value="CEFR" data-i18n="form_cert_cefr">CEFR (Milliy sertifikat)</option>
+                <option value="IELTS">IELTS</option>
+                <option value="SAT">SAT</option>
+              </select>
+            </div>
+
+            <!-- 6. Sertifikat berilgan sana -->
+            <div>
+              <label for="f-cert-date" class="block text-sm font-semibold text-brand-ink">
+                <span data-i18n="form_label_cert_date">Sertifikat berilgan sana</span>
+                <span class="text-brand-red">*</span>
+              </label>
+              <input id="f-cert-date" name="certDate" type="date" required min="2026-01-01" max="2026-12-31"
+                class="mt-2 w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/10 outline-none transition" />
+            </div>
+
+            <!-- 7. Sertifikat natijasi -->
+            <div>
+              <label for="f-result" class="block text-sm font-semibold text-brand-ink">
+                <span data-i18n="form_label_result">Sertifikat natijasi</span>
+                <span class="text-brand-red">*</span>
+              </label>
+
+              <!-- CEFR / IELTS uchun -->
+              <select id="f-result" name="result" required
+                class="mt-2 w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/10 outline-none transition disabled:bg-slate-50 disabled:text-brand-muted">
+                <option value="" data-i18n="form_result_pick_type">Avval sertifikat turini tanlang</option>
+              </select>
+
+              <!-- SAT uchun -->
+              <input id="f-result-sat" name="resultSat" type="number" min="1400" max="1600" step="10" disabled
+                data-i18n-ph="form_ph_result_sat" placeholder="1400 - 1600"
+                class="mt-2 hidden w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/10 outline-none transition" />
+
+            </div>
+
+            <!-- 8. Telefon raqami -->
+            <div>
+              <label for="f-phone" class="block text-sm font-semibold text-brand-ink">
+                <span data-i18n="form_label_phone">Telefon raqami</span>
+                <span class="text-brand-red">*</span>
+              </label>
+              <input id="f-phone" name="phone" type="tel" required inputmode="tel" autocomplete="tel"
+                data-i18n-ph="form_ph_phone" placeholder=""
+                class="mt-2 w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/10 outline-none transition" />
+            </div>
+
           </div>
 
           <div class="mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">

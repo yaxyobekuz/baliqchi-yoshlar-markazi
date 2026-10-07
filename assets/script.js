@@ -50,7 +50,143 @@ function applyLang(lang) {
 
   localStorage.setItem("lang", lang);
   window.__currentLang = lang;
+
+  renderDynamicFields();
 }
+
+function t(key, vars) {
+  const dict = i18n[window.__currentLang || DEFAULT_LANG] || i18n[DEFAULT_LANG];
+  let out = dict[key] != null ? dict[key] : key;
+  if (vars) {
+    Object.keys(vars).forEach((k) => {
+      out = out.replace("{" + k + "}", vars[k]);
+    });
+  }
+  return out;
+}
+
+// ---------- Forma: dinamik maydonlar ----------
+const SCHOOL_MIN = 1;
+const SCHOOL_MAX = 61;
+const GRADE_MIN = 5;
+const GRADE_MAX = 11;
+
+// Sertifikat faqat 2026-yilda berilgan bo'lsa qabul qilinadi
+const CERT_YEAR = 2026;
+const CERT_DATE_MIN = CERT_YEAR + "-01-01";
+const CERT_DATE_MAX = CERT_YEAR + "-12-31";
+
+// Sertifikat turi → qabul qilinadigan natijalar
+const RESULT_OPTIONS = {
+  CEFR: ["B2", "C1", "C2"],
+  IELTS: ["5.5", "6.0", "6.5", "7.0", "7.5", "8.0", "8.5", "9.0"]
+};
+
+const schoolSelect = document.getElementById("f-school");
+const gradeSelect = document.getElementById("f-grade");
+const fishInput = document.getElementById("f-fish");
+const languageSelect = document.getElementById("f-language");
+const certTypeSelect = document.getElementById("f-cert-type");
+const certDateInput = document.getElementById("f-cert-date");
+const resultSelect = document.getElementById("f-result");
+const resultSatInput = document.getElementById("f-result-sat");
+
+function todayISO() {
+  const d = new Date();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return d.getFullYear() + "-" + m + "-" + day;
+}
+
+function fillSelect(select, items) {
+  if (!select) return;
+  const prev = select.value;
+  select.innerHTML = "";
+
+  const placeholder = document.createElement("option");
+  placeholder.value = "";
+  placeholder.textContent = t("form_opt_select");
+  select.appendChild(placeholder);
+
+  items.forEach(({ value, label }) => {
+    const opt = document.createElement("option");
+    opt.value = value;
+    opt.textContent = label;
+    select.appendChild(opt);
+  });
+
+  if (prev) select.value = prev;
+}
+
+function renderSchoolOptions() {
+  const items = [];
+  for (let n = SCHOOL_MIN; n <= SCHOOL_MAX; n++) {
+    items.push({ value: String(n), label: t("form_school_item", { n }) });
+  }
+  fillSelect(schoolSelect, items);
+}
+
+function renderGradeOptions() {
+  const items = [];
+  for (let n = GRADE_MIN; n <= GRADE_MAX; n++) {
+    items.push({ value: String(n), label: t("form_grade_item", { n }) });
+  }
+  fillSelect(gradeSelect, items);
+}
+
+function renderResultField() {
+  if (!certTypeSelect || !resultSelect || !resultSatInput) return;
+
+  const type = certTypeSelect.value;
+  const isSat = type === "SAT";
+
+  // SAT → raqamli input, qolganlari → select
+  resultSatInput.classList.toggle("hidden", !isSat);
+  resultSatInput.disabled = !isSat;
+  resultSatInput.required = isSat;
+  if (!isSat) resultSatInput.value = "";
+
+  resultSelect.classList.toggle("hidden", isSat);
+  resultSelect.disabled = isSat || !type;
+  resultSelect.required = !isSat;
+
+  const prev = resultSelect.value;
+  resultSelect.innerHTML = "";
+
+  const placeholder = document.createElement("option");
+  placeholder.value = "";
+  placeholder.textContent = type ? t("form_opt_select") : t("form_result_pick_type");
+  resultSelect.appendChild(placeholder);
+
+  (RESULT_OPTIONS[type] || []).forEach((value) => {
+    const opt = document.createElement("option");
+    opt.value = value;
+    opt.textContent = value;
+    resultSelect.appendChild(opt);
+  });
+
+  if (prev && RESULT_OPTIONS[type] && RESULT_OPTIONS[type].includes(prev)) {
+    resultSelect.value = prev;
+  }
+}
+
+function renderDynamicFields() {
+  renderSchoolOptions();
+  renderGradeOptions();
+  renderResultField();
+
+  if (certDateInput) {
+    const today = todayISO();
+    certDateInput.min = CERT_DATE_MIN;
+    certDateInput.max = today < CERT_DATE_MAX ? today : CERT_DATE_MAX;
+  }
+}
+
+if (certTypeSelect) {
+  certTypeSelect.addEventListener("change", renderResultField);
+}
+
+renderDynamicFields();
 
 // Dropdown open/close
 const langToggle = document.getElementById("lang-toggle");
@@ -105,6 +241,13 @@ document.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
 
 // ---------- Phone mask: +998 __ ___ __ __ ----------
 const phoneInput = document.querySelector('input[name="phone"]');
+
+function phoneDigits() {
+  if (!phoneInput) return "";
+  const digits = phoneInput.value.replace(/\D/g, "");
+  return digits.startsWith("998") ? digits.slice(3) : digits;
+}
+
 if (phoneInput) {
   phoneInput.addEventListener("input", (e) => {
     let digits = e.target.value.replace(/\D/g, "");
@@ -153,8 +296,21 @@ function setLoading(loading) {
   submitBtn.disabled = loading;
   btnIcon.classList.toggle("hidden", loading);
   btnSpin.classList.toggle("hidden", !loading);
-  const dict = i18n[window.__currentLang || DEFAULT_LANG];
-  btnLabel.textContent = loading ? dict.form_sending : dict.form_submit;
+  btnLabel.textContent = loading ? t("form_sending") : t("form_submit");
+}
+
+function getResultValue() {
+  return certTypeSelect.value === "SAT"
+    ? resultSatInput.value.trim()
+    : resultSelect.value;
+}
+
+/** Brauzer min/max ni qo'llab-quvvatlamasa ham sanani tekshiramiz:
+ *  faqat 2026-yil va bugungi kundan oshmagan sana. */
+function validateCertDate() {
+  const v = certDateInput.value;
+  if (!v) return false;
+  return v >= CERT_DATE_MIN && v <= CERT_DATE_MAX && v <= todayISO();
 }
 
 form.addEventListener("submit", async (e) => {
@@ -165,14 +321,28 @@ form.addEventListener("submit", async (e) => {
     return;
   }
 
-  const dict = i18n[window.__currentLang || DEFAULT_LANG];
+  if (phoneDigits().length !== 9) {
+    showToast(t("form_err_phone"), false);
+    phoneInput.focus();
+    return;
+  }
+
+  if (!validateCertDate()) {
+    showToast(t("form_err_cert_date"), false);
+    certDateInput.focus();
+    return;
+  }
+
   const data = {
     timestamp: new Date().toISOString(),
-    fish: form.fish.value.trim(),
-    phone: form.phone.value.trim(),
-    school: form.school.value.trim(),
-    exam: form.exam.value,
-    score: form.score.value.trim(),
+    school: schoolSelect.value,
+    grade: gradeSelect.value,
+    fish: fishInput.value.trim(),
+    language: languageSelect.value,
+    certType: certTypeSelect.value,
+    certDate: certDateInput.value,
+    result: getResultValue(),
+    phone: phoneInput.value.trim(),
     lang: window.__currentLang || DEFAULT_LANG
   };
 
@@ -185,10 +355,11 @@ form.addEventListener("submit", async (e) => {
       headers: { "Content-Type": "text/plain;charset=utf-8" },
       body: JSON.stringify(data)
     });
-    showToast(dict.form_success, true);
+    showToast(t("form_success"), true);
     form.reset();
+    renderDynamicFields();
   } catch (err) {
-    showToast(dict.form_error, false);
+    showToast(t("form_error"), false);
     console.error(err);
   } finally {
     setLoading(false);

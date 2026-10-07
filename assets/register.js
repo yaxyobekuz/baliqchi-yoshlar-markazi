@@ -24,6 +24,21 @@ const RESULT_OPTIONS = {
 
 const SAT_RANGE = { min: 1400, max: 1600, step: 10 };
 
+// To'garaklar fan kesimida tanlanadi
+const CLUB_SUBJECTS = [
+  { group: "Xorijiy tillar", items: ["Ingliz tili", "Rus tili", "Nemis tili", "Fransuz tili",
+    "Koreys tili", "Yapon tili", "Xitoy tili", "Arab tili", "Turk tili"] },
+  { group: "Aniq va tabiiy fanlar", items: ["Matematika", "Fizika", "Kimyo", "Biologiya",
+    "Geografiya", "Astronomiya"] },
+  { group: "Axborot texnologiyalari", items: ["Informatika", "Dasturlash", "Robototexnika",
+    "Grafik dizayn"] },
+  { group: "Ijtimoiy-gumanitar fanlar", items: ["Ona tili va adabiyot", "Tarix", "Huquq",
+    "Iqtisodiyot", "Psixologiya"] },
+  { group: "Ijod va sport", items: ["Musiqa", "Tasviriy san'at", "Shaxmat", "Sport"] }
+];
+
+const CLUB_OTHER = "Boshqa";
+
 const LANGUAGES = [
   "Ingliz tili", "Nemis tili", "Fransuz tili", "Koreys tili", "Yapon tili",
   "Xitoy tili", "Arab tili", "Turk tili", "Rus tili", "Boshqa"
@@ -191,25 +206,25 @@ let logoPayload = null;   // { name, mime, data }
 
 function bindLogo() {
   const input = $("#c-logo");
+  const zone = $("#logo-zone");
   const preview = $("#logo-preview");
+  const title = $("#logo-title");
   const note = $("#logo-note");
   const clearBtn = $("#logo-clear");
+
+  const PLACEHOLDER = '<svg class="w-6 h-6 text-slate-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>';
 
   const reset = () => {
     logoPayload = null;
     input.value = "";
     clearBtn.hidden = true;
-    note.textContent = "PNG, JPG yoki SVG · 5 MB gacha";
-    preview.innerHTML = '<svg class="w-7 h-7 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>';
+    title.textContent = "Rasmni tanlang yoki shu yerga tashlang";
+    note.textContent = "PNG, JPG yoki SVG · 5 MB gacha · ixtiyoriy";
+    preview.innerHTML = PLACEHOLDER;
   };
 
-  $("#logo-pick").addEventListener("click", () => input.click());
-  clearBtn.addEventListener("click", reset);
-
-  input.addEventListener("change", async () => {
-    const file = input.files && input.files[0];
+  async function accept(file) {
     if (!file) return reset();
-
     if (!file.type.startsWith("image/")) {
       showToast("Faqat rasm fayli tanlang.", false);
       return reset();
@@ -223,7 +238,8 @@ function bindLogo() {
       const prepared = await prepareLogo(file);
       logoPayload = prepared;
       clearBtn.hidden = false;
-      note.textContent = `${file.name} · ${Math.round(prepared.data.length * 0.75 / 1024)} KB`;
+      title.textContent = file.name;
+      note.textContent = `${Math.round(prepared.data.length * 0.75 / 1024)} KB · almashtirish uchun bosing`;
       preview.innerHTML = "";
       const img = document.createElement("img");
       img.src = `data:${prepared.mime};base64,${prepared.data}`;
@@ -235,7 +251,35 @@ function bindLogo() {
       showToast("Rasmni o'qib bo'lmadi.", false);
       reset();
     }
+  }
+
+  input.addEventListener("change", () => accept(input.files && input.files[0]));
+
+  clearBtn.addEventListener("click", (e) => {
+    e.preventDefault();      // label ichida - fayl oynasi ochilmasin
+    e.stopPropagation();
+    reset();
   });
+
+  ["dragenter", "dragover"].forEach((type) => {
+    zone.addEventListener(type, (e) => {
+      e.preventDefault();
+      zone.classList.add("is-dragging");
+    });
+  });
+  ["dragleave", "drop"].forEach((type) => {
+    zone.addEventListener(type, (e) => {
+      e.preventDefault();
+      if (type === "dragleave" && zone.contains(e.relatedTarget)) return;
+      zone.classList.remove("is-dragging");
+    });
+  });
+  zone.addEventListener("drop", (e) => {
+    const file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+    if (file) accept(file);
+  });
+
+  reset();
 }
 
 /** Rasmni 512px ga kichraytirib base64 ga o'giradi (SVG o'zgarmaydi) */
@@ -273,40 +317,128 @@ function readAsBase64(file) {
 
 // ---------- To'garak qatorlari ----------
 
+function subjectSelect() {
+  const select = document.createElement("select");
+  select.className = "field-select";
+  select.setAttribute("data-club-subject", "");
+  select.setAttribute("aria-label", "To'garak fani");
+  select.required = true;
+  select.appendChild(new Option("Fanni tanlang...", ""));
+
+  CLUB_SUBJECTS.forEach(({ group, items }) => {
+    const optgroup = document.createElement("optgroup");
+    optgroup.label = group;
+    items.forEach((name) => optgroup.appendChild(new Option(name, name)));
+    select.appendChild(optgroup);
+  });
+
+  select.appendChild(new Option("Boshqa (o'zim yozaman)", CLUB_OTHER));
+  return select;
+}
+
 function clubRow() {
   const row = document.createElement("div");
-  row.className = "club-row grid grid-cols-[1fr_auto_auto] gap-2.5 items-center";
-  row.innerHTML = `
-    <input type="text" data-club-name required maxlength="80" placeholder="To'garak nomi" aria-label="To'garak nomi"
-      class="w-full min-w-0 px-4 py-3 rounded-xl border border-slate-200 focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/10 outline-none transition" />
-    <input type="number" data-club-count required min="1" max="5000" step="1" inputmode="numeric" placeholder="Soni"
-      aria-label="O'quvchi soni"
-      class="w-20 sm:w-32 px-3 sm:px-4 py-3 rounded-xl border border-slate-200 focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/10 outline-none transition" />
-    <button type="button" data-club-remove aria-label="To'garakni o'chirish"
-      class="w-11 h-11 grid place-items-center rounded-xl border border-slate-200 text-brand-muted hover:border-brand-red hover:text-brand-red transition disabled:opacity-40 disabled:hover:border-slate-200 disabled:hover:text-brand-muted">
-      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
-    </button>`;
+  row.className = "club-row";
+
+  const subject = document.createElement("div");
+  subject.className = "club-subject";
+  subject.appendChild(subjectSelect());
+
+  const custom = document.createElement("div");
+  custom.className = "club-custom";
+  custom.hidden = true;
+  custom.innerHTML = '<input type="text" data-club-custom maxlength="80" placeholder="To\'garak nomini yozing" aria-label="To\'garak nomi" class="field-input" />';
+
+  const count = document.createElement("input");
+  count.type = "number";
+  count.className = "field-input";
+  count.setAttribute("data-club-count", "");
+  count.setAttribute("aria-label", "O'quvchi soni");
+  count.required = true;
+  count.min = 1;
+  count.max = 5000;
+  count.step = 1;
+  count.inputMode = "numeric";
+  count.placeholder = "Soni";
+
+  const remove = document.createElement("button");
+  remove.type = "button";
+  remove.className = "icon-btn";
+  remove.setAttribute("data-club-remove", "");
+  remove.setAttribute("aria-label", "To'garakni o'chirish");
+  remove.innerHTML = '<svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>';
+
+  // custom oxirida - grid'da o'z qatoriga tushadi, soni maydoni joyida qoladi
+  row.append(subject, count, remove, custom);
   return row;
+}
+
+/** Qator qiymati: "Boshqa" tanlansa - qo'lda yozilgan nom */
+function rowName(row) {
+  const select = row.querySelector("[data-club-subject]");
+  if (select.value === CLUB_OTHER) {
+    const custom = row.querySelector("[data-club-custom]");
+    return custom ? custom.value.trim() : "";
+  }
+  return select.value;
 }
 
 function clubs() {
   return $$("#club-rows .club-row").map((row) => ({
-    name: row.querySelector("[data-club-name]").value.trim(),
+    name: rowName(row),
     count: Number(row.querySelector("[data-club-count]").value)
   }));
 }
 
+/** Bir fan ikki marta tanlanmasin - boshqa qatorlarda o'chiriladi */
+function syncSubjectOptions() {
+  const rows = $$("#club-rows .club-row");
+  const taken = rows
+    .map((r) => r.querySelector("[data-club-subject]").value)
+    .filter((v) => v && v !== CLUB_OTHER);
+
+  rows.forEach((row) => {
+    const select = row.querySelector("[data-club-subject]");
+    Array.from(select.options).forEach((opt) => {
+      if (!opt.value || opt.value === CLUB_OTHER) return;
+      opt.disabled = opt.value !== select.value && taken.includes(opt.value);
+    });
+  });
+}
+
 function syncClubs() {
   const rows = $$("#club-rows .club-row");
+
   rows.forEach((row) => {
     row.querySelector("[data-club-remove]").disabled = rows.length === 1;
+
+    // "Boshqa" tanlansa qo'shimcha matn maydoni ochiladi
+    const isOther = row.querySelector("[data-club-subject]").value === CLUB_OTHER;
+    const custom = row.querySelector(".club-custom");
+    const input = row.querySelector("[data-club-custom]");
+    custom.hidden = !isOther;
+    input.required = isOther;
+    row.classList.toggle("is-custom", isOther);
+    if (!isOther) input.value = "";
   });
+
+  syncSubjectOptions();
 
   const list = clubs().filter((c) => c.name && c.count > 0);
   const total = list.reduce((sum, c) => sum + c.count, 0);
-  $("#club-total").textContent = total
-    ? `${list.length} ta to'garak · jami ${total} o'quvchi`
-    : "";
+  const host = $("#club-total");
+  host.replaceChildren();
+  if (!list.length) return;
+
+  const pill = (label, value) => {
+    const el = document.createElement("span");
+    el.className = "pill-stat";
+    const b = document.createElement("b");
+    b.textContent = String(value);
+    el.append(b, document.createTextNode(" " + label));
+    return el;
+  };
+  host.append(pill("to'garak", list.length), pill("o'quvchi", total));
 }
 
 function bindClubs() {
@@ -318,7 +450,7 @@ function bindClubs() {
     const row = clubRow();
     host.appendChild(row);
     syncClubs();
-    row.querySelector("[data-club-name]").focus();
+    row.querySelector("[data-club-subject]").focus();
   });
 
   host.addEventListener("click", (e) => {
@@ -328,19 +460,34 @@ function bindClubs() {
     syncClubs();
   });
 
+  host.addEventListener("change", syncClubs);
   host.addEventListener("input", syncClubs);
 }
 
 function bindCenterForm() {
   const form = $("#center-form");
+  const phone = $("#c-phone");
+
+  phone.addEventListener("input", (e) => {
+    e.target.value = formatPhone(e.target.value);
+  });
+  phone.addEventListener("focus", (e) => {
+    if (!e.target.value) e.target.value = "+998 ";
+  });
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     if (!form.checkValidity()) return form.reportValidity();
 
+    if (phoneDigits(phone.value).length !== 9) {
+      showToast("Markaz telefon raqamini to'liq kiriting (9 ta raqam).", false);
+      phone.focus();
+      return;
+    }
+
     const list = clubs();
     if (list.some((c) => !c.name || !(c.count > 0))) {
-      showToast("Har bir to'garak uchun nom va o'quvchi sonini kiriting.", false);
+      showToast("Har bir to'garak uchun fan va o'quvchi sonini kiriting.", false);
       return;
     }
 
@@ -354,6 +501,7 @@ function bindCenterForm() {
       type: "center",
       timestamp: new Date().toISOString(),
       name: $("#c-name").value.trim(),
+      phone: phone.value.trim(),
       staff: Number($("#c-staff").value),
       clubs: list,
       logo: logoPayload

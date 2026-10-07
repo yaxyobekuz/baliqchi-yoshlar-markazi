@@ -49,6 +49,7 @@ const YOUTH_HEADERS = [
 const CENTER_HEADERS = [
   "Vaqt",
   "O'quv markaz nomi",
+  "Telefon raqami",
   "Logotip",
   "Xodimlar soni",
   "To'garaklar soni",
@@ -96,9 +97,10 @@ function setupRegisterSheets() {
 
   const centers = resetSheet(ss, CENTER_SHEET, CENTER_HEADERS);
   centers.setColumnWidths(1, CENTER_HEADERS.length, 160);
-  centers.setColumnWidth(2, 240);
-  centers.setColumnWidth(3, 260);
-  centers.setColumnWidth(6, 420);
+  centers.setColumnWidth(2, 240);   // markaz nomi
+  centers.setColumnWidth(4, 260);   // logotip havolasi
+  centers.setColumnWidth(7, 420);   // to'garaklar ro'yxati
+  centers.getRange("C2:C").setNumberFormat("@");   // telefon - Plain text
 }
 
 function resetSheet(ss, name, headers) {
@@ -239,6 +241,7 @@ function saveCenter(data) {
   const row = [
     data.timestamp ? new Date(data.timestamp) : new Date(),
     name,
+    String(data.phone || "").slice(0, 30),
     logoUrl,
     staff,
     clubs.length,
@@ -516,6 +519,7 @@ function testCenterPost() {
         type: "center",
         timestamp: new Date().toISOString(),
         name: "Baliqchi Edu Center",
+        phone: "+998 74 123 45 67",
         staff: 14,
         clubs: [
           { name: "Ingliz tili", count: 42 },

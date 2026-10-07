@@ -127,9 +127,17 @@ Header + main + footer. Mainda ikkita forma, tab orqali almashadi
 | Maydon | Tip | Talab |
 |---|---|---|
 | O'quv markaz nomi | text | min 2 belgi |
-| Logotipi | file | ixtiyoriy · PNG/JPG/SVG · 5 MB gacha |
+| Telefon raqami | tel | maska `+998 __ ___ __ __`, 9 ta raqam |
 | Umumiy hodimlari soni | number | 1 - 2000 |
-| To'garaklar nomi + o'quvchi soni | qo'shiladigan qatorlar | kamida 1 ta, nomlar takrorlanmaydi |
+| Logotipi | file | ixtiyoriy · PNG/JPG/SVG · 5 MB gacha · sudrab tashlash mumkin |
+| To'garaklar | qo'shiladigan qatorlar | kamida 1 ta; fan select'i + o'quvchi soni |
+
+**To'garaklar fan kesimida** tanlanadi - ro'yxat 5 guruhga bo'lingan (xorijiy
+tillar, aniq va tabiiy fanlar, axborot texnologiyalari, ijtimoiy-gumanitar
+fanlar, ijod va sport). Tanlangan fan boshqa qatorlarda o'chiriladi, shuning
+uchun bitta fan ikki marta kiritilmaydi. Ro'yxatda yo'q yo'nalish uchun
+**"Boshqa (o'zim yozaman)"** varianti bor - u tanlansa qo'shimcha matn maydoni
+ochiladi. Fanlar ro'yxati `assets/register.js` dagi `CLUB_SUBJECTS` da.
 
 Logotip yuborishdan oldin brauzerda 512px gacha kichraytiriladi, so'ng Apps Script
 uni **Drive** dagi `Baliqchi - markaz logotiplari` papkasiga saqlab, havolasini
@@ -153,7 +161,7 @@ qo'shimcha maydon:
 
 | Maydon | Tip | Variantlar |
 |---|---|---|
-| Ijtimoiy reyestrda turadimi? | select | `Ha` / `Yo'q` |
+| Ijtimoiy reyestrda turadimi? | select | `Yo'q` (standart) / `Ha` |
 | O'quv markazni tanlash | select | `Markazlar` sahifasidan + "Markazga a'zo emas" |
 
 Yozuvlar alohida (`Yoshlar`) jadvalga tushadi. Uning variantlari
@@ -189,7 +197,7 @@ deployment uchchalasiga xizmat qiladi, POST'dagi `type` maydoni yo'naltiradi.
 `… | Telefon raqami | Ijtimoiy reyestrda | O'quv markazi | Sayt tili`
 
 **`Markazlar`** (register.html 1-tab):
-`Vaqt | O'quv markaz nomi | Logotip | Xodimlar soni | To'garaklar soni | To'garaklar (nom va o'quvchi soni) | Jami o'quvchilar`
+`Vaqt | O'quv markaz nomi | Telefon raqami | Logotip | Xodimlar soni | To'garaklar soni | To'garaklar (nom va o'quvchi soni) | Jami o'quvchilar`
 
 > ⚠️ `setupSheet` va `setupRegisterSheets` o'z sahifalarini **tozalaydi**.
 > `setupSheet` faqat `Arizalar` ga, `setupRegisterSheets` faqat `Yoshlar` va

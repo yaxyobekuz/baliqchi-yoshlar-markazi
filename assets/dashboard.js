@@ -35,6 +35,7 @@ const state = {
   rows: [],          // joriy ko'rinishning to'liq to'plami
   filtered: [],
   demo: false,
+  stale: false,
   key: "",
   updatedAt: null,
   filters: emptyFilters(),
@@ -181,7 +182,34 @@ function normalizeCenters(rows) {
     .filter((r) => r.name);
 }
 
-function ingest(payload) {
+/**
+ * Eski deployment `{ rows: [...] }` qaytaradi, yangisi esa uchta ro'yxat.
+ * Shu farqni aniqlab, foydalanuvchiga aniq ayt.
+ */
+function detectStale(payload) {
+  const hasNew = ["applications", "youth", "centers"].some((k) => Array.isArray(payload[k]));
+  const banner = $("#stale-banner");
+  if (hasNew) {
+    state.stale = false;
+    banner.hidden = true;
+    return payload;
+  }
+
+  state.stale = true;
+  banner.hidden = false;
+  $("#stale-detail").textContent = Array.isArray(payload.rows)
+    ? `Javobda faqat eski "rows" maydoni bor (${payload.rows.length} ta yozuv) - "Arizalar" sifatida ko'rsatilmoqda. `
+      + 'Yangi kodni qo\'ygandan keyin Deploy → Manage deployments → ✏️ → Version: New version → Deploy qiling.'
+    : 'Javobda kutilgan maydonlar yo\'q. Apps Script kodini yangilab, Deploy → Manage deployments → ✏️ → '
+      + 'Version: New version → Deploy qiling, so\'ng setupRegisterSheets ni ishga tushiring.';
+
+  return Array.isArray(payload.rows)
+    ? Object.assign({}, payload, { applications: payload.rows, youth: [], centers: [] })
+    : payload;
+}
+
+function ingest(raw) {
+  const payload = detectStale(raw);
   state.data.applications = normalizeYouth(payload.applications, "applications")
     .sort((a, b) => (b.ts?.getTime() || 0) - (a.ts?.getTime() || 0));
   state.data.youth = normalizeYouth(payload.youth, "youth")
@@ -1561,6 +1589,7 @@ function renderAll({ animate = false } = {}) {
   const hasMatch = state.filtered.length > 0;
 
   $("#state-empty").hidden = hasRows;
+  $("#stale-banner").hidden = !state.stale;
   $("#state-nomatch").hidden = !hasRows || hasMatch;
   $("#content").hidden = !hasMatch;
   if (!hasMatch) return;

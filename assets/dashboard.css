@@ -452,6 +452,20 @@ body {
 .table-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 11px 16px; border-top: 1px solid var(--border); }
 .pager { display: flex; gap: 6px; }
 
+/* ---------- Ogohlantirish banneri ---------- */
+.banner {
+  display: flex; align-items: flex-start; gap: 11px;
+  padding: 13px 16px; margin-bottom: 14px;
+  border-radius: var(--radius);
+  border: 1px solid color-mix(in srgb, var(--warn) 45%, transparent);
+  background: color-mix(in srgb, var(--warn) 13%, var(--surface-1));
+  font-size: 13px; line-height: 1.5;
+}
+.banner svg { width: 18px; height: 18px; flex: none; margin-top: 1px; fill: none; stroke: var(--warn); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.banner-text { min-width: 0; }
+.banner-text b { display: block; margin-bottom: 2px; }
+.banner-text span { color: var(--text-secondary); }
+
 /* ---------- Holatlar ---------- */
 .state { text-align: center; padding: 72px 20px; color: var(--text-secondary); }
 .state-icon { width: 34px; height: 34px; fill: none; stroke: var(--text-muted); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }

@@ -4,17 +4,17 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex, nofollow" />
-  <title>Statistika - Baliqchi tumani iqtidorli yoshlar</title>
+  <title>Statistika - Baliqchi tumani hokimligi</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
   <link rel="stylesheet" href="assets/dashboard.css" />
 </head>
 <body>
 
-<!-- ================= KALIT SO'RASH ================= -->
+<!-- ================= KIRISH ================= -->
 <div id="gate" class="gate" hidden>
   <form id="gate-form" class="gate-card">
     <img src="assets/emblem-of-uzbekistan.png" alt="" class="gate-emblem" />
@@ -37,14 +37,14 @@
         <img src="assets/emblem-of-uzbekistan.png" alt="" class="brand-emblem" />
         <span class="brand-text">
           <span class="brand-name">Baliqchi tumani hokimligi</span>
-          <span class="brand-sub">Iqtidorli yoshlar - statistika</span>
+          <span class="brand-sub">Statistika paneli</span>
         </span>
       </a>
 
       <div class="topbar-actions">
         <span id="demo-badge" class="badge badge-warn" hidden>
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>
-          Demo ma'lumotlar
+          Demo
         </span>
         <span id="sync" class="sync" aria-live="polite"></span>
         <button id="refresh" class="btn btn-ghost btn-icon" title="Yangilash" aria-label="Ma'lumotlarni yangilash">
@@ -56,9 +56,34 @@
         </button>
       </div>
     </div>
+
+    <!-- Manba tanlash -->
+    <div class="shell">
+      <nav class="views" role="tablist" aria-label="Ma'lumot manbai">
+        <button class="view-btn is-active" role="tab" aria-selected="true" data-view="overview">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+          <span>Umumiy</span>
+        </button>
+        <button class="view-btn" role="tab" aria-selected="false" data-view="applications">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9 13h6M9 17h4"/></svg>
+          <span>Arizalar</span>
+          <b class="view-count" data-count="applications">0</b>
+        </button>
+        <button class="view-btn" role="tab" aria-selected="false" data-view="youth">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 2 7l10 5 10-5z"/><path d="M6 12v5c3 2.6 9 2.6 12 0v-5"/></svg>
+          <span>Yoshlar</span>
+          <b class="view-count" data-count="youth">0</b>
+        </button>
+        <button class="view-btn" role="tab" aria-selected="false" data-view="centers">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21h18M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/></svg>
+          <span>Markazlar</span>
+          <b class="view-count" data-count="centers">0</b>
+        </button>
+      </nav>
+    </div>
   </header>
 
-  <!-- ===== FILTRLAR: bitta qator, hamma narsani qamrab oladi ===== -->
+  <!-- ===== FILTRLAR ===== -->
   <div class="filterbar">
     <div class="shell filterbar-inner">
       <div class="filter-group filter-range" role="group" aria-label="Davr">
@@ -69,36 +94,59 @@
         <button class="chip" data-range="mtd" aria-pressed="false">Shu oy</button>
       </div>
 
-      <label class="field">
+      <label class="field" data-for="applications youth">
         <span class="field-label">Sertifikat</span>
         <select id="f-cert" class="select"><option value="">Hammasi</option></select>
       </label>
 
-      <label class="field">
+      <label class="field" data-for="applications youth">
         <span class="field-label">Til</span>
         <select id="f-lang" class="select"><option value="">Hammasi</option></select>
       </label>
 
-      <label class="field">
+      <label class="field" data-for="applications youth">
         <span class="field-label">Sinf</span>
         <select id="f-grade" class="select"><option value="">Hammasi</option></select>
       </label>
 
-      <label class="field">
+      <label class="field" data-for="applications youth">
         <span class="field-label">Maktab</span>
         <select id="f-school" class="select"><option value="">Hammasi</option></select>
       </label>
 
-      <label class="field field-search">
-        <span class="field-label">Qidiruv</span>
-        <input id="f-search" class="input" type="search" placeholder="Ism yoki telefon" />
+      <label class="field" data-for="youth">
+        <span class="field-label">Markaz</span>
+        <select id="f-center" class="select"><option value="">Hammasi</option></select>
       </label>
 
-      <button id="f-reset" class="btn btn-ghost btn-reset" hidden>Filtrlarni tozalash</button>
+      <label class="field" data-for="youth">
+        <span class="field-label">Reyestr</span>
+        <select id="f-social" class="select">
+          <option value="">Hammasi</option>
+          <option value="Ha">Ha</option>
+          <option value="Yo'q">Yo'q</option>
+        </select>
+      </label>
+
+      <label class="field field-search">
+        <span class="field-label">Qidiruv</span>
+        <input id="f-search" class="input" type="search" placeholder="Nomi yoki telefon" />
+      </label>
+
+      <button id="f-reset" class="btn btn-ghost btn-reset" hidden>Tozalash</button>
     </div>
   </div>
 
   <main class="shell main">
+
+    <!-- Eski deployment ogohlantirishi -->
+    <div id="stale-banner" class="banner" hidden>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>
+      <div class="banner-text">
+        <b>Apps Script eski versiyada ishlayapti.</b>
+        <span id="stale-detail"></span>
+      </div>
+    </div>
 
     <!-- ===== HOLATLAR ===== -->
     <div id="state-loading" class="state" hidden>
@@ -118,144 +166,42 @@
 
     <div id="state-empty" class="state" hidden>
       <svg viewBox="0 0 24 24" class="state-icon" aria-hidden="true"><path d="M3 7h18M3 12h18M3 17h10"/></svg>
-      <p class="state-title">Hozircha ariza yo'q</p>
+      <p class="state-title">Bu sahifada hali yozuv yo'q</p>
       <p class="state-sub">Forma to'ldirilgach, natijalar shu yerda paydo bo'ladi.</p>
     </div>
 
     <div id="state-nomatch" class="state" hidden>
       <svg viewBox="0 0 24 24" class="state-icon" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
-      <p class="state-title">Filtrga mos ariza topilmadi</p>
+      <p class="state-title">Filtrga mos yozuv topilmadi</p>
       <p class="state-sub">Shartlarni kengaytirib ko'ring.</p>
     </div>
 
     <!-- ===== KONTENT ===== -->
     <div id="content" hidden>
 
-      <!-- Hero + KPI -->
-      <section class="kpi-row" aria-label="Asosiy ko'rsatkichlar">
-        <div class="card hero-card">
-          <p class="stat-label">Jami arizalar</p>
+      <section class="hero-row" aria-label="Asosiy ko'rsatkichlar">
+        <div class="hero-card">
+          <div class="hero-head">
+            <p id="hero-label" class="hero-label">Jami</p>
+            <span id="hero-chip" class="chip-stat" hidden></span>
+          </div>
           <p id="hero-value" class="hero-figure">0</p>
-          <p id="hero-note" class="stat-note"></p>
+          <p id="hero-note" class="hero-note"></p>
+          <div id="hero-spark" class="hero-spark"></div>
         </div>
-        <div class="card stat-card">
-          <p class="stat-label">Qamrab olingan maktablar</p>
-          <p id="kpi-schools" class="stat-value">0</p>
-          <p id="kpi-schools-note" class="stat-note"></p>
-        </div>
-        <div class="card stat-card">
-          <p class="stat-label">So'nggi 7 kun</p>
-          <p id="kpi-week" class="stat-value">0</p>
-          <p id="kpi-week-note" class="stat-note"></p>
-        </div>
-        <div class="card stat-card">
-          <p class="stat-label">Yuqori daraja (C1 / C2 / 7.0+ / 1500+)</p>
-          <p id="kpi-high" class="stat-value">0</p>
-          <p id="kpi-high-note" class="stat-note"></p>
-        </div>
+        <div id="kpi-grid" class="kpi-grid"></div>
       </section>
 
-      <!-- Dinamika -->
-      <section class="card chart-card chart-wide" data-chart="trend">
-        <header class="card-head">
-          <div>
-            <h2 class="card-title">Arizalar dinamikasi</h2>
-            <p id="trend-sub" class="card-sub"></p>
-          </div>
-          <div class="seg" role="group" aria-label="Ko'rinish">
-            <button class="seg-btn is-active" data-view="chart">Grafik</button>
-            <button class="seg-btn" data-view="table">Jadval</button>
-          </div>
-        </header>
-        <div class="card-body"><div class="viz" data-viz="trend"></div></div>
-      </section>
+      <div id="charts"></div>
 
-      <div class="grid-2">
-        <!-- Sertifikat turi -->
-        <section class="card chart-card" data-chart="cert">
-          <header class="card-head">
-            <div>
-              <h2 class="card-title">Sertifikat turlari</h2>
-              <p class="card-sub">Arizalarning turlar bo'yicha ulushi</p>
-            </div>
-            <div class="seg" role="group" aria-label="Ko'rinish">
-              <button class="seg-btn is-active" data-view="chart">Grafik</button>
-              <button class="seg-btn" data-view="table">Jadval</button>
-            </div>
-          </header>
-          <div class="card-body"><div class="viz" data-viz="cert"></div></div>
-        </section>
-
-        <!-- Xorijiy tillar -->
-        <section class="card chart-card" data-chart="lang">
-          <header class="card-head">
-            <div>
-              <h2 class="card-title">Xorijiy tillar</h2>
-              <p class="card-sub">Arizalar soni bo'yicha</p>
-            </div>
-            <div class="seg" role="group" aria-label="Ko'rinish">
-              <button class="seg-btn is-active" data-view="chart">Grafik</button>
-              <button class="seg-btn" data-view="table">Jadval</button>
-            </div>
-          </header>
-          <div class="card-body"><div class="viz" data-viz="lang"></div></div>
-        </section>
-
-        <!-- Sinflar -->
-        <section class="card chart-card" data-chart="grade">
-          <header class="card-head">
-            <div>
-              <h2 class="card-title">Sinflar kesimida</h2>
-              <p class="card-sub">Har bir sinfdagi arizalar soni</p>
-            </div>
-            <div class="seg" role="group" aria-label="Ko'rinish">
-              <button class="seg-btn is-active" data-view="chart">Grafik</button>
-              <button class="seg-btn" data-view="table">Jadval</button>
-            </div>
-          </header>
-          <div class="card-body"><div class="viz" data-viz="grade"></div></div>
-        </section>
-
-        <!-- Maktablar -->
-        <section class="card chart-card" data-chart="school">
-          <header class="card-head">
-            <div>
-              <h2 class="card-title">Eng faol maktablar</h2>
-              <p class="card-sub">Birinchi 10 ta</p>
-            </div>
-            <div class="seg" role="group" aria-label="Ko'rinish">
-              <button class="seg-btn is-active" data-view="chart">Grafik</button>
-              <button class="seg-btn" data-view="table">Jadval</button>
-            </div>
-          </header>
-          <div class="card-body"><div class="viz" data-viz="school"></div></div>
-        </section>
-      </div>
-
-      <!-- Natijalar: kichik multipl - shkalalar har xil, shuning uchun alohida -->
-      <section class="card chart-card chart-wide" data-chart="result">
-        <header class="card-head">
-          <div>
-            <h2 class="card-title">Natijalar taqsimoti</h2>
-            <p class="card-sub">Shkalalar har xil bo'lgani uchun har bir sertifikat turi alohida</p>
-          </div>
-          <div class="seg" role="group" aria-label="Ko'rinish">
-            <button class="seg-btn is-active" data-view="chart">Grafik</button>
-            <button class="seg-btn" data-view="table">Jadval</button>
-          </div>
-        </header>
-        <div class="card-body"><div class="viz viz-multiples" data-viz="result"></div></div>
-      </section>
-
-      <!-- Arizalar jadvali -->
       <section class="card table-card">
         <header class="card-head">
           <div>
-            <h2 class="card-title">Arizalar ro'yxati</h2>
+            <h2 id="table-title" class="card-title">Yozuvlar</h2>
             <p id="table-sub" class="card-sub"></p>
           </div>
           <div class="card-head-actions">
-            <label class="toggle">
+            <label class="toggle" id="mask-wrap">
               <input id="mask-phones" type="checkbox" checked />
               <span>Telefonlarni yashirish</span>
             </label>
@@ -267,19 +213,7 @@
         </header>
         <div class="table-scroll">
           <table class="data-table">
-            <thead>
-              <tr>
-                <th><button class="th-sort" data-sort="ts">Sana<span class="sort-caret"></span></button></th>
-                <th><button class="th-sort" data-sort="school">Maktab<span class="sort-caret"></span></button></th>
-                <th><button class="th-sort" data-sort="grade">Sinf<span class="sort-caret"></span></button></th>
-                <th><button class="th-sort" data-sort="fish">Ismi-sharifi<span class="sort-caret"></span></button></th>
-                <th><button class="th-sort" data-sort="language">Til<span class="sort-caret"></span></button></th>
-                <th><button class="th-sort" data-sort="certType">Sertifikat<span class="sort-caret"></span></button></th>
-                <th><button class="th-sort" data-sort="result">Natija<span class="sort-caret"></span></button></th>
-                <th><button class="th-sort" data-sort="certDate">Berilgan<span class="sort-caret"></span></button></th>
-                <th>Telefon</th>
-              </tr>
-            </thead>
+            <thead id="table-head"></thead>
             <tbody id="table-body"></tbody>
           </table>
         </div>
@@ -297,8 +231,8 @@
       </section>
 
       <p class="footnote">
-        Ma'lumotlar Google Sheets'dagi "Arizalar" sahifasidan olinadi.
-        Sahifa shaxsiy ma'lumotlarni ko'rsatadi - ochiq internetda joylashtirmang.
+        Ma'lumotlar Google Sheets'dagi <b>Arizalar</b>, <b>Yoshlar</b> va <b>Markazlar</b>
+        sahifalaridan olinadi. Sahifa shaxsiy ma'lumotlarni ko'rsatadi - ochiq internetda joylashtirmang.
       </p>
     </div>
   </main>

@@ -127,20 +127,44 @@ Header + main + footer. Mainda ikkita forma, tab orqali almashadi
 | Maydon | Tip | Talab |
 |---|---|---|
 | O'quv markaz nomi | text | min 2 belgi |
-| Logotipi | file | ixtiyoriy · PNG/JPG/SVG · 5 MB gacha |
+| Telefon raqami | tel | maska `+998 __ ___ __ __`, 9 ta raqam |
 | Umumiy hodimlari soni | number | 1 - 2000 |
-| To'garaklar nomi + o'quvchi soni | qo'shiladigan qatorlar | kamida 1 ta, nomlar takrorlanmaydi |
-| Ijtimoiy reyestrdagi oila farzandlari | number | 0 dan |
+| Logotipi | file | ixtiyoriy · PNG/JPG/SVG · 5 MB gacha · sudrab tashlash mumkin |
+| To'garaklar | qo'shiladigan qatorlar | kamida 1 ta; fan select'i + o'quvchi soni |
+
+**To'garaklar fan kesimida** tanlanadi - ro'yxat 5 guruhga bo'lingan (xorijiy
+tillar, aniq va tabiiy fanlar, axborot texnologiyalari, ijtimoiy-gumanitar
+fanlar, ijod va sport). Tanlangan fan boshqa qatorlarda o'chiriladi, shuning
+uchun bitta fan ikki marta kiritilmaydi. Ro'yxatda yo'q yo'nalish uchun
+**"Boshqa (o'zim yozaman)"** varianti bor - u tanlansa qo'shimcha matn maydoni
+ochiladi. Fanlar ro'yxati `assets/register.js` dagi `CLUB_SUBJECTS` da.
 
 Logotip yuborishdan oldin brauzerda 512px gacha kichraytiriladi, so'ng Apps Script
 uni **Drive** dagi `Baliqchi - markaz logotiplari` papkasiga saqlab, havolasini
-jadvalga yozadi. Shu sabab Apps Script'ga Drive ruxsati kerak - birinchi
-deploydan keyin qayta avtorizatsiya so'raydi.
+jadvalga yozadi.
+
+> ⚠️ **Drive ruxsati.** Logotip kodi qo'shilgandan keyin skript qayta
+> avtorizatsiyadan o'tishi shart, aks holda Logotip katagiga
+> `You do not have permission to call DriveApp...` deb yoziladi. Yechim:
+> 1. Apps Script muharririda `authorizeDrive` funksiyasini tanlab **Run** bosing
+>    → **Review permissions → Advanced → Go to project (unsafe) → Allow**;
+> 2. **Deploy → Manage deployments → ✏️ → Version: New version → Deploy**.
+>
+> Ikkinchi qadamsiz web-app eski ruxsat bilan ishlashda davom etadi.
+> Ruxsatlar `apps-script/appsscript.json` da e'lon qilingan: skript faqat
+> **o'zi yaratgan** fayllarga kira oladi (`drive.file`), butun Drive'ga emas.
 
 ### 2-tab - "Iqtidorli yoshni ro'yxatdan o'tkazish" → `Yoshlar` sahifasi
 
-`index.html` dagi forma bilan bir xil tartibdagi 8 maydon, oxirida qo'shimcha
-**"O'quv markazni tanlash"** maydoni. Yozuvlar alohida (`Yoshlar`) jadvalga tushadi. Uning variantlari
+`index.html` dagi forma bilan bir xil tartibdagi 8 maydon, oxirida ikkita
+qo'shimcha maydon:
+
+| Maydon | Tip | Variantlar |
+|---|---|---|
+| Ijtimoiy reyestrda turadimi? | select | `Yo'q` (standart) / `Ha` |
+| O'quv markazni tanlash | select | `Markazlar` sahifasidan + "Markazga a'zo emas" |
+
+Yozuvlar alohida (`Yoshlar`) jadvalga tushadi. Uning variantlari
 `Markazlar` sahifasidagi nomlardan JSONP orqali olinadi
 (`?action=centers`, kalit talab qilinmaydi); ro'yxatga "Markazga a'zo emas"
 varianti ham qo'shiladi.
@@ -161,19 +185,19 @@ deployment uchchalasiga xizmat qiladi, POST'dagi `type` maydoni yo'naltiradi.
 | `register.html` 2-tab | `youth` | `Yoshlar` | `setupRegisterSheets` |
 | `register.html` 1-tab | `center` | `Markazlar` | `setupRegisterSheets` |
 
-`dashboard.html` **faqat `Arizalar`** dan o'qiydi (`?action=data`), ya'ni
-`index.html` formasining natijalarini ko'rsatadi.
+`dashboard.html` bitta so'rovda (`?action=data`) **uchala sahifani** oladi va
+har birini alohida ko'rinishda ko'rsatadi.
 
 ### Ustunlar
 
 **`Arizalar`** (index.html):
 `Vaqt | Maktab raqami | Sinfi | O'quvchining ismi-sharifi | Xorijiy til nomi | Sertifikat turi | Sertifikat berilgan sana | Sertifikat natijasi | Telefon raqami | Sayt tili`
 
-**`Yoshlar`** (register.html 2-tab) - yuqoridagi + `O'quv markazi`:
-`… | Telefon raqami | O'quv markazi | Sayt tili`
+**`Yoshlar`** (register.html 2-tab) - yuqoridagi + 2 ta ustun:
+`… | Telefon raqami | Ijtimoiy reyestrda | O'quv markazi | Sayt tili`
 
 **`Markazlar`** (register.html 1-tab):
-`Vaqt | O'quv markaz nomi | Logotip | Xodimlar soni | To'garaklar soni | To'garaklar (nom va o'quvchi soni) | Jami o'quvchilar | Ijtimoiy reyestrdagi oila farzandlari`
+`Vaqt | O'quv markaz nomi | Telefon raqami | Logotip | Xodimlar soni | To'garaklar soni | To'garaklar (nom va o'quvchi soni) | Jami o'quvchilar`
 
 > ⚠️ `setupSheet` va `setupRegisterSheets` o'z sahifalarini **tozalaydi**.
 > `setupSheet` faqat `Arizalar` ga, `setupRegisterSheets` faqat `Yoshlar` va
@@ -181,27 +205,43 @@ deployment uchchalasiga xizmat qiladi, POST'dagi `type` maydoni yo'naltiradi.
 
 ## Statistika paneli (`dashboard.html`)
 
-Yig'ilgan arizalar bo'yicha ichki panel. Tashqi kutubxona ishlatmaydi -
+Uchala Sheets sahifasi bo'yicha ichki panel. Tashqi kutubxona ishlatmaydi -
 grafiklar SVG'da qo'lda chiziladi, shuning uchun offlayn ham ishlaydi.
 
-### Ichida nima bor
+### To'rtta ko'rinish
 
-| Blok | Shakli | Izoh |
+Yuqoridagi manba tanlagich panelni butunlay almashtiradi (tanlov brauzerda saqlanadi):
+
+| Ko'rinish | Manba | Nima ko'rsatadi |
 |---|---|---|
-| Jami arizalar | hero raqam | Davr oralig'i bilan |
-| Maktablar / 7 kun / yuqori daraja | stat kartalar | Yuqori daraja = C1, C2, IELTS 7.0+, SAT 1500+ |
-| Arizalar dinamikasi | maydon + chiziq | 70 kundan uzun davr haftalarga yig'iladi |
-| Sertifikat turlari | gorizontal stacked bar | 3 segment, 2px yuza bo'shlig'i |
-| Xorijiy tillar | gorizontal bar | Birinchi 7 ta + "Boshqa" |
-| Sinflar kesimida | ustunlar | |
-| Eng faol maktablar | gorizontal bar | Birinchi 10 ta |
-| Natijalar taqsimoti | 3 ta kichik grafik | Shkalalar har xil - CEFR/IELTS/SAT alohida |
-| Arizalar ro'yxati | jadval | Saralash, sahifalash, CSV eksport |
+| **Umumiy** | Arizalar + Yoshlar + Markazlar | Hero: jami yoshlar; KPI: har bir sahifa alohida; dinamikada ikki seriya yonma-yon |
+| **Arizalar** | `Arizalar` | index.html formasi natijalari |
+| **Yoshlar** | `Yoshlar` | register.html natijalari + ijtimoiy reyestr va markaz kesimi |
+| **Markazlar** | `Markazlar` | Xodimlar, to'garaklar, fanlar va o'quvchilar statistikasi |
 
-Qo'shimcha: filtrlar (davr, sertifikat, til, sinf, maktab, qidiruv) hamma
-grafikni bir vaqtda qayta hisoblaydi; har bir grafikning **"Jadval"**
-ko'rinishi bor; yorug'/qorong'i mavzu; telefon raqamlari standart holda
-yashirilgan; har 2 daqiqada jim yangilanadi.
+### Grafiklar
+
+**Yoshlar ko'rinishlarida:** dinamika (maydon/chiziq), sertifikat turlari
+(stacked bar), xorijiy tillar, sinflar, eng faol maktablar, natijalar taqsimoti
+(CEFR/IELTS/SAT alohida - shkalalar har xil). "Yoshlar" da qo'shimcha
+"o'quv markazlari kesimida" grafigi bor.
+
+**Markazlar ko'rinishida:** markazlar qo'shilishi, fanlar bo'yicha o'quvchilar,
+markazlar bo'yicha o'quvchilar va xodimlar.
+
+### Imkoniyatlar
+
+- Filtrlar bitta qatorda, ko'rinishga qarab moslashadi (davr, sertifikat, til,
+  sinf, maktab, markaz, reyestr, qidiruv) - barcha grafikni bir vaqtda qayta hisoblaydi
+- Har bir grafikning **"Jadval"** ko'rinishi bor
+- Hero raqam + sparkline (faqat ma'noli bo'lsa chiziladi) + "so'nggi 7 kun" belgisi
+- Yorug'/qorong'i mavzu; klaviatura bilan ham ishlaydi (dinamikada ←/→)
+- Telefon raqamlari standart holda yashirilgan; CSV eksport har bir ko'rinish uchun alohida
+- Har 2 daqiqada jim yangilanadi (ko'rinish sakramaydi)
+
+> Markaz logotipi jadvalda nomning birinchi harfi sifatida ko'rsatiladi -
+> Google Drive havolalari to'g'ridan-to'g'ri `<img>` da ochilmaydi. Logotipni
+> ko'rish uchun jadvaldagi Drive havolasini oching.
 
 ### Ulash
 
@@ -239,6 +279,8 @@ URL o'zgarmaydi - `script.js` ni o'zgartirish shart emas.
 | Brauzer konsolida CORS xato | Apps Script CORS preflight yubormaydi | Kod allaqachon `mode: 'no-cors'` ishlatadi - bu normal, javobni o'qib bo'lmaydi lekin yozish ishlaydi |
 | Forma yuborilgach hech narsa bo'lmayapti | `APPS_SCRIPT_URL` o'rnatilmagan | `assets/script.js` ning 1-qatorini tekshiring |
 | `setupSheet` xato qaytaryapti | `SPREADSHEET_ID` noto'g'ri | URL'dan IDni qayta nusxalang |
+| Logotip katagida `You do not have permission to call DriveApp...` | Skript Drive kodi qo'shilishidan oldin avtorizatsiya qilingan | `authorizeDrive` ni Run qiling, so'ng deploymentni **New version** bilan qayta chiqaring |
+| Ustun sarlavhalari ma'lumotga mos kelmayapti | Sahifa qo'lda, boshqa ustunlar bilan yaratilgan | `setupRegisterSheets` ni ishga tushiring yoki sarlavha qatorini kod tartibiga keltiring (ustun soni va tartibi muhim, nomini xohlagancha o'zgartirsa bo'ladi) |
 
 ## Litsenziya
 

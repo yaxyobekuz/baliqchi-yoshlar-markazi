@@ -30,7 +30,7 @@ const APPLICATION_HEADERS = [
   "Sayt tili"
 ];
 
-// register.html - 2-tab ("O'quv markazi" ustuni qo'shimcha)
+// register.html - 2-tab (oxirgi ikki ustun qo'shimcha)
 const YOUTH_HEADERS = [
   "Vaqt",
   "Maktab raqami",
@@ -41,6 +41,7 @@ const YOUTH_HEADERS = [
   "Sertifikat berilgan sana",
   "Sertifikat natijasi",
   "Telefon raqami",
+  "Ijtimoiy reyestrda",
   "O'quv markazi",
   "Sayt tili"
 ];
@@ -48,12 +49,12 @@ const YOUTH_HEADERS = [
 const CENTER_HEADERS = [
   "Vaqt",
   "O'quv markaz nomi",
+  "Telefon raqami",
   "Logotip",
   "Xodimlar soni",
   "To'garaklar soni",
   "To'garaklar (nom va o'quvchi soni)",
-  "Jami o'quvchilar",
-  "Ijtimoiy reyestrdagi oila farzandlari"
+  "Jami o'quvchilar"
 ];
 
 // Ikkala yosh jadvalida ham bir xil ustun raqamlari (1 dan boshlanadi)
@@ -96,9 +97,10 @@ function setupRegisterSheets() {
 
   const centers = resetSheet(ss, CENTER_SHEET, CENTER_HEADERS);
   centers.setColumnWidths(1, CENTER_HEADERS.length, 160);
-  centers.setColumnWidth(2, 240);
-  centers.setColumnWidth(3, 260);
-  centers.setColumnWidth(6, 420);
+  centers.setColumnWidth(2, 240);   // markaz nomi
+  centers.setColumnWidth(4, 260);   // logotip havolasi
+  centers.setColumnWidth(7, 420);   // to'garaklar ro'yxati
+  centers.getRange("C2:C").setNumberFormat("@");   // telefon - Plain text
 }
 
 function resetSheet(ss, name, headers) {
@@ -170,8 +172,12 @@ function doPost(e) {
   }
 }
 
-/** Ikkala yosh formasi uchun umumiy yozuvchi - faqat sahifa va markaz ustuni farqli */
-function saveYouth(data, sheetName, headers, withCenter) {
+/**
+ * Ikkala yosh formasi uchun umumiy yozuvchi.
+ * `withExtras` - register.html ning qo'shimcha ustunlari
+ * ("Ijtimoiy reyestrda" va "O'quv markazi"); index.html da ular yo'q.
+ */
+function saveYouth(data, sheetName, headers, withExtras) {
   const required = ["school", "grade", "fish", "language", "certType", "certDate", "result", "phone"];
   const missing = required.filter(function (k) { return !data[k]; });
   if (missing.length) {
@@ -196,7 +202,10 @@ function saveYouth(data, sheetName, headers, withCenter) {
     String(data.result).slice(0, 20),
     String(data.phone).slice(0, 30)
   ];
-  if (withCenter) row.push(String(data.center || "").slice(0, 120));
+  if (withExtras) {
+    row.push(String(data.social || "").slice(0, 10));
+    row.push(String(data.center || "").slice(0, 120));
+  }
   row.push(String(data.lang || "uz").slice(0, 4));
 
   // Xuddi shunday qator allaqachon bo'lsa - qayta yozilmaydi
@@ -217,9 +226,7 @@ function saveCenter(data) {
   if (!data.name) return jsonResponse({ ok: false, error: "Missing fields: name" });
 
   const staff = Number(data.staff);
-  const social = Number(data.social);
   if (!(staff > 0)) return jsonResponse({ ok: false, error: "Invalid staff" });
-  if (!(social >= 0)) return jsonResponse({ ok: false, error: "Invalid social" });
 
   const clubs = (data.clubs || []).filter(function (c) {
     return c && c.name && Number(c.count) > 0;
@@ -245,12 +252,12 @@ function saveCenter(data) {
   const row = [
     data.timestamp ? new Date(data.timestamp) : new Date(),
     name,
+    String(data.phone || "").slice(0, 30),
     logoUrl,
     staff,
     clubs.length,
     summary.slice(0, 2000),
-    students,
-    social
+    students
   ];
 
   const nextRow = sheet.getLastRow() + 1;
@@ -270,17 +277,54 @@ function saveLogo(logo, centerName) {
 
     const blob = Utilities.newBlob(bytes, logo.mime || "image/png", fileName);
     const file = getLogoFolder().createFile(blob);
-    file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+
+    // Havola bo'yicha ko'rish - ochilmasa ham fayl saqlangan bo'ladi
+    try {
+      file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    } catch (shareErr) {
+      // ruxsat yetmasa: fayl Drive'da qoladi, faqat egasi ko'radi
+    }
+
     return file.getUrl();
   } catch (err) {
     // logotip saqlanmasa ham markaz yozuvi yo'qolmasligi kerak
-    return "Xato: " + String(err).slice(0, 120);
+    return "Logotip saqlanmadi: " + String(err && err.message ? err.message : err).slice(0, 150);
   }
 }
 
+/**
+ * Logotiplar papkasi. Nom bo'yicha qidirish (getFoldersByName) butun Drive'ni
+ * ko'rish ruxsatini talab qiladi, shuning uchun papka ID'si bir marta
+ * yaratilib Script Properties'da saqlanadi - "drive.file" ruxsati yetarli.
+ */
 function getLogoFolder() {
-  const found = DriveApp.getFoldersByName(LOGO_FOLDER);
-  return found.hasNext() ? found.next() : DriveApp.createFolder(LOGO_FOLDER);
+  const props = PropertiesService.getScriptProperties();
+  const saved = props.getProperty("LOGO_FOLDER_ID");
+
+  if (saved) {
+    try {
+      const folder = DriveApp.getFolderById(saved);
+      if (!folder.isTrashed()) return folder;
+    } catch (err) {
+      // papka o'chirilgan yoki ID yaroqsiz - yangisini yaratamiz
+    }
+  }
+
+  const folder = DriveApp.createFolder(LOGO_FOLDER);
+  props.setProperty("LOGO_FOLDER_ID", folder.getId());
+  return folder;
+}
+
+/**
+ * Ruxsatlarni bir marta berish uchun: Apps Script muharririda shu funksiyani
+ * tanlab Run bosing. Drive ruxsati so'raladi, papka yaratiladi va test fayli
+ * darhol o'chiriladi. Keyin deploymentni "New version" bilan qayta chiqaring.
+ */
+function authorizeDrive() {
+  const folder = getLogoFolder();
+  const probe = folder.createFile(Utilities.newBlob("ok", "text/plain", "ruxsat-testi.txt"));
+  probe.setTrashed(true);
+  Logger.log("Drive ruxsati berildi. Papka: " + folder.getName() + " (" + folder.getId() + ")");
 }
 
 // ============================================================
@@ -372,7 +416,13 @@ function doGet(e) {
   }
 
   try {
-    return reply({ ok: true, updatedAt: new Date().toISOString(), rows: readApplicationRows() }, callback);
+    return reply({
+      ok: true,
+      updatedAt: new Date().toISOString(),
+      applications: readYouthSheet(APPLICATION_SHEET, APPLICATION_HEADERS, false),
+      youth: readYouthSheet(YOUTH_SHEET, YOUTH_HEADERS, true),
+      centers: readCenterRows()
+    }, callback);
   } catch (err) {
     return reply({ ok: false, error: String(err) }, callback);
   }
@@ -398,19 +448,22 @@ function readCenterNames() {
   return names.sort(function (a, b) { return a.localeCompare(b); });
 }
 
-/** dashboard.html uchun: "Arizalar" sahifasini obyektlar ro'yxatiga aylantiradi */
-function readApplicationRows() {
+/**
+ * dashboard.html uchun: yosh jadvalini obyektlar ro'yxatiga aylantiradi.
+ * `withExtras` - "Yoshlar" sahifasidagi qo'shimcha ikki ustun.
+ */
+function readYouthSheet(sheetName, headers, withExtras) {
   const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-  const sheet = ss.getSheetByName(APPLICATION_SHEET);
+  const sheet = ss.getSheetByName(sheetName);
   if (!sheet || sheet.getLastRow() < 2) return [];
 
-  const values = sheet.getRange(2, 1, sheet.getLastRow() - 1, APPLICATION_HEADERS.length).getValues();
+  const values = sheet.getRange(2, 1, sheet.getLastRow() - 1, headers.length).getValues();
   const tz = Session.getScriptTimeZone();
 
   return values
     .filter(function (r) { return r[3] !== "" && r[3] != null; })
     .map(function (r) {
-      return {
+      const row = {
         ts: asIsoDateTime(r[0], tz),
         school: r[1],
         grade: r[2],
@@ -419,10 +472,53 @@ function readApplicationRows() {
         certType: String(r[5]),
         certDate: asIsoDate(r[6], tz),
         result: String(r[7]),
-        phone: String(r[8]),
-        lang: String(r[9] || "")
+        phone: String(r[8])
+      };
+      if (withExtras) {
+        row.social = String(r[9] || "");
+        row.center = String(r[10] || "");
+        row.lang = String(r[11] || "");
+      } else {
+        row.lang = String(r[9] || "");
+      }
+      return row;
+    });
+}
+
+/** "Markazlar" sahifasi - to'garaklar satri juftliklarga ajratiladi */
+function readCenterRows() {
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+  const sheet = ss.getSheetByName(CENTER_SHEET);
+  if (!sheet || sheet.getLastRow() < 2) return [];
+
+  const values = sheet.getRange(2, 1, sheet.getLastRow() - 1, CENTER_HEADERS.length).getValues();
+  const tz = Session.getScriptTimeZone();
+
+  return values
+    .filter(function (r) { return r[1] !== "" && r[1] != null; })
+    .map(function (r) {
+      return {
+        ts: asIsoDateTime(r[0], tz),
+        name: String(r[1]),
+        phone: String(r[2] || ""),
+        logo: String(r[3] || ""),
+        staff: Number(r[4]) || 0,
+        clubCount: Number(r[5]) || 0,
+        clubs: parseClubs(r[6]),
+        students: Number(r[7]) || 0
       };
     });
+}
+
+/** "Ingliz tili (42); Matematika (18)" → [{name, count}, ...] */
+function parseClubs(value) {
+  return String(value || "")
+    .split(";")
+    .map(function (part) {
+      const m = /^\s*(.+?)\s*\((\d+)\)\s*$/.exec(part);
+      return m ? { name: m[1], count: Number(m[2]) } : null;
+    })
+    .filter(function (c) { return c; });
 }
 
 // ============================================================
@@ -519,6 +615,7 @@ function testYouthPost() {
         certDate: CERT_YEAR + "-02-14",
         result: "B2",
         phone: "+998 95 477 08 11",
+        social: "Yo'q",
         center: "Baliqchi Edu Center",
         lang: "uz"
       })
@@ -535,8 +632,8 @@ function testCenterPost() {
         type: "center",
         timestamp: new Date().toISOString(),
         name: "Baliqchi Edu Center",
+        phone: "+998 74 123 45 67",
         staff: 14,
-        social: 23,
         clubs: [
           { name: "Ingliz tili", count: 42 },
           { name: "Matematika", count: 18 }

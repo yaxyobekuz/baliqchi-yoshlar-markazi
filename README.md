@@ -9,11 +9,14 @@ to'g'ridan-to'g'ri **Google Sheets** ga (Google Apps Script Web App orqali) tush
 
 ```
 form/
-├── index.html                # Asosiy sahifa
+├── index.html                # Asosiy sahifa (forma)
+├── dashboard.html            # Statistika paneli (ichki foydalanish)
 ├── assets/
 │   ├── translations.js       # 3 tilli matnlar
 │   ├── style.css             # Animatsiyalar va qo'shimcha stillar
-│   └── script.js             # i18n, scroll-reveal, forma yuborish
+│   ├── script.js             # i18n, scroll-reveal, forma yuborish
+│   ├── dashboard.css         # Panel dizayn tokenlari (yorug'/qorong'i)
+│   └── dashboard.js          # Ma'lumot olish, filtrlar, SVG grafiklar
 └── apps-script/
     └── Code.gs               # Google Apps Script (backend)
 ```
@@ -118,6 +121,47 @@ Ro'yxatni o'zgartirish uchun `assets/script.js` dagi `RESULT_OPTIONS` ni tahrirl
 > `setupSheet` ni **qayta ishga tushirish** kerak (eski sarlavhalar tozalanadi).
 > Ichida eski arizalar bo'lsa, avval ularni boshqa sahifaga nusxalab oling -
 > `setupSheet` sahifani butunlay tozalaydi.
+
+## Statistika paneli (`dashboard.html`)
+
+Yig'ilgan arizalar bo'yicha ichki panel. Tashqi kutubxona ishlatmaydi -
+grafiklar SVG'da qo'lda chiziladi, shuning uchun offlayn ham ishlaydi.
+
+### Ichida nima bor
+
+| Blok | Shakli | Izoh |
+|---|---|---|
+| Jami arizalar | hero raqam | Davr oralig'i bilan |
+| Maktablar / 7 kun / yuqori daraja | stat kartalar | Yuqori daraja = C1, C2, IELTS 7.0+, SAT 1500+ |
+| Arizalar dinamikasi | maydon + chiziq | 70 kundan uzun davr haftalarga yig'iladi |
+| Sertifikat turlari | gorizontal stacked bar | 3 segment, 2px yuza bo'shlig'i |
+| Xorijiy tillar | gorizontal bar | Birinchi 7 ta + "Boshqa" |
+| Sinflar kesimida | ustunlar | |
+| Eng faol maktablar | gorizontal bar | Birinchi 10 ta |
+| Natijalar taqsimoti | 3 ta kichik grafik | Shkalalar har xil - CEFR/IELTS/SAT alohida |
+| Arizalar ro'yxati | jadval | Saralash, sahifalash, CSV eksport |
+
+Qo'shimcha: filtrlar (davr, sertifikat, til, sinf, maktab, qidiruv) hamma
+grafikni bir vaqtda qayta hisoblaydi; har bir grafikning **"Jadval"**
+ko'rinishi bor; yorug'/qorong'i mavzu; telefon raqamlari standart holda
+yashirilgan; har 2 daqiqada jim yangilanadi.
+
+### Ulash
+
+1. `apps-script/Code.gs` dagi `ACCESS_KEY` ni o'zgartiring (standart: `baliqchi-2026`).
+2. Apps Script'ni **qayta deploy qiling** (Deploy → Manage deployments →
+   ✏️ → New version), aks holda yangi `doGet` ishlamaydi.
+3. `dashboard.html` ni oching va o'sha kalitni kiriting - u brauzerda saqlanadi.
+
+Tekshirish: `<WEB_APP_URL>?action=data&key=baliqchi-2026` - brauzerda JSON chiqishi kerak.
+
+Kalitsiz ko'rish uchun kirish ekranida **"Demo ma'lumotlar bilan ko'rish"**
+tugmasi bor - panel o'ylab topilgan 184 ta yozuv bilan to'liq ishlaydi.
+
+> ⚠️ **Panelni ochiq internetda joylashtirmang.** U ismlar va telefon
+> raqamlarini ko'rsatadi, `ACCESS_KEY` esa brauzerdagi so'rovda ko'rinadi -
+> bu tasodifiy kirishdan to'sadi, lekin haqiqiy himoya emas. Panelni
+> lokal oching yoki Web App'ni "Anyone with Google account" rejimiga o'tkazing.
 
 ## Yangi versiya chiqarish
 

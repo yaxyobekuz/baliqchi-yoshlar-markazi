@@ -22,6 +22,10 @@ const COL_PHONE = 9;        // I - Telefon raqami
 // Sertifikat faqat shu yilda berilgan bo'lsa qabul qilinadi
 const CERT_YEAR = 2026;
 
+// Dashboard (dashboard.html) ma'lumot olish uchun shu kalitni yuboradi.
+// Bo'sh qoldirilsa - endpoint hammaga ochiq bo'ladi (tavsiya etilmaydi).
+const ACCESS_KEY = "baliqchi-2026";
+
 /**
  * Bir marta qo'lda ishga tushiring: sahifa va sarlavhalarni tayyorlaydi.
  */
@@ -139,14 +143,84 @@ function parseIsoDate(value) {
 }
 
 /**
- * Brauzerda URL ochilganda oddiy javob (health-check uchun).
+ * GET endpoint:
+ *   ?action=ping                      - health-check
+ *   ?action=data&key=...              - dashboard uchun barcha arizalar (JSON)
+ *   ?action=data&key=...&callback=fn  - xuddi shu, JSONP ko'rinishida
+ *
+ * JSONP kerak, chunki Apps Script CORS preflight'ni qo'llab-quvvatlamaydi;
+ * dashboard avval oddiy fetch'ni sinaydi, u ishlamasa JSONP'ga o'tadi.
  */
-function doGet() {
-  return jsonResponse({
-    ok: true,
-    service: "Baliqchi gifted-youth registry",
-    time: new Date().toISOString()
-  });
+function doGet(e) {
+  const params = (e && e.parameter) || {};
+  const action = params.action || "ping";
+  const callback = params.callback;
+
+  if (action === "ping") {
+    return reply({ ok: true, service: "Baliqchi gifted-youth registry", time: new Date().toISOString() }, callback);
+  }
+
+  if (action !== "data") {
+    return reply({ ok: false, error: "Unknown action: " + action }, callback);
+  }
+
+  if (ACCESS_KEY && params.key !== ACCESS_KEY) {
+    return reply({ ok: false, error: "unauthorized" }, callback);
+  }
+
+  try {
+    return reply({ ok: true, updatedAt: new Date().toISOString(), rows: readRows() }, callback);
+  } catch (err) {
+    return reply({ ok: false, error: String(err) }, callback);
+  }
+}
+
+/** "Arizalar" sahifasini obyektlar ro'yxatiga aylantiradi */
+function readRows() {
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+  const sheet = ss.getSheetByName(SHEET_NAME);
+  if (!sheet || sheet.getLastRow() < 2) return [];
+
+  const values = sheet.getRange(2, 1, sheet.getLastRow() - 1, HEADERS.length).getValues();
+  const tz = Session.getScriptTimeZone();
+
+  return values
+    .filter(function (r) { return r[3] !== "" && r[3] != null; })
+    .map(function (r) {
+      return {
+        ts: asIsoDateTime(r[0], tz),
+        school: r[1],
+        grade: r[2],
+        fish: String(r[3]),
+        language: String(r[4]),
+        certType: String(r[5]),
+        certDate: asIsoDate(r[6], tz),
+        result: String(r[7]),
+        phone: String(r[8]),
+        lang: String(r[9] || "")
+      };
+    });
+}
+
+function asIsoDate(v, tz) {
+  if (v instanceof Date) return Utilities.formatDate(v, tz, "yyyy-MM-dd");
+  return String(v || "").slice(0, 10);
+}
+
+function asIsoDateTime(v, tz) {
+  if (v instanceof Date) return Utilities.formatDate(v, tz, "yyyy-MM-dd'T'HH:mm:ss");
+  return String(v || "");
+}
+
+/** JSONP so'ralgan bo'lsa JavaScript, aks holda JSON qaytaradi */
+function reply(obj, callback) {
+  const body = JSON.stringify(obj);
+  if (callback && /^[A-Za-z_$][A-Za-z0-9_$]*$/.test(callback)) {
+    return ContentService
+      .createTextOutput(callback + "(" + body + ");")
+      .setMimeType(ContentService.MimeType.JAVASCRIPT);
+  }
+  return ContentService.createTextOutput(body).setMimeType(ContentService.MimeType.JSON);
 }
 
 function jsonResponse(obj) {

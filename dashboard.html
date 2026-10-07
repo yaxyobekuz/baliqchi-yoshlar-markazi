@@ -8,11 +8,14 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet" />
 
   <link rel="stylesheet" href="assets/dashboard.css" />
 </head>
 <body>
+
+<!-- Uchinchi aurora nuri (qolgan ikkitasi body::before/::after) -->
+<div class="aurora-3" aria-hidden="true"></div>
 
 <!-- ================= KIRISH ================= -->
 <div id="gate" class="gate" hidden>
@@ -65,6 +68,7 @@
           <span>Umumiy</span>
         </button>
         <button class="view-btn" role="tab" aria-selected="false" data-view="applications">
+          <!-- sertifikat / diplom -->
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9 13h6M9 17h4"/></svg>
           <span>Arizalar</span>
           <b class="view-count" data-count="applications">0</b>

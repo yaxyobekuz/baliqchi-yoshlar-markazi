@@ -74,6 +74,14 @@ function svg(tag, attrs = {}, text) {
 const cssVar = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 const fmt = (n) => Number(n).toLocaleString("ru-RU").replace(/ /g, " ");
 
+/* SVG ichidagi gradient/filtr id lari takrorlanmasligi uchun */
+let _uid = 0;
+const nextUid = () => ++_uid;
+
+/* Foydalanuvchi animatsiyani kamaytirishni so'ragan bo'lsa - tekshiramiz */
+const reducedMotion = () =>
+  window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
 function pct(part, total) {
   if (!total) return "0%";
   const v = (part / total) * 100;
@@ -540,7 +548,16 @@ function attachTip(target, viz, build) {
     (target.__marks || []).forEach((m) => m.classList.add("is-hot"));
     tip.show(build(), x, y);
   };
-  const hide = () => {
+  const hide = (ev) => {
+    // Halqa diagrammasida segmentlarning hit-sohalari ustma-ust yotadi.
+    // Sichqoncha bir segmentdan ikkinchisiga o'tganda brauzer eskisiga
+    // pointerleave yuboradi - o'sha paytda tooltip'ni yopmaymiz, aks holda
+    // u darhol o'chib qoladi.
+    if (ev && ev.relatedTarget && ev.relatedTarget.classList &&
+        ev.relatedTarget.classList.contains("mark-hit")) {
+      (target.__marks || []).forEach((m) => m.classList.remove("is-hot"));
+      return;
+    }
     viz.classList.remove("is-hovering");
     (target.__marks || []).forEach((m) => m.classList.remove("is-hot"));
     tip.hide();
@@ -610,20 +627,45 @@ function sparkIsUseful(points) {
 function drawSpark(host, points) {
   if (!sparkIsUseful(points)) { host.replaceChildren(); return; }
   const W = host.clientWidth || 300;
-  const H = 54;
+  const H = 76;
   const max = Math.max(1, ...points.map((p) => p.value));
   const x = (i) => (i / (points.length - 1)) * W;
-  const y = (v) => H - (v / max) * (H - 6) - 3;
+  const y = (v) => H - (v / max) * (H - 8) - 4;
   const color = cssVar("--accent");
+  const uid = nextUid();
 
   const root = svg("svg", { viewBox: `0 0 ${W} ${H}`, width: W, height: H, "aria-hidden": "true" });
+
+  const defs = svg("defs");
+  const g = svg("linearGradient", { id: `sp-${uid}`, x1: "0", y1: "0", x2: "0", y2: "1" });
+  g.appendChild(svg("stop", { offset: "0%", "stop-color": color, "stop-opacity": "0.42" }));
+  g.appendChild(svg("stop", { offset: "100%", "stop-color": color, "stop-opacity": "0" }));
+  defs.appendChild(g);
+  root.appendChild(defs);
+
   const line = points.map((p, i) => `${i ? "L" : "M"}${x(i).toFixed(1)},${y(p.value).toFixed(1)}`).join(" ");
-  root.appendChild(svg("path", { d: `${line} L${W},${H} L0,${H} Z`, fill: color, "fill-opacity": "0.1" }));
-  root.appendChild(svg("path", { d: line, fill: "none", stroke: color, "stroke-width": "2", "stroke-linejoin": "round", "stroke-linecap": "round" }));
-  root.appendChild(svg("circle", {
-    cx: x(points.length - 1), cy: y(points[points.length - 1].value), r: 3.5,
-    fill: color, stroke: cssVar("--surface-1"), "stroke-width": "2"
+  root.appendChild(svg("path", {
+    class: "anim-area", d: `${line} L${W},${H} L0,${H} Z`, fill: `url(#sp-${uid})`
   }));
+
+  const path = svg("path", {
+    class: "anim-line", d: line, fill: "none", stroke: color,
+    "stroke-width": "2.2", "stroke-linejoin": "round", "stroke-linecap": "round"
+  });
+  root.appendChild(path);
+  try {
+    path.style.setProperty("--dash", Math.ceil(path.getTotalLength()));
+  } catch (_) { path.classList.remove("anim-line"); }
+
+  const lastX = x(points.length - 1);
+  const lastY = y(points[points.length - 1].value);
+  const dot = svg("circle", {
+    class: "anim-dot", cx: lastX, cy: lastY, r: 3.8,
+    fill: color, stroke: cssVar("--surface-raised"), "stroke-width": "2"
+  });
+  dot.style.animationDelay = "900ms";
+  root.appendChild(dot);
+
   host.replaceChildren(root);
 }
 
@@ -646,6 +688,7 @@ function drawTrend(host, opts) {
   const x = (i) => m.l + (i / (points.length - 1)) * iw;
   const y = (v) => m.t + ih - (v / max) * ih;
 
+  const uid = nextUid();
   const root = svg("svg", { viewBox: `0 0 ${W} ${H}`, width: W, height: H, role: "img" });
   root.appendChild(svg("title", {}, "Ro'yxatga olish dinamikasi"));
 
@@ -654,31 +697,84 @@ function drawTrend(host, opts) {
     root.appendChild(svg("text", { class: "axis-text", x: m.l - 8, y: y(t) + 3.5, "text-anchor": "end" }, fmt(t)));
   });
 
+  // Har bir qator uchun gradient - maydon tagiga yumshoq o'tish
+  const defs = svg("defs");
+  series.forEach((s, si) => {
+    const g = svg("linearGradient", { id: `grad-${uid}-${si}`, x1: "0", y1: "0", x2: "0", y2: "1" });
+    g.appendChild(svg("stop", { offset: "0%", "stop-color": s.color, "stop-opacity": "0.34" }));
+    g.appendChild(svg("stop", { offset: "100%", "stop-color": s.color, "stop-opacity": "0.02" }));
+    defs.appendChild(g);
+  });
+  root.appendChild(defs);
+
+  const labelQueue = [];
+
   series.forEach((s, si) => {
     const line = points.map((p, i) => `${i ? "L" : "M"}${x(i).toFixed(1)},${y(p[s.key] || 0).toFixed(1)}`).join(" ");
     if (series.length === 1) {
       root.appendChild(svg("path", {
+        class: "anim-area",
         d: `${line} L${x(points.length - 1)},${y(0)} L${x(0)},${y(0)} Z`,
-        fill: s.color, "fill-opacity": "0.1"
+        fill: `url(#grad-${uid}-${si})`
       }));
     }
-    root.appendChild(svg("path", {
-      d: line, fill: "none", stroke: s.color, "stroke-width": "2",
+    const path = svg("path", {
+      class: "anim-line",
+      d: line, fill: "none", stroke: s.color, "stroke-width": "2.4",
       "stroke-linejoin": "round", "stroke-linecap": "round"
-    }));
+    });
+    // Chiziq uzunligini o'lchab, chizilish animatsiyasini sozlaymiz
+    root.appendChild(path);
+    try {
+      const len = Math.ceil(path.getTotalLength());
+      path.style.setProperty("--dash", len);
+      path.style.animationDelay = `${si * 160}ms`;
+    } catch (_) { path.classList.remove("anim-line"); }
 
-    // oxirgi nuqta: 2px yuza halqasi + to'g'ridan-to'g'ri yorliq
+    // oxirgi nuqta: pulsatsiyalanuvchi halqa + to'g'ridan-to'g'ri yorliq
     const lastI = points.length - 1;
     const lastVal = points[lastI][s.key] || 0;
-    root.appendChild(svg("circle", {
-      cx: x(lastI), cy: y(lastVal), r: 4.5,
-      fill: s.color, stroke: cssVar("--surface-1"), "stroke-width": "2"
-    }));
-    if (lastVal > 0) {
-      root.appendChild(svg("text", {
-        class: "value-text", x: x(lastI) - 8, y: y(lastVal) - 9 - si * 2, "text-anchor": "end"
-      }, fmt(lastVal)));
+
+    if (!reducedMotion()) {
+      const pulse = svg("circle", {
+        class: "anim-dot", cx: x(lastI), cy: y(lastVal), r: 4.5,
+        fill: "none", stroke: s.color, "stroke-width": "2", opacity: ".7"
+      });
+      pulse.style.animationDelay = "1100ms";
+      pulse.appendChild(svg("animate", {
+        attributeName: "r", values: "4.5;13;4.5", dur: "2.4s",
+        begin: `${1.1 + si * 0.2}s`, repeatCount: "indefinite"
+      }));
+      pulse.appendChild(svg("animate", {
+        attributeName: "opacity", values: ".7;0;.7", dur: "2.4s",
+        begin: `${1.1 + si * 0.2}s`, repeatCount: "indefinite"
+      }));
+      root.appendChild(pulse);
     }
+
+    const dot = svg("circle", {
+      class: "anim-dot", cx: x(lastI), cy: y(lastVal), r: 4.5,
+      fill: s.color, stroke: cssVar("--surface-raised"), "stroke-width": "2"
+    });
+    dot.style.animationDelay = "1000ms";
+    root.appendChild(dot);
+
+    if (lastVal > 0) labelQueue.push({ si, value: lastVal, y: y(lastVal), color: s.color });
+  });
+
+  // Oxirgi qiymat yorliqlari: qiymatlar yaqin bo'lsa ustma-ust tushadi,
+  // shuning uchun ularni yuqoridan pastga ko'rib, kamida LBL_GAP px ajratamiz.
+  const LBL_GAP = 14;
+  labelQueue.sort((a, b) => a.y - b.y);
+  labelQueue.forEach((l, i) => {
+    if (i > 0 && l.y - labelQueue[i - 1].y < LBL_GAP) l.y = labelQueue[i - 1].y + LBL_GAP;
+  });
+  labelQueue.forEach((l) => {
+    const lbl = svg("text", {
+      class: "value-text anim-dot", x: x(points.length - 1) - 9, y: l.y - 8, "text-anchor": "end"
+    }, fmt(l.value));
+    lbl.style.animationDelay = "1150ms";
+    root.appendChild(lbl);
   });
 
   const minGap = measure("00.00", 10.5, 400) + 14;
@@ -825,6 +921,123 @@ function drawStack(host, parts, total) {
   host.replaceChildren(root, legend);
 }
 
+// ---------- Halqa (donut) ----------
+/**
+ * Markazida jami son turadigan halqa diagrammasi.
+ * Segmentlar stroke-dasharray orqali chiziladi - shu bois
+ * ularni soat yo'nalishi bo'yicha "o'sib chiqqandek" jonlantirish oson.
+ */
+function drawDonut(host, parts, total, opts = {}) {
+  const live = parts.filter((p) => p.value > 0);
+  if (!live.length || !total) {
+    host.replaceChildren(elem("p", { class: "mini-empty" }, "Ma'lumot yo'q."));
+    return;
+  }
+
+  const W = host.clientWidth || 380;
+  const H = opts.height || 230;
+  const cx = W / 2;
+  const cy = H / 2;
+  const R = Math.min(cx, cy) - 14;      // tashqi radius
+  const THICK = Math.max(16, R * 0.30); // halqa qalinligi
+  const r = R - THICK / 2;              // markaziy chiziq radiusi
+  const C = 2 * Math.PI * r;
+  const GAP = live.length > 1 ? 2.5 : 0; // segmentlar orasidagi tirqish (px)
+
+  const root = svg("svg", { viewBox: `0 0 ${W} ${H}`, width: W, height: H, role: "img" });
+  root.appendChild(svg("title", {}, opts.title || "Taqsimot"));
+
+  // Orqa fon halqasi
+  root.appendChild(svg("circle", {
+    cx, cy, r, fill: "none",
+    stroke: cssVar("--surface-3"), "stroke-width": THICK, opacity: ".55"
+  }));
+
+  const g = svg("g", { transform: `rotate(-90 ${cx} ${cy})` });
+  let offset = 0;
+
+  live.forEach((p, i) => {
+    const frac = p.value / total;
+    const len = Math.max(C * frac - GAP, 1);
+
+    const seg = svg("circle", {
+      class: "mark", cx, cy, r, fill: "none",
+      stroke: p.color, "stroke-width": THICK, "stroke-linecap": "butt",
+      "stroke-dasharray": `${len} ${C - len}`,
+      "stroke-dashoffset": -offset
+    });
+
+    // Soat yo'nalishi bo'yicha chizilish animatsiyasi
+    if (!reducedMotion()) {
+      seg.style.transition = "none";
+      const from = svg("animate", {
+        attributeName: "stroke-dasharray",
+        from: `0 ${C}`, to: `${len} ${C - len}`,
+        dur: "760ms", begin: `${i * 110}ms`,
+        fill: "freeze", calcMode: "spline",
+        keySplines: "0.22 1 0.36 1", keyTimes: "0;1"
+      });
+      seg.setAttribute("stroke-dasharray", `0 ${C}`);
+      seg.appendChild(from);
+    }
+
+    const hit = svg("circle", {
+      class: "mark-hit", cx, cy, r, fill: "none",
+      stroke: "transparent", "stroke-width": THICK,
+      "stroke-dasharray": `${len} ${C - len}`, "stroke-dashoffset": -offset,
+      tabindex: "0", role: "img",
+      "aria-label": `${p.label}: ${p.value}, ${pct(p.value, total)}`
+    });
+    // .mark-hit da fill: transparent bor, lekin bu segment stroke bilan
+    // chizilgan - hodisalar chiziq ustida ham ushlanishi kerak
+    hit.style.pointerEvents = "stroke";
+    hit.__marks = [seg];
+    attachTip(hit, host, () => tipContent(p.label, [
+      { name: `· ${pct(p.value, total)}`, value: fmt(p.value), color: p.color }
+    ]));
+
+    g.append(seg, hit);
+    offset += C * frac;
+  });
+  root.appendChild(g);
+
+  // Markazdagi jami son.
+  // pointer-events: none - aks holda matn hover hodisasini ushlab,
+  // segment tooltip'ini darhol yopib qo'yadi.
+  const totalText = svg("text", {
+    x: cx, y: cy - 2, "text-anchor": "middle",
+    "font-size": "26", "font-weight": "800",
+    fill: cssVar("--text-primary"), "font-family": "Sora, Inter, sans-serif"
+  }, fmt(total));
+  totalText.style.pointerEvents = "none";
+  root.appendChild(totalText);
+
+  const centerLbl = svg("text", {
+    x: cx, y: cy + 17, "text-anchor": "middle",
+    "font-size": "11", "font-weight": "700", "letter-spacing": ".06em",
+    fill: cssVar("--text-muted")
+  }, (opts.centerLabel || "JAMI").toUpperCase());
+  centerLbl.style.pointerEvents = "none";
+  root.appendChild(centerLbl);
+
+  // Legenda - qiymat va ulush bilan
+  const legend = elem("div", { class: "legend" });
+  live.forEach((p) => {
+    const item = elem("div", { class: "legend-item" });
+    const key = elem("span", { class: "legend-key" });
+    key.style.background = p.color;
+    key.style.color = p.color;
+    item.append(
+      key,
+      elem("span", {}, p.label),
+      elem("span", { class: "legend-value" }, `${fmt(p.value)} · ${pct(p.value, total)}`)
+    );
+    legend.appendChild(item);
+  });
+
+  host.replaceChildren(root, legend);
+}
+
 // ---------- Gorizontal bar ----------
 function drawHBars(host, items, opts = {}) {
   if (!items.length) {
@@ -845,26 +1058,49 @@ function drawHBars(host, items, opts = {}) {
   const max = Math.max(...items.map((d) => d.value));
   const total = items.reduce((s, d) => s + d.value, 0);
 
+  const uid = nextUid();
   const root = svg("svg", { viewBox: `0 0 ${W} ${H}`, width: W, height: H, role: "img" });
   root.appendChild(svg("title", {}, opts.title || "Taqsimot"));
+
+  // Barlar uchun gorizontal gradient - chapdan o'ngga yorishadi
+  const baseColor = opts.color || cssVar("--series-1");
+  const defs = svg("defs");
+  const grad = svg("linearGradient", { id: `hb-${uid}`, x1: "0", y1: "0", x2: "1", y2: "0" });
+  grad.appendChild(svg("stop", { offset: "0%", "stop-color": baseColor, "stop-opacity": "0.78" }));
+  grad.appendChild(svg("stop", { offset: "100%", "stop-color": baseColor, "stop-opacity": "1" }));
+  defs.appendChild(grad);
+  root.appendChild(defs);
 
   items.forEach((d, i) => {
     const yTop = i * rowH + (rowH - barH) / 2;
     const w = max ? Math.max(2, (d.value / max) * trackW) : 2;
-    const color = d.isOther ? cssVar("--series-de") : (opts.color || cssVar("--series-1"));
+    const color = d.isOther ? cssVar("--series-de") : baseColor;
 
     root.appendChild(svg("text", {
       class: "label-text", x: labelW - GUTTER, y: i * rowH + rowH / 2 + 4, "text-anchor": "end"
     }, truncate(d.label, labelW - GUTTER, 11.5, 500)));
 
+    // Bo'sh yo'lak - barning to'liq uzunligini ko'rsatadi
+    root.appendChild(svg("path", {
+      d: roundedRectPath(labelW, yTop, trackW, barH, { tr: 4, br: 4 }),
+      fill: cssVar("--surface-3"), opacity: ".5"
+    }));
+
     const mark = svg("path", {
-      class: "mark", d: roundedRectPath(labelW, yTop, w, barH, { tr: 4, br: 4 }), fill: color
+      class: "mark anim-bar",
+      d: roundedRectPath(labelW, yTop, w, barH, { tr: 4, br: 4 }),
+      fill: d.isOther ? color : `url(#hb-${uid})`
     });
+    // transform-origin barning chap chetida bo'lishi kerak
+    mark.style.transformOrigin = `${labelW}px center`;
+    mark.style.animationDelay = `${i * 55}ms`;
     root.appendChild(mark);
 
-    root.appendChild(svg("text", {
-      class: "value-text", x: labelW + w + 8, y: i * rowH + rowH / 2 + 4
-    }, fmt(d.value)));
+    const valText = svg("text", {
+      class: "value-text anim-dot", x: labelW + w + 8, y: i * rowH + rowH / 2 + 4
+    }, fmt(d.value));
+    valText.style.animationDelay = `${i * 55 + 320}ms`;
+    root.appendChild(valText);
 
     const hit = svg("rect", {
       class: "mark-hit", x: 0, y: i * rowH, width: W, height: rowH,
@@ -902,8 +1138,17 @@ function drawColumns(host, items, opts = {}) {
   const widestLabel = Math.max(...items.map((d) => measure(d.label, 11, 400)));
   const keep = labelIndices(items.length, (i) => m.l + band * i + band / 2, widestLabel + 10);
 
+  const uid = nextUid();
   const root = svg("svg", { viewBox: `0 0 ${W} ${H}`, width: W, height: H, role: "img" });
   root.appendChild(svg("title", {}, opts.title || "Taqsimot"));
+
+  // Ustunlar uchun vertikal gradient - tepasi to'q, pastki qismi yorug'
+  const defs = svg("defs");
+  const grad = svg("linearGradient", { id: `col-${uid}`, x1: "0", y1: "0", x2: "0", y2: "1" });
+  grad.appendChild(svg("stop", { offset: "0%", "stop-color": color, "stop-opacity": "1" }));
+  grad.appendChild(svg("stop", { offset: "100%", "stop-color": color, "stop-opacity": "0.55" }));
+  defs.appendChild(grad);
+  root.appendChild(defs);
 
   const y = (v) => m.t + ih - (v / top) * ih;
 
@@ -920,10 +1165,18 @@ function drawColumns(host, items, opts = {}) {
     let mark = null;
     if (h > 0) {
       mark = svg("path", {
-        class: "mark", d: roundedRectPath(cx - barW / 2, yTop, barW, h, { tl: 4, tr: 4 }), fill: color
+        class: "mark anim-col",
+        d: roundedRectPath(cx - barW / 2, yTop, barW, h, { tl: 4, tr: 4 }),
+        fill: `url(#col-${uid})`
       });
+      // o'sish ustunning tagidan boshlanadi
+      mark.style.transformOrigin = `center ${m.t + ih}px`;
+      mark.style.animationDelay = `${i * 45}ms`;
       root.appendChild(mark);
-      root.appendChild(svg("text", { class: "value-text", x: cx, y: yTop - 7, "text-anchor": "middle" }, fmt(d.value)));
+
+      const vt = svg("text", { class: "value-text anim-dot", x: cx, y: yTop - 7, "text-anchor": "middle" }, fmt(d.value));
+      vt.style.animationDelay = `${i * 45 + 300}ms`;
+      root.appendChild(vt);
     }
 
     if (keep.has(i)) {
@@ -1098,7 +1351,9 @@ function youthChartSpecs(rows, opts = {}) {
     id: "cert",
     title: "Sertifikat turlari",
     sub: "Yozuvlarning turlar bo'yicha ulushi",
-    chart: (h) => drawStack(h, certParts, rows.length),
+    chart: (h) => drawDonut(h, certParts, rows.length, {
+      title: "Sertifikat turlari", centerLabel: "Yozuv"
+    }),
     table: (h) => h.replaceChildren(buildTable(
       ["Sertifikat turi", "Yozuvlar", "Ulush"],
       [...certCounts.entries()].sort((a, b) => b[1] - a[1])
@@ -1323,17 +1578,48 @@ function centerChartSpecs(rows) {
 //  HERO + KPI
 // ============================================================
 
+/**
+ * Raqamni 0 dan yakuniy qiymatgacha sanab chiqadi.
+ * Katta sonlar tez, kichiklari sekinroq - ko'z ilg'aydigan tezlik.
+ */
+function countUp(node, target, duration = 900) {
+  const end = Number(target) || 0;
+  if (reducedMotion() || end === 0) {
+    node.textContent = fmt(end);
+    return;
+  }
+
+  const start = performance.now();
+  // easeOutExpo - boshida tez, oxirida sekin to'xtaydi
+  const ease = (t) => (t === 1 ? 1 : 1 - Math.pow(2, -10 * t));
+
+  function step(now) {
+    const t = Math.min(1, (now - start) / duration);
+    node.textContent = fmt(Math.round(ease(t) * end));
+    if (t < 1) requestAnimationFrame(step);
+  }
+  node.textContent = "0";
+  requestAnimationFrame(step);
+}
+
 function statCard({ label, value, note, color }) {
   const card = elem("div", { class: "stat-card" });
+  if (color) card.style.setProperty("--stat-color", color);
+
   const top = elem("div", { class: "stat-top" });
   if (color) {
     const dot = elem("span", { class: "stat-dot" });
     dot.style.background = color;
+    dot.style.color = color;          // ::shadow halqasi currentColor dan oladi
     top.appendChild(dot);
   }
   top.appendChild(elem("p", { class: "stat-label" }, label));
   card.appendChild(top);
-  card.appendChild(elem("p", { class: "stat-value" }, fmt(value)));
+
+  const valueNode = elem("p", { class: "stat-value" }, fmt(value));
+  card.appendChild(valueNode);
+  countUp(valueNode, value);
+
   if (note) card.appendChild(elem("p", { class: "stat-note" }, note));
   return card;
 }
@@ -1341,7 +1627,7 @@ function statCard({ label, value, note, color }) {
 function renderHero(rows) {
   const v = view();
   $("#hero-label").textContent = v.heroLabel;
-  $("#hero-value").textContent = fmt(rows.length);
+  countUp($("#hero-value"), rows.length, 1100);
 
   const dated = rows.filter((r) => r.ts).map((r) => r.ts).sort((a, b) => a - b);
   $("#hero-note").textContent = dated.length ? `${fullDate(dated[0])} - ${fullDate(dated[dated.length - 1])}` : "";
@@ -1381,17 +1667,17 @@ function renderKPIs(rows) {
       { label: "Arizalar", value: apps, note: '"Arizalar" sahifasi', color: cssVar("--series-1") },
       { label: "Yoshlar", value: yth, note: '"Yoshlar" sahifasi', color: cssVar("--series-2") },
       { label: "O'quv markazlari", value: centers.length, note: '"Markazlar" sahifasi', color: cssVar("--series-3") },
-      { label: "To'garak o'quvchilari", value: students, note: `${fmt(centers.reduce((s, c) => s + c.clubCount, 0))} ta to'garak` }
+      { label: "To'garak o'quvchilari", value: students, note: `${fmt(centers.reduce((s, c) => s + c.clubCount, 0))} ta to'garak`, color: cssVar("--series-4") }
     );
   } else if (isCenters()) {
     const staff = rows.reduce((s, c) => s + c.staff, 0);
     const clubs = rows.reduce((s, c) => s + c.clubCount, 0);
     const students = rows.reduce((s, c) => s + c.students, 0);
     cards.push(
-      { label: "Jami xodimlar", value: staff, note: rows.length ? `O'rtacha ${(staff / rows.length).toFixed(1)} ta markazga` : "" },
-      { label: "Jami to'garaklar", value: clubs, note: `${fmt(subjectTotals(rows).size)} xil fan` },
-      { label: "Jami o'quvchilar", value: students, note: rows.length ? `O'rtacha ${Math.round(students / rows.length)} ta markazga` : "" },
-      { label: "O'rtacha to'garak hajmi", value: clubs ? Math.round(students / clubs) : 0, note: "Bitta to'garakdagi o'quvchi" }
+      { label: "Jami xodimlar", value: staff, note: rows.length ? `O'rtacha ${(staff / rows.length).toFixed(1)} ta markazga` : "", color: cssVar("--series-1") },
+      { label: "Jami to'garaklar", value: clubs, note: `${fmt(subjectTotals(rows).size)} xil fan`, color: cssVar("--series-2") },
+      { label: "Jami o'quvchilar", value: students, note: rows.length ? `O'rtacha ${Math.round(students / rows.length)} ta markazga` : "", color: cssVar("--series-3") },
+      { label: "O'rtacha to'garak hajmi", value: clubs ? Math.round(students / clubs) : 0, note: "Bitta to'garakdagi o'quvchi", color: cssVar("--series-4") }
     );
   } else {
     const schools = new Set(rows.map((r) => r.school).filter(Boolean));
@@ -1400,17 +1686,17 @@ function renderKPIs(rows) {
     const high = rows.filter(isHighLevel).length;
 
     cards.push(
-      { label: "Qamrab olingan maktablar", value: schools.size, note: rows.length ? `O'rtacha ${(rows.length / Math.max(1, schools.size)).toFixed(1)} ta` : "" },
-      { label: "So'nggi 7 kun", value: week, note: rows.length ? `Jami yozuvlarning ${pct(week, rows.length)} i` : "" },
-      { label: "Yuqori daraja", value: high, note: "C1 / C2 · IELTS 7.0+ · SAT 1500+" }
+      { label: "Qamrab olingan maktablar", value: schools.size, note: rows.length ? `O'rtacha ${(rows.length / Math.max(1, schools.size)).toFixed(1)} ta` : "", color: cssVar("--series-1") },
+      { label: "So'nggi 7 kun", value: week, note: rows.length ? `Jami yozuvlarning ${pct(week, rows.length)} i` : "", color: cssVar("--series-2") },
+      { label: "Yuqori daraja", value: high, note: "C1 / C2 · IELTS 7.0+ · SAT 1500+", color: cssVar("--series-5") }
     );
 
     if (state.view === "youth") {
       const social = rows.filter((r) => r.social === "Ha").length;
-      cards.push({ label: "Ijtimoiy reyestrda", value: social, note: rows.length ? `Jami yozuvlarning ${pct(social, rows.length)} i` : "" });
+      cards.push({ label: "Ijtimoiy reyestrda", value: social, note: rows.length ? `Jami yozuvlarning ${pct(social, rows.length)} i` : "", color: cssVar("--series-3") });
     } else {
       const langs = new Set(rows.map((r) => r.language).filter(Boolean));
-      cards.push({ label: "Xorijiy tillar", value: langs.size, note: "Turli til yo'nalishlari" });
+      cards.push({ label: "Xorijiy tillar", value: langs.size, note: "Turli til yo'nalishlari", color: cssVar("--series-3") });
     }
   }
 
@@ -1757,7 +2043,38 @@ function currentTheme() {
   return matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 }
 
+/**
+ * Kartalar ustida sichqoncha ortidan yuradigan yorug'lik.
+ * Hodisa document darajasida - kartalar qayta chizilganda ham ishlaydi.
+ */
+function bindCardGlow() {
+  if (reducedMotion()) return;
+
+  let frame = 0;
+  document.addEventListener("pointermove", (e) => {
+    if (frame) return;                       // kadrga bitta yangilanish yetarli
+    frame = requestAnimationFrame(() => {
+      frame = 0;
+      const card = e.target.closest && e.target.closest(".card");
+      if (!card) return;
+      const r = card.getBoundingClientRect();
+      card.style.setProperty("--mx", `${e.clientX - r.left}px`);
+      card.style.setProperty("--my", `${e.clientY - r.top}px`);
+    });
+  }, { passive: true });
+
+  // Sichqoncha kartadan chiqqanda nurni olib qo'yamiz
+  document.addEventListener("pointerout", (e) => {
+    const card = e.target.closest && e.target.closest(".card");
+    if (card && !card.contains(e.relatedTarget)) {
+      card.style.removeProperty("--mx");
+      card.style.removeProperty("--my");
+    }
+  }, { passive: true });
+}
+
 function bindEvents() {
+  bindCardGlow();
   $$(".view-btn").forEach((btn) => btn.addEventListener("click", () => switchView(btn.dataset.view)));
 
   $$(".chip[data-range]").forEach((btn) => {

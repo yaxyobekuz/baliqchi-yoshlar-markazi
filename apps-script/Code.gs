@@ -30,7 +30,7 @@ const APPLICATION_HEADERS = [
   "Sayt tili"
 ];
 
-// register.html - 2-tab ("O'quv markazi" ustuni qo'shimcha)
+// register.html - 2-tab (oxirgi ikki ustun qo'shimcha)
 const YOUTH_HEADERS = [
   "Vaqt",
   "Maktab raqami",
@@ -41,6 +41,7 @@ const YOUTH_HEADERS = [
   "Sertifikat berilgan sana",
   "Sertifikat natijasi",
   "Telefon raqami",
+  "Ijtimoiy reyestrda",
   "O'quv markazi",
   "Sayt tili"
 ];
@@ -52,8 +53,7 @@ const CENTER_HEADERS = [
   "Xodimlar soni",
   "To'garaklar soni",
   "To'garaklar (nom va o'quvchi soni)",
-  "Jami o'quvchilar",
-  "Ijtimoiy reyestrdagi oila farzandlari"
+  "Jami o'quvchilar"
 ];
 
 // Ikkala yosh jadvalida ham bir xil ustun raqamlari (1 dan boshlanadi)
@@ -170,8 +170,12 @@ function doPost(e) {
   }
 }
 
-/** Ikkala yosh formasi uchun umumiy yozuvchi - faqat sahifa va markaz ustuni farqli */
-function saveYouth(data, sheetName, headers, withCenter) {
+/**
+ * Ikkala yosh formasi uchun umumiy yozuvchi.
+ * `withExtras` - register.html ning qo'shimcha ustunlari
+ * ("Ijtimoiy reyestrda" va "O'quv markazi"); index.html da ular yo'q.
+ */
+function saveYouth(data, sheetName, headers, withExtras) {
   const required = ["school", "grade", "fish", "language", "certType", "certDate", "result", "phone"];
   const missing = required.filter(function (k) { return !data[k]; });
   if (missing.length) {
@@ -196,7 +200,10 @@ function saveYouth(data, sheetName, headers, withCenter) {
     String(data.result).slice(0, 20),
     String(data.phone).slice(0, 30)
   ];
-  if (withCenter) row.push(String(data.center || "").slice(0, 120));
+  if (withExtras) {
+    row.push(String(data.social || "").slice(0, 10));
+    row.push(String(data.center || "").slice(0, 120));
+  }
   row.push(String(data.lang || "uz").slice(0, 4));
 
   const nextRow = sheet.getLastRow() + 1;
@@ -212,9 +219,7 @@ function saveCenter(data) {
   if (!data.name) return jsonResponse({ ok: false, error: "Missing fields: name" });
 
   const staff = Number(data.staff);
-  const social = Number(data.social);
   if (!(staff > 0)) return jsonResponse({ ok: false, error: "Invalid staff" });
-  if (!(social >= 0)) return jsonResponse({ ok: false, error: "Invalid social" });
 
   const clubs = (data.clubs || []).filter(function (c) {
     return c && c.name && Number(c.count) > 0;
@@ -238,8 +243,7 @@ function saveCenter(data) {
     staff,
     clubs.length,
     summary.slice(0, 2000),
-    students,
-    social
+    students
   ];
 
   const nextRow = sheet.getLastRow() + 1;
@@ -495,6 +499,7 @@ function testYouthPost() {
         certDate: CERT_YEAR + "-02-14",
         result: "B2",
         phone: "+998 95 477 08 11",
+        social: "Yo'q",
         center: "Baliqchi Edu Center",
         lang: "uz"
       })
@@ -512,7 +517,6 @@ function testCenterPost() {
         timestamp: new Date().toISOString(),
         name: "Baliqchi Edu Center",
         staff: 14,
-        social: 23,
         clubs: [
           { name: "Ingliz tili", count: 42 },
           { name: "Matematika", count: 18 }

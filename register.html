@@ -133,16 +133,6 @@
               class="mt-2 w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/10 outline-none transition" />
           </div>
 
-          <!-- Ijtimoiy reyestr -->
-          <div>
-            <label for="c-social" class="block text-sm font-semibold">
-              Ijtimoiy reyestrda turgan oila farzandlari <span class="text-brand-red">*</span>
-            </label>
-            <input id="c-social" name="social" type="number" required min="0" max="10000" step="1" inputmode="numeric"
-              placeholder="Masalan: 23"
-              class="mt-2 w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/10 outline-none transition" />
-          </div>
-
           <!-- To'garaklar -->
           <div class="sm:col-span-2">
             <div class="flex items-end justify-between gap-3">
@@ -270,7 +260,20 @@
               class="mt-2 w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/10 outline-none transition" />
           </div>
 
-          <!-- 9. O'quv markazi -->
+          <!-- 9. Ijtimoiy reyestr -->
+          <div>
+            <label for="y-social" class="block text-sm font-semibold">
+              Ijtimoiy reyestrda turadimi? <span class="text-brand-red">*</span>
+            </label>
+            <select id="y-social" name="social" required
+              class="mt-2 w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/10 outline-none transition">
+              <option value="">Tanlang...</option>
+              <option value="Ha">Ha</option>
+              <option value="Yo'q">Yo'q</option>
+            </select>
+          </div>
+
+          <!-- 10. O'quv markazi -->
           <div class="sm:col-span-2">
             <div class="flex items-end justify-between gap-3">
               <label for="y-center" class="block text-sm font-semibold">

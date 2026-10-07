@@ -130,7 +130,6 @@ Header + main + footer. Mainda ikkita forma, tab orqali almashadi
 | Logotipi | file | ixtiyoriy · PNG/JPG/SVG · 5 MB gacha |
 | Umumiy hodimlari soni | number | 1 - 2000 |
 | To'garaklar nomi + o'quvchi soni | qo'shiladigan qatorlar | kamida 1 ta, nomlar takrorlanmaydi |
-| Ijtimoiy reyestrdagi oila farzandlari | number | 0 dan |
 
 Logotip yuborishdan oldin brauzerda 512px gacha kichraytiriladi, so'ng Apps Script
 uni **Drive** dagi `Baliqchi - markaz logotiplari` papkasiga saqlab, havolasini
@@ -149,8 +148,15 @@ jadvalga yozadi.
 
 ### 2-tab - "Iqtidorli yoshni ro'yxatdan o'tkazish" → `Yoshlar` sahifasi
 
-`index.html` dagi forma bilan bir xil tartibdagi 8 maydon, oxirida qo'shimcha
-**"O'quv markazni tanlash"** maydoni. Yozuvlar alohida (`Yoshlar`) jadvalga tushadi. Uning variantlari
+`index.html` dagi forma bilan bir xil tartibdagi 8 maydon, oxirida ikkita
+qo'shimcha maydon:
+
+| Maydon | Tip | Variantlar |
+|---|---|---|
+| Ijtimoiy reyestrda turadimi? | select | `Ha` / `Yo'q` |
+| O'quv markazni tanlash | select | `Markazlar` sahifasidan + "Markazga a'zo emas" |
+
+Yozuvlar alohida (`Yoshlar`) jadvalga tushadi. Uning variantlari
 `Markazlar` sahifasidagi nomlardan JSONP orqali olinadi
 (`?action=centers`, kalit talab qilinmaydi); ro'yxatga "Markazga a'zo emas"
 varianti ham qo'shiladi.
@@ -179,11 +185,11 @@ deployment uchchalasiga xizmat qiladi, POST'dagi `type` maydoni yo'naltiradi.
 **`Arizalar`** (index.html):
 `Vaqt | Maktab raqami | Sinfi | O'quvchining ismi-sharifi | Xorijiy til nomi | Sertifikat turi | Sertifikat berilgan sana | Sertifikat natijasi | Telefon raqami | Sayt tili`
 
-**`Yoshlar`** (register.html 2-tab) - yuqoridagi + `O'quv markazi`:
-`… | Telefon raqami | O'quv markazi | Sayt tili`
+**`Yoshlar`** (register.html 2-tab) - yuqoridagi + 2 ta ustun:
+`… | Telefon raqami | Ijtimoiy reyestrda | O'quv markazi | Sayt tili`
 
 **`Markazlar`** (register.html 1-tab):
-`Vaqt | O'quv markaz nomi | Logotip | Xodimlar soni | To'garaklar soni | To'garaklar (nom va o'quvchi soni) | Jami o'quvchilar | Ijtimoiy reyestrdagi oila farzandlari`
+`Vaqt | O'quv markaz nomi | Logotip | Xodimlar soni | To'garaklar soni | To'garaklar (nom va o'quvchi soni) | Jami o'quvchilar`
 
 > ⚠️ `setupSheet` va `setupRegisterSheets` o'z sahifalarini **tozalaydi**.
 > `setupSheet` faqat `Arizalar` ga, `setupRegisterSheets` faqat `Yoshlar` va

@@ -355,7 +355,6 @@ function bindCenterForm() {
       timestamp: new Date().toISOString(),
       name: $("#c-name").value.trim(),
       staff: Number($("#c-staff").value),
-      social: Number($("#c-social").value),
       clubs: list,
       logo: logoPayload
     };
@@ -469,6 +468,7 @@ function bindYouthForm() {
   youth.result = $("#y-result");
   youth.resultSat = $("#y-result-sat");
   youth.phone = $("#y-phone");
+  youth.social = $("#y-social");
   youth.center = $("#y-center");
 
   buildYouthOptions();
@@ -512,6 +512,7 @@ function bindYouthForm() {
       certDate: youth.certDate.value,
       result: youth.certType.value === "SAT" ? youth.resultSat.value.trim() : youth.result.value,
       phone: youth.phone.value.trim(),
+      social: youth.social.value,
       center: youth.center.value,
       lang: "uz"
     };

@@ -259,17 +259,54 @@ function saveLogo(logo, centerName) {
 
     const blob = Utilities.newBlob(bytes, logo.mime || "image/png", fileName);
     const file = getLogoFolder().createFile(blob);
-    file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+
+    // Havola bo'yicha ko'rish - ochilmasa ham fayl saqlangan bo'ladi
+    try {
+      file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    } catch (shareErr) {
+      // ruxsat yetmasa: fayl Drive'da qoladi, faqat egasi ko'radi
+    }
+
     return file.getUrl();
   } catch (err) {
     // logotip saqlanmasa ham markaz yozuvi yo'qolmasligi kerak
-    return "Xato: " + String(err).slice(0, 120);
+    return "Logotip saqlanmadi: " + String(err && err.message ? err.message : err).slice(0, 150);
   }
 }
 
+/**
+ * Logotiplar papkasi. Nom bo'yicha qidirish (getFoldersByName) butun Drive'ni
+ * ko'rish ruxsatini talab qiladi, shuning uchun papka ID'si bir marta
+ * yaratilib Script Properties'da saqlanadi - "drive.file" ruxsati yetarli.
+ */
 function getLogoFolder() {
-  const found = DriveApp.getFoldersByName(LOGO_FOLDER);
-  return found.hasNext() ? found.next() : DriveApp.createFolder(LOGO_FOLDER);
+  const props = PropertiesService.getScriptProperties();
+  const saved = props.getProperty("LOGO_FOLDER_ID");
+
+  if (saved) {
+    try {
+      const folder = DriveApp.getFolderById(saved);
+      if (!folder.isTrashed()) return folder;
+    } catch (err) {
+      // papka o'chirilgan yoki ID yaroqsiz - yangisini yaratamiz
+    }
+  }
+
+  const folder = DriveApp.createFolder(LOGO_FOLDER);
+  props.setProperty("LOGO_FOLDER_ID", folder.getId());
+  return folder;
+}
+
+/**
+ * Ruxsatlarni bir marta berish uchun: Apps Script muharririda shu funksiyani
+ * tanlab Run bosing. Drive ruxsati so'raladi, papka yaratiladi va test fayli
+ * darhol o'chiriladi. Keyin deploymentni "New version" bilan qayta chiqaring.
+ */
+function authorizeDrive() {
+  const folder = getLogoFolder();
+  const probe = folder.createFile(Utilities.newBlob("ok", "text/plain", "ruxsat-testi.txt"));
+  probe.setTrashed(true);
+  Logger.log("Drive ruxsati berildi. Papka: " + folder.getName() + " (" + folder.getId() + ")");
 }
 
 // ============================================================

@@ -134,8 +134,18 @@ Header + main + footer. Mainda ikkita forma, tab orqali almashadi
 
 Logotip yuborishdan oldin brauzerda 512px gacha kichraytiriladi, so'ng Apps Script
 uni **Drive** dagi `Baliqchi - markaz logotiplari` papkasiga saqlab, havolasini
-jadvalga yozadi. Shu sabab Apps Script'ga Drive ruxsati kerak - birinchi
-deploydan keyin qayta avtorizatsiya so'raydi.
+jadvalga yozadi.
+
+> ⚠️ **Drive ruxsati.** Logotip kodi qo'shilgandan keyin skript qayta
+> avtorizatsiyadan o'tishi shart, aks holda Logotip katagiga
+> `You do not have permission to call DriveApp...` deb yoziladi. Yechim:
+> 1. Apps Script muharririda `authorizeDrive` funksiyasini tanlab **Run** bosing
+>    → **Review permissions → Advanced → Go to project (unsafe) → Allow**;
+> 2. **Deploy → Manage deployments → ✏️ → Version: New version → Deploy**.
+>
+> Ikkinchi qadamsiz web-app eski ruxsat bilan ishlashda davom etadi.
+> Ruxsatlar `apps-script/appsscript.json` da e'lon qilingan: skript faqat
+> **o'zi yaratgan** fayllarga kira oladi (`drive.file`), butun Drive'ga emas.
 
 ### 2-tab - "Iqtidorli yoshni ro'yxatdan o'tkazish" → `Yoshlar` sahifasi
 
@@ -239,6 +249,8 @@ URL o'zgarmaydi - `script.js` ni o'zgartirish shart emas.
 | Brauzer konsolida CORS xato | Apps Script CORS preflight yubormaydi | Kod allaqachon `mode: 'no-cors'` ishlatadi - bu normal, javobni o'qib bo'lmaydi lekin yozish ishlaydi |
 | Forma yuborilgach hech narsa bo'lmayapti | `APPS_SCRIPT_URL` o'rnatilmagan | `assets/script.js` ning 1-qatorini tekshiring |
 | `setupSheet` xato qaytaryapti | `SPREADSHEET_ID` noto'g'ri | URL'dan IDni qayta nusxalang |
+| Logotip katagida `You do not have permission to call DriveApp...` | Skript Drive kodi qo'shilishidan oldin avtorizatsiya qilingan | `authorizeDrive` ni Run qiling, so'ng deploymentni **New version** bilan qayta chiqaring |
+| Ustun sarlavhalari ma'lumotga mos kelmayapti | Sahifa qo'lda, boshqa ustunlar bilan yaratilgan | `setupRegisterSheets` ni ishga tushiring yoki sarlavha qatorini kod tartibiga keltiring (ustun soni va tartibi muhim, nomini xohlagancha o'zgartirsa bo'ladi) |
 
 ## Litsenziya
 

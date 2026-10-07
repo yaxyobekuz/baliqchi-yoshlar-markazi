@@ -68,6 +68,7 @@ function t(key, vars) {
 // ---------- Forma: dinamik maydonlar ----------
 const SCHOOL_MIN = 1;
 const SCHOOL_MAX = 61;
+const SPECIAL_SCHOOL = "Ixtisoslashtirilgan maktab";
 const GRADE_MIN = 5;
 const GRADE_MAX = 11;
 
@@ -125,6 +126,7 @@ function renderSchoolOptions() {
   for (let n = SCHOOL_MIN; n <= SCHOOL_MAX; n++) {
     items.push({ value: String(n), label: t("form_school_item", { n }) });
   }
+  items.push({ value: SPECIAL_SCHOOL, label: t("form_school_special") });
   fillSelect(schoolSelect, items);
 }
 

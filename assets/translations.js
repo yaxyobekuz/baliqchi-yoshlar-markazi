@@ -49,6 +49,7 @@ const i18n = {
 
     form_label_school: "Maktab raqami",
     form_school_item: "{n}-maktab",
+    form_school_special: "Ixtisoslashtirilgan maktab",
 
     form_label_grade: "Sinfi",
     form_grade_item: "{n}-sinf",
@@ -148,6 +149,7 @@ const i18n = {
 
     form_label_school: "Номер школы",
     form_school_item: "школа №{n}",
+    form_school_special: "Специализированная школа",
 
     form_label_grade: "Класс",
     form_grade_item: "{n} класс",
@@ -247,6 +249,7 @@ const i18n = {
 
     form_label_school: "School number",
     form_school_item: "School #{n}",
+    form_school_special: "Specialized school",
 
     form_label_grade: "Grade",
     form_grade_item: "Grade {n}",

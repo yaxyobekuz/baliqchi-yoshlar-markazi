@@ -355,7 +355,13 @@ function doGet(e) {
   }
 
   try {
-    return reply({ ok: true, updatedAt: new Date().toISOString(), rows: readApplicationRows() }, callback);
+    return reply({
+      ok: true,
+      updatedAt: new Date().toISOString(),
+      applications: readYouthSheet(APPLICATION_SHEET, APPLICATION_HEADERS, false),
+      youth: readYouthSheet(YOUTH_SHEET, YOUTH_HEADERS, true),
+      centers: readCenterRows()
+    }, callback);
   } catch (err) {
     return reply({ ok: false, error: String(err) }, callback);
   }
@@ -381,19 +387,22 @@ function readCenterNames() {
   return names.sort(function (a, b) { return a.localeCompare(b); });
 }
 
-/** dashboard.html uchun: "Arizalar" sahifasini obyektlar ro'yxatiga aylantiradi */
-function readApplicationRows() {
+/**
+ * dashboard.html uchun: yosh jadvalini obyektlar ro'yxatiga aylantiradi.
+ * `withExtras` - "Yoshlar" sahifasidagi qo'shimcha ikki ustun.
+ */
+function readYouthSheet(sheetName, headers, withExtras) {
   const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-  const sheet = ss.getSheetByName(APPLICATION_SHEET);
+  const sheet = ss.getSheetByName(sheetName);
   if (!sheet || sheet.getLastRow() < 2) return [];
 
-  const values = sheet.getRange(2, 1, sheet.getLastRow() - 1, APPLICATION_HEADERS.length).getValues();
+  const values = sheet.getRange(2, 1, sheet.getLastRow() - 1, headers.length).getValues();
   const tz = Session.getScriptTimeZone();
 
   return values
     .filter(function (r) { return r[3] !== "" && r[3] != null; })
     .map(function (r) {
-      return {
+      const row = {
         ts: asIsoDateTime(r[0], tz),
         school: r[1],
         grade: r[2],
@@ -402,10 +411,53 @@ function readApplicationRows() {
         certType: String(r[5]),
         certDate: asIsoDate(r[6], tz),
         result: String(r[7]),
-        phone: String(r[8]),
-        lang: String(r[9] || "")
+        phone: String(r[8])
+      };
+      if (withExtras) {
+        row.social = String(r[9] || "");
+        row.center = String(r[10] || "");
+        row.lang = String(r[11] || "");
+      } else {
+        row.lang = String(r[9] || "");
+      }
+      return row;
+    });
+}
+
+/** "Markazlar" sahifasi - to'garaklar satri juftliklarga ajratiladi */
+function readCenterRows() {
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+  const sheet = ss.getSheetByName(CENTER_SHEET);
+  if (!sheet || sheet.getLastRow() < 2) return [];
+
+  const values = sheet.getRange(2, 1, sheet.getLastRow() - 1, CENTER_HEADERS.length).getValues();
+  const tz = Session.getScriptTimeZone();
+
+  return values
+    .filter(function (r) { return r[1] !== "" && r[1] != null; })
+    .map(function (r) {
+      return {
+        ts: asIsoDateTime(r[0], tz),
+        name: String(r[1]),
+        phone: String(r[2] || ""),
+        logo: String(r[3] || ""),
+        staff: Number(r[4]) || 0,
+        clubCount: Number(r[5]) || 0,
+        clubs: parseClubs(r[6]),
+        students: Number(r[7]) || 0
       };
     });
+}
+
+/** "Ingliz tili (42); Matematika (18)" → [{name, count}, ...] */
+function parseClubs(value) {
+  return String(value || "")
+    .split(";")
+    .map(function (part) {
+      const m = /^\s*(.+?)\s*\((\d+)\)\s*$/.exec(part);
+      return m ? { name: m[1], count: Number(m[2]) } : null;
+    })
+    .filter(function (c) { return c; });
 }
 
 // ============================================================

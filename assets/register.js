@@ -9,6 +9,7 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxOsfh4if4NsK4p
 // ---------- Iqtidorli yosh formasining qoidalari ----------
 const SCHOOL_MIN = 1;
 const SCHOOL_MAX = 61;
+const SPECIAL_SCHOOL = "Ixtisoslashtirilgan maktab";
 const GRADE_MIN = 5;
 const GRADE_MAX = 11;
 
@@ -543,6 +544,7 @@ function buildYouthOptions() {
   for (let n = SCHOOL_MIN; n <= SCHOOL_MAX; n++) {
     schools.push({ value: String(n), label: `${n}-maktab` });
   }
+  schools.push({ value: SPECIAL_SCHOOL, label: SPECIAL_SCHOOL });
   fillSelect(youth.school, schools);
 
   const grades = [];

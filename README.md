@@ -185,8 +185,8 @@ deployment uchchalasiga xizmat qiladi, POST'dagi `type` maydoni yo'naltiradi.
 | `register.html` 2-tab | `youth` | `Yoshlar` | `setupRegisterSheets` |
 | `register.html` 1-tab | `center` | `Markazlar` | `setupRegisterSheets` |
 
-`dashboard.html` **faqat `Arizalar`** dan o'qiydi (`?action=data`), ya'ni
-`index.html` formasining natijalarini ko'rsatadi.
+`dashboard.html` bitta so'rovda (`?action=data`) **uchala sahifani** oladi va
+har birini alohida ko'rinishda ko'rsatadi.
 
 ### Ustunlar
 
@@ -205,27 +205,43 @@ deployment uchchalasiga xizmat qiladi, POST'dagi `type` maydoni yo'naltiradi.
 
 ## Statistika paneli (`dashboard.html`)
 
-Yig'ilgan arizalar bo'yicha ichki panel. Tashqi kutubxona ishlatmaydi -
+Uchala Sheets sahifasi bo'yicha ichki panel. Tashqi kutubxona ishlatmaydi -
 grafiklar SVG'da qo'lda chiziladi, shuning uchun offlayn ham ishlaydi.
 
-### Ichida nima bor
+### To'rtta ko'rinish
 
-| Blok | Shakli | Izoh |
+Yuqoridagi manba tanlagich panelni butunlay almashtiradi (tanlov brauzerda saqlanadi):
+
+| Ko'rinish | Manba | Nima ko'rsatadi |
 |---|---|---|
-| Jami arizalar | hero raqam | Davr oralig'i bilan |
-| Maktablar / 7 kun / yuqori daraja | stat kartalar | Yuqori daraja = C1, C2, IELTS 7.0+, SAT 1500+ |
-| Arizalar dinamikasi | maydon + chiziq | 70 kundan uzun davr haftalarga yig'iladi |
-| Sertifikat turlari | gorizontal stacked bar | 3 segment, 2px yuza bo'shlig'i |
-| Xorijiy tillar | gorizontal bar | Birinchi 7 ta + "Boshqa" |
-| Sinflar kesimida | ustunlar | |
-| Eng faol maktablar | gorizontal bar | Birinchi 10 ta |
-| Natijalar taqsimoti | 3 ta kichik grafik | Shkalalar har xil - CEFR/IELTS/SAT alohida |
-| Arizalar ro'yxati | jadval | Saralash, sahifalash, CSV eksport |
+| **Umumiy** | Arizalar + Yoshlar + Markazlar | Hero: jami yoshlar; KPI: har bir sahifa alohida; dinamikada ikki seriya yonma-yon |
+| **Arizalar** | `Arizalar` | index.html formasi natijalari |
+| **Yoshlar** | `Yoshlar` | register.html natijalari + ijtimoiy reyestr va markaz kesimi |
+| **Markazlar** | `Markazlar` | Xodimlar, to'garaklar, fanlar va o'quvchilar statistikasi |
 
-Qo'shimcha: filtrlar (davr, sertifikat, til, sinf, maktab, qidiruv) hamma
-grafikni bir vaqtda qayta hisoblaydi; har bir grafikning **"Jadval"**
-ko'rinishi bor; yorug'/qorong'i mavzu; telefon raqamlari standart holda
-yashirilgan; har 2 daqiqada jim yangilanadi.
+### Grafiklar
+
+**Yoshlar ko'rinishlarida:** dinamika (maydon/chiziq), sertifikat turlari
+(stacked bar), xorijiy tillar, sinflar, eng faol maktablar, natijalar taqsimoti
+(CEFR/IELTS/SAT alohida - shkalalar har xil). "Yoshlar" da qo'shimcha
+"o'quv markazlari kesimida" grafigi bor.
+
+**Markazlar ko'rinishida:** markazlar qo'shilishi, fanlar bo'yicha o'quvchilar,
+markazlar bo'yicha o'quvchilar va xodimlar.
+
+### Imkoniyatlar
+
+- Filtrlar bitta qatorda, ko'rinishga qarab moslashadi (davr, sertifikat, til,
+  sinf, maktab, markaz, reyestr, qidiruv) - barcha grafikni bir vaqtda qayta hisoblaydi
+- Har bir grafikning **"Jadval"** ko'rinishi bor
+- Hero raqam + sparkline (faqat ma'noli bo'lsa chiziladi) + "so'nggi 7 kun" belgisi
+- Yorug'/qorong'i mavzu; klaviatura bilan ham ishlaydi (dinamikada ←/→)
+- Telefon raqamlari standart holda yashirilgan; CSV eksport har bir ko'rinish uchun alohida
+- Har 2 daqiqada jim yangilanadi (ko'rinish sakramaydi)
+
+> Markaz logotipi jadvalda nomning birinchi harfi sifatida ko'rsatiladi -
+> Google Drive havolalari to'g'ridan-to'g'ri `<img>` da ochilmaydi. Logotipni
+> ko'rish uchun jadvaldagi Drive havolasini oching.
 
 ### Ulash
 

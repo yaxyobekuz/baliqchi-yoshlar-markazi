@@ -17,6 +17,8 @@ form/
 │   ├── style.css             # Animatsiyalar va qo'shimcha stillar
 │   ├── script.js             # i18n, scroll-reveal, forma yuborish
 │   ├── register.js           # register.html: tablar, to'garaklar, logotip
+│   ├── register.css          # register.html dizayni (fon, kartalar, maydonlar)
+│   ├── register-ui.js        # register.html interaktivi (ikonka, bayroq, jonli karta)
 │   ├── dashboard.css         # Panel dizayn tokenlari (yorug'/qorong'i)
 │   └── dashboard.js          # Ma'lumot olish, filtrlar, SVG grafiklar
 └── apps-script/
@@ -169,10 +171,21 @@ Yozuvlar alohida (`Yoshlar`) jadvalga tushadi. Uning variantlari
 (`?action=centers`, kalit talab qilinmaydi); ro'yxatga "Markazga a'zo emas"
 varianti ham qo'shiladi.
 
-`register.html` mustaqil: `assets/register.js` dan boshqa hech narsaga bog'liq
-emas. Qoidalar (maktab 1-61, sinf 5-11, 2026 sanasi, natija ro'yxatlari) shu
+`register.html` mustaqil: ma'lumot mantig'i faqat `assets/register.js` da.
+Qoidalar (maktab 1-61, sinf 5-11, 2026 sanasi, natija ro'yxatlari) shu
 faylning boshida - `index.html` dagi `assets/script.js` da ham o'z nusxasi bor,
 shart o'zgarsa ikkalasini ham yangilang.
+
+Ko'rinish ikkita qo'shimcha faylda, ikkalasi ham `register.js` ga tegmaydi:
+
+- `assets/register.css` - fon naqshi, tab kartalari, maydon dizayni, o'ng panel.
+- `assets/register-ui.js` - `register.js` dan **keyin** yuklanadi va ustiga
+  interaktiv qatlam qo'yadi: fan/til ikonkalari va bayroqlari
+  ([flagcdn.com](https://flagcdn.com)), to'ldirish foizi halqasi, jonli
+  "Markaz kartasi" va "Sertifikat kartasi", muvaffaqiyatli yuborishda konfetti
+  ([canvas-confetti](https://github.com/catdad/canvas-confetti), jsDelivr CDN).
+
+Internet bo'lmasa bayroq va konfetti ishlamaydi, qolgan hammasi ishlayveradi.
 
 ## Sahifalar va jadvallar
 

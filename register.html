@@ -5,10 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Ro'yxatga olish - Baliqchi tumani hokimligi</title>
   <meta name="description" content="Baliqchi tumani: o'quv markazlarini va iqtidorli yoshlarni ro'yxatga olish." />
+  <meta name="theme-color" content="#0099B5" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="preconnect" href="https://flagcdn.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet" />
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -26,7 +28,10 @@
               soft: '#F1F5F9'
             }
           },
-          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            display: ['"Plus Jakarta Sans"', 'Inter', 'sans-serif']
+          },
           boxShadow: {
             soft: '0 10px 40px -10px rgba(15, 23, 42, 0.12)'
           }
@@ -36,395 +41,784 @@
   </script>
 
   <link rel="stylesheet" href="assets/style.css" />
-
-  <style>
-    /* register.html forma elementlari - bitta joyda */
-    .field-label { display: block; font-size: 13px; font-weight: 600; color: #0F172A; }
-    .req { color: #CE1126; }
-
-    .field-input,
-    .field-select {
-      margin-top: 8px;
-      width: 100%;
-      padding: 12px 16px;
-      border-radius: 12px;
-      border: 1px solid #E2E8F0;
-      background: #fff;
-      font: inherit;
-      font-size: 15px;
-      color: #0F172A;
-      transition: border-color 150ms, box-shadow 150ms;
-    }
-    .field-input::placeholder { color: #94A3B8; }
-    .field-input:focus, .field-select:focus {
-      outline: none;
-      border-color: #0099B5;
-      box-shadow: 0 0 0 4px rgba(0, 153, 181, .12);
-    }
-    .field-input:disabled, .field-select:disabled { background: #F8FAFC; color: #94A3B8; }
-    .field-hint { margin-top: 6px; font-size: 11.5px; color: #64748B; }
-
-    /* Logotip tashlash maydoni */
-    #logo-zone.is-dragging {
-      border-color: #0099B5;
-      background: rgba(0, 153, 181, .07);
-    }
-
-    /* To'garak qatori */
-    .club-row {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 10px;
-      align-items: center;
-      padding: 10px;
-      border-radius: 16px;
-      background: #fff;
-      border: 1px solid #E2E8F0;
-    }
-    .club-row > .club-subject { grid-column: 1 / -1; }
-    .club-row .field-select, .club-row .field-input { margin-top: 0; }
-    @media (min-width: 640px) {
-      .club-row { grid-template-columns: 1fr 132px auto; }
-      .club-row > .club-subject { grid-column: auto; }
-    }
-    .club-custom { grid-column: 1 / -1; }
-
-    .pill-stat {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 5px 12px;
-      border-radius: 999px;
-      background: #fff;
-      border: 1px solid #E2E8F0;
-      font-size: 12px;
-      font-weight: 600;
-      color: #0F172A;
-    }
-    .pill-stat b { color: #0099B5; }
-
-    .icon-btn {
-      width: 44px; height: 44px;
-      display: grid; place-items: center;
-      border-radius: 12px;
-      border: 1px solid #E2E8F0;
-      background: #fff;
-      color: #64748B;
-      transition: border-color 150ms, color 150ms;
-    }
-    .icon-btn:hover:not(:disabled) { border-color: #CE1126; color: #CE1126; }
-    .icon-btn:disabled { opacity: .35; cursor: default; }
-
-  </style>
+  <link rel="stylesheet" href="assets/register.css" />
 </head>
-<body class="font-sans bg-brand-soft/40 text-brand-ink antialiased min-h-screen flex flex-col">
+<body class="font-sans text-brand-ink antialiased min-h-screen flex flex-col">
+
+  <!-- ============ DEKORATIV FON ============ -->
+  <div class="decor" aria-hidden="true">
+    <span class="blob blob-1"></span>
+    <span class="blob blob-2"></span>
+    <span class="blob blob-3"></span>
+  </div>
+
+  <!-- ============ UMUMIY SVG GRADIENTLAR ============ -->
+  <svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute">
+    <defs>
+      <linearGradient id="progGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#0099B5" />
+        <stop offset="100%" stop-color="#1EB53A" />
+      </linearGradient>
+      <linearGradient id="certGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#1EB53A" />
+        <stop offset="60%" stop-color="#0099B5" />
+        <stop offset="100%" stop-color="#007A91" />
+      </linearGradient>
+    </defs>
+  </svg>
 
   <!-- ================= HEADER ================= -->
-  <header class="sticky top-0 z-40 bg-white/90 backdrop-blur border-b border-slate-200/70">
-    <nav class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
-      <a href="index.html" class="flex items-center gap-3 min-w-0">
-        <img src="assets/emblem-of-uzbekistan.png" alt="O'zbekiston gerbi" class="w-10 h-10 object-contain flex-none" />
+  <header class="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-200/70">
+    <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+      <a href="index.html" class="flex items-center gap-3 min-w-0 group">
+        <span class="relative flex-none">
+          <img src="assets/emblem-of-uzbekistan.png" alt="O'zbekiston gerbi"
+            class="w-10 h-10 object-contain transition-transform duration-500 group-hover:scale-110" />
+        </span>
         <span class="leading-tight min-w-0">
-          <span class="block text-sm font-semibold text-brand-ink truncate">Baliqchi tumani hokimligi</span>
-          <span class="block text-[11px] text-brand-muted truncate">Ro'yxatga olish</span>
+          <span class="block text-sm font-extrabold font-display tracking-tight truncate">Baliqchi tumani hokimligi</span>
+          <span class="block text-[11px] text-brand-muted truncate">Iqtidorli yoshlar markazi</span>
         </span>
       </a>
 
       <a href="index.html"
-        class="inline-flex items-center gap-2 text-sm font-semibold text-brand-muted hover:text-brand-blue transition flex-none">
-        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M11 19l-7-7 7-7"/></svg>
+        class="inline-flex items-center gap-2 text-sm font-semibold text-brand-muted hover:text-brand-blue transition flex-none group">
+        <span class="w-8 h-8 grid place-items-center rounded-full border border-slate-200 bg-white group-hover:border-brand-blue transition">
+          <svg class="w-4 h-4 transition-transform group-hover:-translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 19l-7-7 7-7"/></svg>
+        </span>
         <span class="hidden sm:inline">Asosiy sahifa</span>
       </a>
     </nav>
   </header>
 
-  <!-- ================= MAIN ================= -->
-  <main class="flex-1 w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
+  <main class="flex-1 w-full">
 
-    <div class="text-center max-w-2xl mx-auto">
-      <span class="text-xs font-bold uppercase tracking-widest text-brand-blue">Ma'lumot kiritish</span>
-      <h1 class="mt-3 text-2xl sm:text-3xl font-bold tracking-tight">Ro'yxatga olish</h1>
-      <p class="mt-3 text-slate-600">Kerakli bo'limni tanlang va maydonlarni to'ldiring.</p>
-    </div>
+    <!-- ================= HERO ================= -->
+    <section class="clip-x">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-8 sm:pt-16 lg:pt-20 grid lg:grid-cols-12 gap-10 lg:gap-6 items-center">
 
-    <!-- ===== TABLAR ===== -->
-    <div class="mt-9 flex justify-center">
-      <div role="tablist" aria-label="Forma turi"
-        class="inline-flex w-full sm:w-auto p-1.5 bg-white rounded-2xl border border-slate-200 shadow-soft">
+        <div class="lg:col-span-7 reveal">
+          <span class="hero-eyebrow">
+            <span class="dot">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+            </span>
+            Ma'lumot kiritish
+          </span>
+
+          <h1 class="hero-title mt-5">
+            Ro'yxatdan o'tish —<br />
+            <span class="mark"><span class="grad">bir necha daqiqada</span>
+              <svg viewBox="0 0 400 20" preserveAspectRatio="none" aria-hidden="true">
+                <path d="M4 14C70 5 150 4 210 9c60 5 120 7 186 2" />
+              </svg>
+            </span>
+          </h1>
+
+          <p class="mt-7 text-base sm:text-lg text-slate-600 max-w-xl leading-relaxed">
+            Kerakli bo'limni tanlang, maydonlarni to'ldiring — o'ng tomondagi karta
+            siz yozgan ma'lumotlarni darhol ko'rsatib boradi.
+          </p>
+
+          <div class="hero-chips mt-8">
+            <span class="hero-chip hc-blue">
+              <i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></i>
+              <span><b>61</b> maktab</span>
+            </span>
+            <span class="hero-chip hc-green">
+              <i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/></svg></i>
+              <span><b>30+</b> to'garak yo'nalishi</span>
+            </span>
+            <span class="hero-chip hc-red">
+              <i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg></i>
+              <span><b>100%</b> bepul</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- ---- KONSTELLATSIYA ---- -->
+        <div class="lg:col-span-5 reveal reveal-delay-1" aria-hidden="true">
+          <div class="constellation">
+            <svg class="cs-rings" viewBox="0 0 100 100">
+              <circle class="spin-a" cx="50" cy="50" r="48" />
+              <circle class="spin-b" cx="50" cy="50" r="34" />
+            </svg>
+
+            <div class="cs-core">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+                <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+              </svg>
+            </div>
+
+            <span class="cs-chip cs-1">
+              <img class="lg" src="assets/ielts-logog-2000x1200.png" alt="" />
+              <span>7.5</span>
+            </span>
+            <span class="cs-chip cs-2">
+              <img src="https://flagcdn.com/w40/gb.png" srcset="https://flagcdn.com/w80/gb.png 2x" alt="" data-flag="1" loading="lazy" decoding="async" />
+              <span>C1</span>
+            </span>
+            <span class="cs-chip cs-3">
+              <span class="bdg" style="background:#E8F8FB;color:#0099B5">CE</span>
+              <span>CEFR</span>
+            </span>
+            <span class="cs-chip cs-4">
+              <span class="bdg" style="background:#FDECEE;color:#CE1126">SAT</span>
+              <span>1540</span>
+            </span>
+            <span class="cs-chip cs-5">
+              <img src="https://flagcdn.com/w40/kr.png" srcset="https://flagcdn.com/w80/kr.png 2x" alt="" data-flag="1" loading="lazy" decoding="async" />
+              <span>TOPIK</span>
+            </span>
+            <span class="cs-chip cs-6">
+              <img src="https://flagcdn.com/w40/de.png" srcset="https://flagcdn.com/w80/de.png 2x" alt="" data-flag="1" loading="lazy" decoding="async" />
+              <span>Goethe</span>
+            </span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+
+      <!-- ===== TABLAR ===== -->
+      <div role="tablist" aria-label="Forma turi" class="tabs reveal">
         <button id="tab-center" role="tab" aria-selected="true" aria-controls="panel-center" type="button"
-          class="tab-btn flex-1 sm:flex-none px-4 sm:px-6 py-2.5 rounded-xl text-sm font-semibold transition">
-          O'quv markazni kiritish
+          class="tab-btn tab-card">
+          <span class="pat"></span>
+          <span class="shine"></span>
+          <span class="tab-ico">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 21h18M5 21V7l7-4 7 4v14"/><path d="M10 21v-5h4v5"/>
+              <path d="M9 10h.01M15 10h.01M9 13h.01M15 13h.01"/>
+            </svg>
+          </span>
+          <span class="tab-text">
+            <b>O'quv markazni kiritish</b>
+            <i>Markaz, xodimlar va to'garaklar</i>
+          </span>
+          <span class="tab-arrow">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+          </span>
         </button>
+
         <button id="tab-youth" role="tab" aria-selected="false" aria-controls="panel-youth" type="button" tabindex="-1"
-          class="tab-btn flex-1 sm:flex-none px-4 sm:px-6 py-2.5 rounded-xl text-sm font-semibold transition">
-          Iqtidorli yoshni ro'yxatdan o'tkazish
+          class="tab-btn tab-card">
+          <span class="pat"></span>
+          <span class="shine"></span>
+          <span class="tab-ico">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="8" r="6"/><path d="M15.5 12.9 17 22l-5-3-5 3 1.5-9.1"/>
+            </svg>
+          </span>
+          <span class="tab-text">
+            <b>Iqtidorli yoshni ro'yxatdan o'tkazish</b>
+            <i>Sertifikat va natijalar</i>
+          </span>
+          <span class="tab-arrow">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+          </span>
         </button>
       </div>
-    </div>
 
-    <!-- ========== 1-TAB: O'QUV MARKAZ ========== -->
-    <section id="panel-center" role="tabpanel" aria-labelledby="tab-center" tabindex="0"
-      class="mt-8 bg-white rounded-3xl shadow-soft border border-slate-100 overflow-hidden">
+      <!-- ===== FORMA + O'NG PANEL ===== -->
+      <div class="reg-grid mt-7">
 
-      <form id="center-form" novalidate>
+        <div class="min-w-0">
 
-        <!-- ----- 1-bo'lim: markaz haqida ----- -->
-        <div role="group" aria-labelledby="sec-center" class="p-6 sm:p-9">
-          <div id="sec-center" class="flex items-center gap-3 mb-6">
-            <span class="w-7 h-7 flex-none grid place-items-center rounded-full bg-brand-blue/10 text-brand-blue text-xs font-bold">1</span>
-            <span>
-              <span class="block text-base font-bold tracking-tight">Markaz haqida</span>
-              <span class="block text-xs text-brand-muted mt-0.5">Asosiy ma'lumotlar va aloqa</span>
-            </span>
-          </div>
+          <!-- ========== 1-TAB: O'QUV MARKAZ ========== -->
+          <section id="panel-center" role="tabpanel" aria-labelledby="tab-center" tabindex="0" class="panel reveal">
+            <form id="center-form" novalidate>
 
-          <div class="grid sm:grid-cols-2 gap-x-5 gap-y-6">
-
-            <!-- Markaz nomi -->
-            <div class="sm:col-span-2">
-              <label for="c-name" class="field-label">
-                O'quv markaz nomi <span class="req">*</span>
-              </label>
-              <input id="c-name" name="name" type="text" required minlength="2" maxlength="120"
-                placeholder="Masalan: Baliqchi Edu Center" class="field-input" />
-            </div>
-
-            <!-- Telefon -->
-            <div>
-              <label for="c-phone" class="field-label">
-                Telefon raqami <span class="req">*</span>
-              </label>
-              <input id="c-phone" name="phone" type="tel" required inputmode="tel" autocomplete="tel"
-                placeholder="+998 __ ___ __ __" class="field-input" />
-              <p class="field-hint">Markaz bilan bog'lanish uchun</p>
-            </div>
-
-            <!-- Xodimlar -->
-            <div>
-              <label for="c-staff" class="field-label">
-                Umumiy hodimlari soni <span class="req">*</span>
-              </label>
-              <input id="c-staff" name="staff" type="number" required min="1" max="2000" step="1" inputmode="numeric"
-                placeholder="Masalan: 14" class="field-input" />
-              <p class="field-hint">O'qituvchilar va ma'muriyat bilan birga</p>
-            </div>
-
-            <!-- Logotip -->
-            <div class="sm:col-span-2">
-              <span class="field-label">Logotipi</span>
-              <input id="c-logo" name="logo" type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" class="sr-only" />
-
-              <label for="c-logo" id="logo-zone"
-                class="mt-2 flex items-center gap-4 p-4 rounded-2xl border-2 border-dashed border-slate-200 bg-brand-soft/30 cursor-pointer transition hover:border-brand-blue hover:bg-brand-blue/5">
-                <div id="logo-preview"
-                  class="w-16 h-16 flex-none rounded-xl bg-white border border-slate-200 grid place-items-center overflow-hidden">
-                  <svg class="w-6 h-6 text-slate-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+              <!-- 1-bo'lim -->
+              <div role="group" aria-labelledby="sec-center" class="p-6 sm:p-9 pt-8 sm:pt-10">
+                <div id="sec-center" class="sec-head mb-6">
+                  <span class="sec-num">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M3 21h18M5 21V7l7-4 7 4v14"/><path d="M10 21v-5h4v5"/>
+                    </svg>
+                    <span>1</span>
+                  </span>
+                  <span>
+                    <span class="sec-title">Markaz haqida</span>
+                    <span class="sec-sub">Asosiy ma'lumotlar, aloqa va logotip</span>
+                  </span>
                 </div>
-                <div class="min-w-0 flex-1">
-                  <p id="logo-title" class="text-sm font-semibold">Rasmni tanlang yoki shu yerga tashlang</p>
-                  <p id="logo-note" class="text-xs text-brand-muted mt-0.5">PNG, JPG yoki SVG · 5 MB gacha · ixtiyoriy</p>
+
+                <div class="grid sm:grid-cols-2 gap-x-5 gap-y-6">
+
+                  <!-- Markaz nomi -->
+                  <div class="sm:col-span-2">
+                    <label for="c-name" class="field-label">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V7l7-4 7 4v14"/><path d="M10 21v-5h4v5"/></svg>
+                      O'quv markaz nomi <span class="req">*</span>
+                    </label>
+                    <div class="f-wrap has-ico">
+                      <span class="f-ico" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V7l7-4 7 4v14"/><path d="M10 21v-5h4v5"/></svg>
+                      </span>
+                      <input id="c-name" name="name" type="text" required minlength="2" maxlength="120"
+                        data-prog="Markaz nomi"
+                        placeholder="Masalan: Baliqchi Edu Center" class="field-input" />
+                      <span class="f-ok" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                      </span>
+                    </div>
+                  </div>
+
+                  <!-- Telefon -->
+                  <div>
+                    <label for="c-phone" class="field-label">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7A2 2 0 0 1 22 16.9z"/></svg>
+                      Telefon raqami <span class="req">*</span>
+                    </label>
+                    <div class="f-wrap has-ico">
+                      <span class="f-ico" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7A2 2 0 0 1 22 16.9z"/></svg>
+                      </span>
+                      <input id="c-phone" name="phone" type="tel" required inputmode="tel" autocomplete="tel"
+                        data-prog="Markaz telefoni" data-prog-type="phone"
+                        placeholder="+998 __ ___ __ __" class="field-input" />
+                      <span class="f-ok" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                      </span>
+                    </div>
+                    <p class="field-hint">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+                      Markaz bilan bog'lanish uchun
+                    </p>
+                  </div>
+
+                  <!-- Xodimlar -->
+                  <div>
+                    <label for="c-staff" class="field-label">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></svg>
+                      Umumiy hodimlari soni <span class="req">*</span>
+                    </label>
+                    <div class="f-wrap has-ico">
+                      <span class="f-ico" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></svg>
+                      </span>
+                      <input id="c-staff" name="staff" type="number" required min="1" max="2000" step="1" inputmode="numeric"
+                        data-prog="Xodimlar soni"
+                        placeholder="Masalan: 14" class="field-input" />
+                      <span class="f-ok" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                      </span>
+                    </div>
+                    <p class="field-hint">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+                      O'qituvchilar va ma'muriyat bilan birga
+                    </p>
+                  </div>
+
+                  <!-- Logotip -->
+                  <div class="sm:col-span-2">
+                    <span class="field-label">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+                      Logotipi
+                    </span>
+                    <input id="c-logo" name="logo" type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" class="sr-only" />
+
+                    <label for="c-logo" id="logo-zone">
+                      <span class="lz-pulse" aria-hidden="true"></span>
+                      <div id="logo-preview">
+                        <svg class="w-6 h-6 text-slate-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+                      </div>
+                      <div class="min-w-0 flex-1 relative">
+                        <p id="logo-title" class="text-sm font-bold">Rasmni tanlang yoki shu yerga tashlang</p>
+                        <p id="logo-note" class="text-xs text-brand-muted mt-1">PNG, JPG yoki SVG · 5 MB gacha · ixtiyoriy</p>
+                      </div>
+                      <button type="button" id="logo-clear" hidden aria-label="Logotipni o'chirish">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                      </button>
+                    </label>
+                  </div>
                 </div>
-                <button type="button" id="logo-clear" hidden
-                  class="flex-none w-9 h-9 grid place-items-center rounded-full border border-slate-200 text-brand-muted hover:border-brand-red hover:text-brand-red transition"
-                  aria-label="Logotipni o'chirish">
-                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+              </div>
+
+              <!-- 2-bo'lim: to'garaklar -->
+              <div role="group" aria-labelledby="sec-clubs" class="p-6 sm:p-9 border-t border-slate-100 bg-brand-soft/30">
+                <div id="sec-clubs" class="sec-head mb-5">
+                  <span class="sec-num">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/>
+                      <path d="M19 15l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7z"/>
+                    </svg>
+                    <span>2</span>
+                  </span>
+                  <span>
+                    <span class="sec-title">To'garaklar <span class="req">*</span></span>
+                    <span class="sec-sub">Fanni tanlang — ikonkasi avtomatik chiqadi</span>
+                  </span>
+                </div>
+
+                <div id="club-rows" class="space-y-2.5"></div>
+
+                <div class="mt-4 flex flex-wrap items-center justify-between gap-3">
+                  <button type="button" id="club-add" class="btn-add">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+                    To'garak qo'shish
+                  </button>
+
+                  <div id="club-total" class="flex flex-wrap gap-2"></div>
+                </div>
+              </div>
+
+              <!-- Yuborish -->
+              <div class="px-6 sm:px-9 py-6 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <p class="text-xs text-brand-muted flex items-center gap-2">
+                  <svg class="w-3.5 h-3.5 flex-none text-brand-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                  <span><span class="req">*</span> belgisi majburiy maydonlarni bildiradi.</span>
+                </p>
+                <button type="submit" data-submit class="btn-submit">
+                  <span class="btn-label">Markazni saqlash</span>
+                  <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+                  <svg class="btn-spin hidden animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
                 </button>
-              </label>
-            </div>
-          </div>
+              </div>
+            </form>
+          </section>
+
+          <!-- ========== 2-TAB: IQTIDORLI YOSH ========== -->
+          <section id="panel-youth" role="tabpanel" aria-labelledby="tab-youth" tabindex="0" hidden class="panel reveal">
+            <form id="youth-form" novalidate>
+
+              <!-- 1-bo'lim: o'quvchi -->
+              <div role="group" aria-labelledby="sec-pupil" class="p-6 sm:p-9 pt-8 sm:pt-10">
+                <div id="sec-pupil" class="sec-head mb-6">
+                  <span class="sec-num">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                    </svg>
+                    <span>1</span>
+                  </span>
+                  <span>
+                    <span class="sec-title">O'quvchi haqida</span>
+                    <span class="sec-sub">Maktab, sinf va aloqa ma'lumotlari</span>
+                  </span>
+                </div>
+
+                <div class="grid sm:grid-cols-2 gap-x-5 gap-y-6">
+
+                  <!-- Ismi-sharifi -->
+                  <div class="sm:col-span-2">
+                    <label for="y-fish" class="field-label">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                      O'quvchining ismi-sharifi <span class="req">*</span>
+                    </label>
+                    <div class="f-wrap has-ico">
+                      <span class="f-ico" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                      </span>
+                      <input id="y-fish" name="fish" type="text" required minlength="5" autocomplete="name"
+                        data-prog="Ismi-sharifi"
+                        placeholder="Masalan: Raxmonaliyev Abubakir Komiljon o'g'li" class="field-input" />
+                      <span class="f-ok" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                      </span>
+                    </div>
+                  </div>
+
+                  <!-- Maktab -->
+                  <div>
+                    <label for="y-school" class="field-label">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+                      Maktab raqami <span class="req">*</span>
+                    </label>
+                    <div class="f-wrap has-ico has-sel">
+                      <span class="f-ico" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+                      </span>
+                      <select id="y-school" name="school" required data-prog="Maktab" class="field-select">
+                        <option value="">Tanlang...</option>
+                      </select>
+                      <span class="f-ok" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                      </span>
+                    </div>
+                  </div>
+
+                  <!-- Sinf -->
+                  <div>
+                    <label for="y-grade" class="field-label">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 2 7l10 5 10-5-10-5z"/><path d="m2 17 10 5 10-5M2 12l10 5 10-5"/></svg>
+                      Sinfi <span class="req">*</span>
+                    </label>
+                    <div class="f-wrap has-ico has-sel">
+                      <span class="f-ico" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 2 7l10 5 10-5-10-5z"/><path d="m2 17 10 5 10-5M2 12l10 5 10-5"/></svg>
+                      </span>
+                      <select id="y-grade" name="grade" required data-prog="Sinf" class="field-select">
+                        <option value="">Tanlang...</option>
+                      </select>
+                      <span class="f-ok" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                      </span>
+                    </div>
+                  </div>
+
+                  <!-- Telefon -->
+                  <div>
+                    <label for="y-phone" class="field-label">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7A2 2 0 0 1 22 16.9z"/></svg>
+                      Telefon raqami <span class="req">*</span>
+                    </label>
+                    <div class="f-wrap has-ico">
+                      <span class="f-ico" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7A2 2 0 0 1 22 16.9z"/></svg>
+                      </span>
+                      <input id="y-phone" name="phone" type="tel" required inputmode="tel" autocomplete="tel"
+                        data-prog="Telefon raqami" data-prog-type="phone"
+                        placeholder="+998 __ ___ __ __" class="field-input" />
+                      <span class="f-ok" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                      </span>
+                    </div>
+                  </div>
+
+                  <!-- Ijtimoiy reyestr -->
+                  <div>
+                    <label for="y-social" class="field-label">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+                      Ijtimoiy reyestrda turadimi? <span class="req">*</span>
+                    </label>
+                    <div class="f-wrap has-ico has-sel">
+                      <span class="f-ico" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+                      </span>
+                      <select id="y-social" name="social" required data-prog="Ijtimoiy reyestr" class="field-select">
+                        <option value="Yo'q" selected>Yo'q</option>
+                        <option value="Ha">Ha</option>
+                      </select>
+                      <span class="f-ok" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 2-bo'lim: sertifikat -->
+              <div role="group" aria-labelledby="sec-cert" class="p-6 sm:p-9 border-t border-slate-100 bg-brand-soft/30">
+                <div id="sec-cert" class="sec-head mb-6">
+                  <span class="sec-num">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="12" cy="8" r="6"/><path d="M15.5 12.9 17 22l-5-3-5 3 1.5-9.1"/>
+                    </svg>
+                    <span>2</span>
+                  </span>
+                  <span>
+                    <span class="sec-title">Sertifikat va markaz</span>
+                    <span class="sec-sub">Til, sertifikat turi hamda natija</span>
+                  </span>
+                </div>
+
+                <div class="grid sm:grid-cols-2 gap-x-5 gap-y-6">
+
+                  <!-- Xorijiy til -->
+                  <div>
+                    <label for="y-language" class="field-label">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg>
+                      Xorijiy til nomi <span class="req">*</span>
+                    </label>
+                    <div class="f-wrap has-ico has-sel">
+                      <span class="f-ico" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg>
+                      </span>
+                      <select id="y-language" name="language" required data-prog="Xorijiy til" class="field-select">
+                        <option value="">Tanlang...</option>
+                      </select>
+                      <span class="f-ok" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                      </span>
+                    </div>
+                    <p class="field-hint">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+                      Tanlangandan keyin mamlakat bayrog'i chiqadi
+                    </p>
+                  </div>
+
+                  <!-- Sertifikat turi -->
+                  <div>
+                    <label for="y-cert-type" class="field-label">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.5 12.9 17 22l-5-3-5 3 1.5-9.1"/></svg>
+                      Sertifikat turi <span class="req">*</span>
+                    </label>
+                    <div class="f-wrap has-ico has-sel">
+                      <span class="f-ico" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.5 12.9 17 22l-5-3-5 3 1.5-9.1"/></svg>
+                      </span>
+                      <select id="y-cert-type" name="certType" required data-prog="Sertifikat turi" class="field-select">
+                        <option value="">Tanlang...</option>
+                        <option value="CEFR">CEFR (Milliy sertifikat)</option>
+                        <option value="IELTS">IELTS</option>
+                        <option value="SAT">SAT</option>
+                      </select>
+                      <span class="f-ok" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                      </span>
+                    </div>
+                  </div>
+
+                  <!-- Sana -->
+                  <div>
+                    <label for="y-cert-date" class="field-label">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="3"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                      Sertifikat berilgan sana <span class="req">*</span>
+                    </label>
+                    <div class="f-wrap">
+                      <input id="y-cert-date" name="certDate" type="date" required min="2026-01-01" max="2026-12-31"
+                        data-prog="Sertifikat sanasi" class="field-input" />
+                    </div>
+                    <p class="field-hint">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+                      Faqat 2026-yilda berilgan sertifikatlar
+                    </p>
+                  </div>
+
+                  <!-- Natija -->
+                  <div>
+                    <label for="y-result" class="field-label">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                      Sertifikat natijasi <span class="req">*</span>
+                    </label>
+                    <div class="f-wrap has-ico has-sel">
+                      <span class="f-ico" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                      </span>
+                      <select id="y-result" name="result" required data-prog="Sertifikat natijasi" class="field-select">
+                        <option value="">Avval sertifikat turini tanlang</option>
+                      </select>
+                      <input id="y-result-sat" name="resultSat" type="number" min="1400" max="1600" step="10" disabled
+                        data-prog="Sertifikat natijasi"
+                        placeholder="1400 - 1600" class="field-input hidden" />
+                      <span class="f-ok" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                      </span>
+                    </div>
+                  </div>
+
+                  <!-- O'quv markaz -->
+                  <div class="sm:col-span-2">
+                    <div class="flex items-end justify-between gap-3">
+                      <label for="y-center" class="field-label">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V7l7-4 7 4v14"/><path d="M10 21v-5h4v5"/></svg>
+                        O'quv markazni tanlash <span class="req">*</span>
+                      </label>
+                      <button type="button" id="center-reload" hidden
+                        class="inline-flex items-center gap-1.5 text-xs font-bold text-brand-blue hover:text-brand-blue-dark transition">
+                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6M3 12a9 9 0 0 1 15-6.7L21 8M3 22v-6h6M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
+                        Qayta yuklash
+                      </button>
+                    </div>
+                    <div class="f-wrap has-ico has-sel">
+                      <span class="f-ico" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V7l7-4 7 4v14"/><path d="M10 21v-5h4v5"/></svg>
+                      </span>
+                      <select id="y-center" name="center" required data-prog="O'quv markaz" class="field-select">
+                        <option value="">Yuklanmoqda…</option>
+                      </select>
+                      <span class="f-ok" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Yuborish -->
+              <div class="px-6 sm:px-9 py-6 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <p class="text-xs text-brand-muted flex items-center gap-2">
+                  <svg class="w-3.5 h-3.5 flex-none text-brand-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                  <span>Ma'lumotlaringiz faqat loyiha doirasida ishlatiladi.</span>
+                </p>
+                <button type="submit" data-submit class="btn-submit">
+                  <span class="btn-label">Yuborish</span>
+                  <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+                  <svg class="btn-spin hidden animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+                </button>
+              </div>
+            </form>
+          </section>
         </div>
 
-        <!-- ----- 2-bo'lim: to'garaklar ----- -->
-        <div role="group" aria-labelledby="sec-clubs" class="p-6 sm:p-9 border-t border-slate-100 bg-brand-soft/20">
-          <div id="sec-clubs" class="flex items-start justify-between gap-4 w-full mb-5">
-            <span class="flex items-center gap-3">
-              <span class="w-7 h-7 flex-none grid place-items-center rounded-full bg-brand-blue/10 text-brand-blue text-xs font-bold">2</span>
-              <span>
-                <span class="block text-base font-bold tracking-tight">To'garaklar <span class="req">*</span></span>
-                <span class="block text-xs text-brand-muted mt-0.5">Fan bo'yicha tanlang va o'quvchi sonini yozing</span>
-              </span>
+        <!-- ===== O'NG PANEL ===== -->
+        <aside class="reg-rail reveal reveal-delay-1" aria-label="Jonli ko'rinish">
+
+          <!-- Jarayon -->
+          <div class="rail-box">
+            <div class="rail-head">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+              To'ldirish jarayoni
+            </div>
+            <div class="prog-wrap">
+              <div class="ring" id="prog-ring">
+                <svg viewBox="0 0 120 120">
+                  <circle class="ring-bg" cx="60" cy="60" r="52" />
+                  <circle class="ring-fg" id="prog-fg" cx="60" cy="60" r="52"
+                    stroke-dasharray="326.7" stroke-dashoffset="326.7" />
+                </svg>
+                <div class="ring-val">
+                  <b id="prog-pct">0</b>
+                  <i>FOIZ</i>
+                </div>
+              </div>
+              <div class="prog-text">
+                <b>Deyarli tayyor</b>
+                <span id="prog-note">Maydonlarni to'ldirishni boshlang.</span>
+              </div>
+            </div>
+            <div id="prog-list"></div>
+          </div>
+
+          <!-- Markaz kartasi -->
+          <div class="rail-box" id="rail-center">
+            <div class="rail-head">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+              Markaz kartasi
+            </div>
+            <div class="pv-body">
+              <div class="pv-top">
+                <div class="pv-logo" id="pv-logo">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V7l7-4 7 4v14"/><path d="M10 21v-5h4v5"/></svg>
+                </div>
+                <div class="min-w-0">
+                  <div class="pv-name" id="pv-name">O'quv markaz nomi</div>
+                  <div class="pv-meta" id="pv-meta">Telefon raqami kiritilmagan</div>
+                </div>
+              </div>
+
+              <div class="pv-grid">
+                <div class="pv-stat"><b id="pv-staff">—</b><span>Xodim</span></div>
+                <div class="pv-stat"><b id="pv-students">—</b><span>O'quvchi</span></div>
+              </div>
+
+              <div class="pv-chips" id="pv-chips"></div>
+
+              <p class="mt-3 text-[11px] text-brand-muted flex items-center gap-1.5">
+                <svg class="w-3 h-3 flex-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/></svg>
+                Jami <b id="pv-clubs" class="text-brand-ink">0</b> to'garak tanlandi
+              </p>
+            </div>
+          </div>
+
+          <!-- Sertifikat kartasi -->
+          <div class="rail-box" id="rail-youth" hidden>
+            <div class="rail-head">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.5 12.9 17 22l-5-3-5 3 1.5-9.1"/></svg>
+              Sertifikat kartasi
+            </div>
+
+            <div class="cert">
+              <div class="cert-top">
+                <div>
+                  <div class="cert-kicker">Iqtidorli yosh</div>
+                  <div class="cert-name" id="cv-name">O'quvchining ismi-sharifi</div>
+                  <div class="cert-sub" id="cv-sub">Maktab va sinf tanlanmagan</div>
+                </div>
+                <div class="cert-logo" id="cv-logo"><span class="txt">—</span></div>
+              </div>
+
+              <div class="cert-mid">
+                <div class="gauge">
+                  <svg viewBox="0 0 80 80">
+                    <circle class="g-bg" cx="40" cy="40" r="35" />
+                    <circle class="g-fg" id="cv-gauge" cx="40" cy="40" r="35"
+                      stroke-dasharray="219.9" stroke-dashoffset="219.9" />
+                  </svg>
+                  <div class="gauge-val">
+                    <b id="cv-score">—</b>
+                    <i id="cv-scale">NATIJA</i>
+                  </div>
+                </div>
+
+                <div class="cert-rows">
+                  <div class="cert-row dim" id="cv-lang">
+                    <span class="ic">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg>
+                    </span>
+                    <b>Xorijiy til</b>
+                  </div>
+                  <div class="cert-row dim" id="cv-date">
+                    <span class="ic">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="3"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                    </span>
+                    <b>Sertifikat sanasi</b>
+                  </div>
+                  <div class="cert-row dim" id="cv-center">
+                    <span class="ic">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V7l7-4 7 4v14"/><path d="M10 21v-5h4v5"/></svg>
+                    </span>
+                    <b>O'quv markaz</b>
+                  </div>
+                </div>
+              </div>
+
+              <div class="cert-seal idle" id="cv-seal">
+                <span class="sl">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                </span>
+                <p id="cv-seal-text"><b>To'ldirilmoqda</b>Maydonlarni to'ldirgan sari karta jonlanadi.</p>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
+
+      <!-- ===== KEYINGI QADAMLAR ===== -->
+      <section class="mt-14" aria-labelledby="steps-title">
+        <div class="text-center max-w-xl mx-auto reveal">
+          <span class="text-[11px] font-extrabold uppercase tracking-[.14em] text-brand-blue">Keyin nima bo'ladi?</span>
+          <h2 id="steps-title" class="mt-3 font-display text-2xl sm:text-3xl font-extrabold tracking-tight">Uch qadamda tamom</h2>
+        </div>
+
+        <div class="steps mt-8 reveal reveal-delay-1">
+          <div class="step">
+            <span class="s-n">01</span>
+            <span class="s-ico">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4z"/><path d="M22 2 11 13"/></svg>
             </span>
+            <h3>Forma yuboriladi</h3>
+            <p>Ma'lumotlar bir zumda tuman hokimligining yagona reyestriga tushadi.</p>
           </div>
 
-          <div id="club-rows" class="space-y-2.5"></div>
-
-          <div class="mt-4 flex flex-wrap items-center justify-between gap-3">
-            <button type="button" id="club-add"
-              class="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-white border border-slate-200 text-sm font-semibold hover:border-brand-blue hover:text-brand-blue transition shadow-sm">
-              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
-              To'garak qo'shish
-            </button>
-
-            <div id="club-total" class="flex flex-wrap gap-2"></div>
-          </div>
-        </div>
-
-        <!-- ----- Yuborish ----- -->
-        <div class="px-6 sm:px-9 py-5 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <p class="text-xs text-brand-muted">
-            <span class="req">*</span> belgisi majburiy maydonlarni bildiradi.
-          </p>
-          <button type="submit" data-submit
-            class="inline-flex items-center justify-center gap-2 bg-brand-blue text-white font-semibold px-7 py-3.5 rounded-full hover:bg-brand-blue-dark transition shadow-soft hover:scale-[1.02] disabled:opacity-60 disabled:hover:scale-100">
-            <span class="btn-label">Markazni saqlash</span>
-            <svg class="w-4 h-4 btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
-            <svg class="w-4 h-4 btn-spin hidden animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
-          </button>
-        </div>
-      </form>
-    </section>
-
-    <!-- ========== 2-TAB: IQTIDORLI YOSH ========== -->
-    <section id="panel-youth" role="tabpanel" aria-labelledby="tab-youth" tabindex="0" hidden
-      class="mt-8 bg-white rounded-3xl shadow-soft border border-slate-100 p-6 sm:p-10">
-
-      <form id="youth-form" novalidate>
-        <div class="grid sm:grid-cols-2 gap-5">
-
-          <!-- 1. Maktab raqami -->
-          <div>
-            <label for="y-school" class="block text-sm font-semibold">
-              Maktab raqami <span class="text-brand-red">*</span>
-            </label>
-            <select id="y-school" name="school" required
-              class="mt-2 w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/10 outline-none transition">
-              <option value="">Tanlang...</option>
-            </select>
+          <div class="step g">
+            <span class="s-n">02</span>
+            <span class="s-ico">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+            </span>
+            <h3>Tekshiruvdan o'tadi</h3>
+            <p>Mas'ul xodim sertifikat va maktab ma'lumotlarini solishtirib tasdiqlaydi.</p>
           </div>
 
-          <!-- 2. Sinfi -->
-          <div>
-            <label for="y-grade" class="block text-sm font-semibold">
-              Sinfi <span class="text-brand-red">*</span>
-            </label>
-            <select id="y-grade" name="grade" required
-              class="mt-2 w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/10 outline-none transition">
-              <option value="">Tanlang...</option>
-            </select>
-          </div>
-
-          <!-- 3. Ismi-sharifi -->
-          <div class="sm:col-span-2">
-            <label for="y-fish" class="block text-sm font-semibold">
-              O'quvchining ismi-sharifi <span class="text-brand-red">*</span>
-            </label>
-            <input id="y-fish" name="fish" type="text" required minlength="5" autocomplete="name"
-              placeholder="Masalan: Raxmonaliyev Abubakir Komiljon o'g'li"
-              class="mt-2 w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/10 outline-none transition" />
-          </div>
-
-          <!-- 4. Xorijiy til -->
-          <div>
-            <label for="y-language" class="block text-sm font-semibold">
-              Xorijiy til nomi <span class="text-brand-red">*</span>
-            </label>
-            <select id="y-language" name="language" required
-              class="mt-2 w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/10 outline-none transition">
-              <option value="">Tanlang...</option>
-            </select>
-          </div>
-
-          <!-- 5. Sertifikat turi -->
-          <div>
-            <label for="y-cert-type" class="block text-sm font-semibold">
-              Sertifikat turi <span class="text-brand-red">*</span>
-            </label>
-            <select id="y-cert-type" name="certType" required
-              class="mt-2 w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/10 outline-none transition">
-              <option value="">Tanlang...</option>
-              <option value="CEFR">CEFR (Milliy sertifikat)</option>
-              <option value="IELTS">IELTS</option>
-              <option value="SAT">SAT</option>
-            </select>
-          </div>
-
-          <!-- 6. Sertifikat berilgan sana -->
-          <div>
-            <label for="y-cert-date" class="block text-sm font-semibold">
-              Sertifikat berilgan sana <span class="text-brand-red">*</span>
-            </label>
-            <input id="y-cert-date" name="certDate" type="date" required min="2026-01-01" max="2026-12-31"
-              class="mt-2 w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/10 outline-none transition" />
-          </div>
-
-          <!-- 7. Sertifikat natijasi -->
-          <div>
-            <label for="y-result" class="block text-sm font-semibold">
-              Sertifikat natijasi <span class="text-brand-red">*</span>
-            </label>
-            <select id="y-result" name="result" required
-              class="mt-2 w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/10 outline-none transition disabled:bg-slate-50 disabled:text-brand-muted">
-              <option value="">Avval sertifikat turini tanlang</option>
-            </select>
-            <input id="y-result-sat" name="resultSat" type="number" min="1400" max="1600" step="10" disabled
-              placeholder="1400 - 1600"
-              class="mt-2 hidden w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/10 outline-none transition" />
-          </div>
-
-          <!-- 8. Telefon raqami -->
-          <div>
-            <label for="y-phone" class="block text-sm font-semibold">
-              Telefon raqami <span class="text-brand-red">*</span>
-            </label>
-            <input id="y-phone" name="phone" type="tel" required inputmode="tel" autocomplete="tel"
-              placeholder="+998 __ ___ __ __"
-              class="mt-2 w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/10 outline-none transition" />
-          </div>
-
-          <!-- 9. Ijtimoiy reyestr -->
-          <div>
-            <label for="y-social" class="block text-sm font-semibold">
-              Ijtimoiy reyestrda turadimi? <span class="text-brand-red">*</span>
-            </label>
-            <select id="y-social" name="social" required
-              class="mt-2 w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/10 outline-none transition">
-              <option value="Yo'q" selected>Yo'q</option>
-              <option value="Ha">Ha</option>
-            </select>
-          </div>
-
-          <!-- 10. O'quv markazi -->
-          <div class="sm:col-span-2">
-            <div class="flex items-end justify-between gap-3">
-              <label for="y-center" class="block text-sm font-semibold">
-                O'quv markazni tanlash <span class="text-brand-red">*</span>
-              </label>
-              <button type="button" id="center-reload" hidden
-                class="text-xs font-semibold text-brand-blue hover:text-brand-blue-dark transition">Qayta yuklash</button>
-            </div>
-            <select id="y-center" name="center" required
-              class="mt-2 w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/10 outline-none transition disabled:bg-slate-50 disabled:text-brand-muted">
-              <option value="">Yuklanmoqda…</option>
-            </select>
+          <div class="step r">
+            <span class="s-n">03</span>
+            <span class="s-ico">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7A2 2 0 0 1 22 16.9z"/></svg>
+            </span>
+            <h3>Siz bilan bog'lanamiz</h3>
+            <p>Imkoniyatlar, tanlovlar va qo'llab-quvvatlash choralari haqida xabar beramiz.</p>
           </div>
         </div>
-
-        <div class="mt-7 flex justify-end">
-          <button type="submit" data-submit
-            class="inline-flex items-center justify-center gap-2 bg-brand-blue text-white font-semibold px-7 py-3.5 rounded-full hover:bg-brand-blue-dark transition shadow-soft hover:scale-[1.02] disabled:opacity-60 disabled:hover:scale-100">
-            <span class="btn-label">Yuborish</span>
-            <svg class="w-4 h-4 btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
-            <svg class="w-4 h-4 btn-spin hidden animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
-          </button>
-        </div>
-      </form>
-    </section>
+      </section>
+    </div>
   </main>
 
   <!-- ================= FOOTER ================= -->
-  <footer class="bg-brand-ink text-slate-300 mt-auto">
-    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 grid sm:grid-cols-2 gap-8">
+  <footer class="bg-brand-ink text-slate-300 mt-auto relative">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 grid sm:grid-cols-2 gap-8">
       <div>
         <div class="flex items-center gap-3">
           <img src="assets/emblem-of-uzbekistan.png" alt="" class="w-9 h-9 object-contain bg-white/10 rounded-full p-1" />
-          <span class="font-semibold text-white text-sm">Baliqchi tumani hokimligi</span>
+          <span class="font-display font-extrabold text-white text-sm">Baliqchi tumani hokimligi</span>
         </div>
         <p class="mt-3 text-sm text-slate-400 leading-relaxed max-w-xs">
           Iqtidorli yoshlarni qo'llab-quvvatlash markazi.
         </p>
       </div>
       <div class="sm:text-right">
-        <div class="text-xs font-semibold uppercase tracking-widest text-slate-500">Aloqa</div>
+        <div class="text-xs font-bold uppercase tracking-[.14em] text-slate-500">Aloqa</div>
         <ul class="mt-3 space-y-1.5 text-sm">
           <li>Andijon viloyati, Baliqchi tumani</li>
           <li><a href="tel:+998993081308" class="hover:text-white transition">+998 99 308 13 08</a></li>
@@ -434,7 +828,7 @@
       </div>
     </div>
     <div class="border-t border-white/10">
-      <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-4 text-xs text-slate-500 text-center">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 text-xs text-slate-500 text-center">
         © 2026 Baliqchi tumani hokimligi. Barcha huquqlar himoyalangan.
       </div>
     </div>
@@ -442,12 +836,13 @@
 
   <!-- TOAST -->
   <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 hidden px-4 w-full max-w-md">
-    <div class="bg-brand-ink text-white text-sm font-medium px-5 py-3 rounded-2xl shadow-soft flex items-center gap-2.5">
+    <div class="bg-brand-ink text-white text-sm font-medium px-5 py-3.5 rounded-2xl shadow-soft flex items-center gap-2.5">
       <svg id="toast-icon" class="w-4 h-4 flex-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
       <span id="toast-msg">OK</span>
     </div>
   </div>
 
   <script src="assets/register.js"></script>
+  <script src="assets/register-ui.js"></script>
 </body>
 </html>

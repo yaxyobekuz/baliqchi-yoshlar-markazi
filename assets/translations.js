@@ -93,7 +93,8 @@ const i18n = {
     footer_about_desc: "Iqtidorli yoshlarni qo'llab-quvvatlash markazi.",
     footer_contact_title: "Aloqa",
     footer_address: "Andijon viloyati, Baliqchi tumani",
-    footer_phone: "+998 74 000 00 00",
+    footer_phone: "+998 99 308 13 08",
+    footer_telegram: "@sarax_88",
     footer_email: "info@baliqchi.uz",
     footer_links_title: "Sahifa",
     footer_copy: "© 2025 Baliqchi tumani hokimligi. Barcha huquqlar himoyalangan."
@@ -193,7 +194,8 @@ const i18n = {
     footer_about_desc: "Центр поддержки одарённой молодёжи.",
     footer_contact_title: "Контакты",
     footer_address: "Андижанская область, Балыкчинский район",
-    footer_phone: "+998 74 000 00 00",
+    footer_phone: "+998 99 308 13 08",
+    footer_telegram: "@sarax_88",
     footer_email: "info@baliqchi.uz",
     footer_links_title: "Страница",
     footer_copy: "© 2025 Хокимият Балыкчинского района. Все права защищены."
@@ -293,7 +295,8 @@ const i18n = {
     footer_about_desc: "Gifted Youth Support Center.",
     footer_contact_title: "Contact",
     footer_address: "Andijan Region, Baliqchi District",
-    footer_phone: "+998 74 000 00 00",
+    footer_phone: "+998 99 308 13 08",
+    footer_telegram: "@sarax_88",
     footer_email: "info@baliqchi.uz",
     footer_links_title: "Pages",
     footer_copy: "© 2025 Baliqchi District Hokimiyat. All rights reserved."

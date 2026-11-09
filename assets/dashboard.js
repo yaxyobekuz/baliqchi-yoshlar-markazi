@@ -1306,25 +1306,8 @@ function repaintCharts() {
 function youthChartSpecs(rows, opts = {}) {
   const specs = [];
 
-  if (opts.dualTrend) {
-    const apps = state.filtered.filter((r) => r.source === "applications");
-    const yth = state.filtered.filter((r) => r.source === "youth");
-    const { points, unit } = trendBuckets(apps, yth);
-    const series = [
-      { key: "value", label: "Arizalar", color: cssVar(SOURCES.applications.varName) },
-      { key: "value2", label: "Yoshlar", color: cssVar(SOURCES.youth.varName) }
-    ];
-    specs.push({
-      id: "trend", wide: true,
-      title: "Ro'yxatga olish dinamikasi",
-      sub: `Har bir ${unit} uchun yozuvlar soni · ikkala sahifa alohida`,
-      chart: (h) => drawTrend(h, { points, unit, series }),
-      table: (h) => h.replaceChildren(buildTable(
-        [unit === "hafta" ? "Hafta boshi" : "Sana", "Arizalar", "Yoshlar"],
-        points.slice().reverse().map((p) => [fullDate(p.date), fmt(p.value), fmt(p.value2 || 0)]),
-        [false, true, true]))
-    });
-  } else {
+  // "Umumiy" sahifada dinamika kartasi ko'rsatilmaydi
+  if (!opts.dualTrend) {
     const { points, unit } = trendBuckets(rows);
     const series = [{ key: "value", label: "Yozuvlar", color: cssVar("--series-1") }];
     specs.push({

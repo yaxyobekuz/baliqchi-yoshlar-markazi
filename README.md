@@ -19,8 +19,9 @@ form/
 │   ├── register.js           # register.html: tablar, to'garaklar, logotip
 │   ├── register.css          # register.html dizayni (fon, kartalar, maydonlar)
 │   ├── register-ui.js        # register.html interaktivi (ikonka, bayroq, jonli karta)
-│   ├── dashboard.css         # Panel dizayn tokenlari (yorug'/qorong'i)
-│   └── dashboard.js          # Ma'lumot olish, filtrlar, SVG grafiklar
+│   ├── dashboard.css         # Panel dizayni (yorug'/qorong'i, xarita, karta)
+│   ├── dashboard.js          # Ma'lumot olish, filtrlar, SVG grafiklar
+│   └── edu-*.jpg             # Panel uchun fotosuratlar (Pexels, bepul litsenziya)
 └── apps-script/
     └── Code.gs               # Google Apps Script (backend)
 ```
@@ -246,15 +247,31 @@ markazlar bo'yicha o'quvchilar va xodimlar.
 
 - Filtrlar bitta qatorda, ko'rinishga qarab moslashadi (davr, sertifikat, til,
   sinf, maktab, markaz, reyestr, qidiruv) - barcha grafikni bir vaqtda qayta hisoblaydi
+- **Grafikni bosib filtrlash:** halqa segmenti, bar, ustun yoki maktab katakchasini
+  bosing - o'sha shart qo'llanadi, qayta bosilsa o'chadi
+- **Faol filtrlar lentasi:** har bir shart filtr qatori ostida chipcha bo'lib turadi
+  (×) bilan - "Umumiy" sahifada filtr maydonlari yashirin bo'lsa ham ko'rinadi
+- **Maktablar xaritasi:** tumandagi har bir maktab katakcha, rang to'yinganligi
+  yozuvlar soniga bog'liq
+- **Yozuv kartasi:** jadval qatorini bosing - o'ngdan panel ochiladi (sertifikat
+  halqasi, bayroq, markaz ma'lumotlari; Esc bilan yopiladi)
 - Har bir grafikning **"Jadval"** ko'rinishi bor
 - Hero raqam + sparkline (faqat ma'noli bo'lsa chiziladi) + "so'nggi 7 kun" belgisi
 - Yorug'/qorong'i mavzu; klaviatura bilan ham ishlaydi (dinamikada ←/→)
 - Telefon raqamlari standart holda yashirilgan; CSV eksport har bir ko'rinish uchun alohida
 - Har 2 daqiqada jim yangilanadi (ko'rinish sakramaydi)
 
-> Markaz logotipi jadvalda nomning birinchi harfi sifatida ko'rsatiladi -
-> Google Drive havolalari to'g'ridan-to'g'ri `<img>` da ochilmaydi. Logotipni
-> ko'rish uchun jadvaldagi Drive havolasini oching.
+### Rasm va bayroqlar
+
+- Har bir ko'rinishning o'z hero fotosurati bor (`HERO_ART`, `assets/dashboard.js`).
+- Xorijiy til yorliqlari yonida mamlakat bayrog'i ko'rsatiladi
+  ([flagcdn.com](https://flagcdn.com)), IELTS legendasida esa rasmiy logotip.
+- Markaz logotipi Drive havolasidan `drive.google.com/thumbnail?id=...` ko'rinishida
+  olinadi; fayl ochiq bo'lmasa yoki internet yo'q bo'lsa, o'rniga nom monogrammasi
+  ko'rsatiladi - hech qayerda "singan rasm" belgisi qolmaydi.
+- `assets/edu-*.jpg` fotosuratlari [Pexels](https://www.pexels.com) dan olingan
+  (bepul litsenziya, atribut talab qilinmaydi). Almashtirmoqchi bo'lsangiz,
+  faylni shu nom bilan almashtiring - kod o'zgarmaydi.
 
 ### Ulash
 

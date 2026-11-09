@@ -1016,3 +1016,561 @@ body::after {
   .topbar, .filterbar, .card-head-actions, .pager, .btn { display: none !important; }
   .card, .stat-card, .hero-card { box-shadow: none; border: 1px solid #ddd; backdrop-filter: none; background: #fff; }
 }
+
+/* ============================================================
+   ===== QO'SHIMCHA QATLAM: rasm, xarita va yozuv kartasi =====
+   ============================================================ */
+
+/* Yuklanmagan tashqi rasm o'rnini zaxira egallaydi */
+[data-broken] { display: none !important; }
+
+/* ------------------------------------------------------------
+   1. KIRISH EKRANI - rasm bilan ikki panelli
+   ------------------------------------------------------------ */
+
+.gate-shell {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 392px;
+  gap: 22px;
+  width: 100%;
+  max-width: 1010px;
+  align-items: stretch;
+}
+
+.gate-visual {
+  position: relative;
+  min-height: 540px;
+  border-radius: 28px;
+  overflow: hidden;
+  border: 1px solid var(--glass-edge);
+  box-shadow: var(--shadow-lg);
+  animation: gate-in 620ms var(--ease-spring) both;
+}
+
+.gate-photo {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  object-position: 58% 45%;
+  transform: scale(1.06);
+  animation: gate-pan 26s ease-in-out infinite alternate;
+}
+@keyframes gate-pan {
+  from { transform: scale(1.06) translate3d(0, 0, 0); }
+  to   { transform: scale(1.16) translate3d(-2.5%, -2%, 0); }
+}
+
+.gate-veil {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 70% 50% at 85% 8%, var(--aurora-2), transparent 62%),
+    linear-gradient(162deg,
+      rgba(8, 10, 26, .30) 0%,
+      rgba(8, 10, 26, .72) 46%,
+      rgba(8, 10, 26, .94) 100%);
+}
+
+/* O'zbek sakkiz qirrali yulduz naqshi */
+.gate-grain {
+  position: absolute; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='78' height='78' viewBox='0 0 78 78'%3E%3Cg fill='none' stroke='%23ffffff' stroke-width='1'%3E%3Cpath d='M39 7 46 21 60 14 53 28 67 35 53 42 60 56 46 49 39 63 32 49 18 56 25 42 11 35 25 28 18 14 32 21Z'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 78px 78px;
+  opacity: .08;
+}
+
+.gate-copy {
+  position: relative;
+  height: 100%;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  gap: 15px;
+  padding: 36px 34px 32px;
+  color: #fff;
+}
+
+.gate-kicker {
+  display: inline-flex; align-items: center; gap: 8px;
+  align-self: flex-start;
+  padding: 6px 13px 6px 9px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .13);
+  border: 1px solid rgba(255, 255, 255, .22);
+  backdrop-filter: blur(8px);
+  font-size: 11px; font-weight: 700;
+  letter-spacing: .07em; text-transform: uppercase;
+}
+.gate-live {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--accent-2);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent-2) 30%, transparent);
+  animation: gate-pulse 2.2s ease-in-out infinite;
+}
+@keyframes gate-pulse {
+  0%, 100% { box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent-2) 30%, transparent); }
+  50%      { box-shadow: 0 0 0 9px color-mix(in srgb, var(--accent-2) 6%, transparent); }
+}
+
+.gate-head {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(26px, 3.1vw, 38px);
+  font-weight: 800; letter-spacing: -.03em; line-height: 1.1;
+}
+.gate-head em {
+  font-style: normal;
+  background: linear-gradient(100deg, var(--accent-2), #8de8ff 60%, #fff);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.gate-lead {
+  margin: 0;
+  max-width: 44ch;
+  font-size: 14px; line-height: 1.6;
+  color: rgba(255, 255, 255, .80);
+}
+
+.gate-points { margin: 4px 0 0; padding: 0; list-style: none; display: grid; gap: 9px; }
+.gate-points li {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 13px; font-weight: 600;
+  color: rgba(255, 255, 255, .92);
+}
+.gate-points svg {
+  width: 30px; height: 30px; flex: none; padding: 7px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, .13);
+  border: 1px solid rgba(255, 255, 255, .18);
+  fill: none; stroke: currentColor; stroke-width: 1.9;
+  stroke-linecap: round; stroke-linejoin: round;
+}
+
+.gate-flags { display: flex; align-items: center; gap: 7px; margin-top: 6px; }
+.gate-flags img {
+  width: 28px; height: 20px; object-fit: cover;
+  border-radius: 4px;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .3), 0 4px 10px -4px rgba(0, 0, 0, .8);
+}
+.gate-flags-more {
+  font-size: 11px; font-weight: 700;
+  color: rgba(255, 255, 255, .7);
+  padding-left: 2px;
+}
+
+@media (max-width: 920px) {
+  .gate-shell { grid-template-columns: minmax(0, 1fr); max-width: 420px; }
+  .gate-visual { display: none; }
+}
+
+/* ------------------------------------------------------------
+   2. HERO KARTASIDAGI RASM
+   ------------------------------------------------------------ */
+
+.hero-art {
+  position: absolute;
+  inset: 0 0 0 auto;
+  width: 62%;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(90deg, transparent 2%, #000 62%);
+  mask-image: linear-gradient(90deg, transparent 2%, #000 62%);
+}
+.hero-art img {
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: 52% 38%;
+  opacity: .26;
+  transform: scale(1.03);
+}
+.hero-veil {
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--accent) 26%, transparent),
+    transparent 58%);
+}
+.hero-rings {
+  position: absolute;
+  right: -46px; bottom: -46px;
+  width: 190px; height: 190px;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--accent-2) 55%, transparent);
+  box-shadow:
+    0 0 0 18px color-mix(in srgb, var(--accent-2) 10%, transparent),
+    0 0 0 36px color-mix(in srgb, var(--accent-2) 5%, transparent);
+  animation: hero-ring 6s ease-in-out infinite;
+}
+@keyframes hero-ring {
+  0%, 100% { transform: scale(1); opacity: .85; }
+  50%      { transform: scale(1.06); opacity: .45; }
+}
+:root[data-theme="dark"] .hero-art img { opacity: .34; }
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) .hero-art img { opacity: .34; }
+}
+
+/* ------------------------------------------------------------
+   3. GRAFIKDAN FILTRGA
+   ------------------------------------------------------------ */
+
+.mark-hit.is-pickable { cursor: pointer; }
+.legend-item.is-pickable {
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  padding: 3px 7px;
+  margin: -3px -7px;
+  transition: background 160ms, border-color 160ms;
+}
+.legend-item.is-pickable:hover { background: var(--surface-3); border-color: var(--border); }
+.legend-item.is-picked { border-color: var(--accent); background: var(--accent-wash); }
+
+.legend-logo {
+  width: 26px; height: 15px; flex: none;
+  object-fit: contain;
+  border-radius: 3px;
+  background: #fff;
+  padding: 1px;
+}
+
+.bar-icon { border-radius: 3px; }
+
+/* ------------------------------------------------------------
+   4. MAKTABLAR XARITASI
+   ------------------------------------------------------------ */
+
+.school-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+  gap: 7px;
+}
+
+.school-tile {
+  position: relative;
+  aspect-ratio: 1 / .86;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 1px;
+  padding: 0;
+  font: inherit;
+  color: var(--text-primary);
+  background: var(--surface-3);
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  overflow: hidden;
+  cursor: default;
+  transition: transform 180ms var(--ease-spring), border-color 180ms, box-shadow 200ms;
+}
+.school-tile::before {
+  content: "";
+  position: absolute; inset: 0;
+  background: linear-gradient(145deg, var(--series-1), var(--accent-2));
+  opacity: calc(var(--heat, 0) * .68);
+  transition: opacity 320ms var(--ease-out);
+}
+.school-tile.is-empty { opacity: .45; }
+.school-tile .st-n {
+  position: relative;
+  font-family: var(--font-display);
+  font-size: 13px; font-weight: 700; line-height: 1;
+  letter-spacing: -.02em;
+}
+.school-tile .st-v {
+  position: relative;
+  font-size: 10px; font-weight: 700;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+.school-tile.is-pickable { cursor: pointer; }
+.school-tile.is-pickable:hover,
+.school-tile:focus-visible {
+  transform: translateY(-2px) scale(1.06);
+  border-color: var(--accent);
+  box-shadow: var(--shadow-glow);
+  outline: none;
+  z-index: 2;
+}
+.school-tile.is-picked {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-wash), var(--shadow-glow);
+}
+
+.school-scale {
+  display: flex; align-items: center; gap: 9px;
+  margin-top: 14px;
+  font-size: 11px; font-weight: 600;
+  color: var(--text-muted);
+}
+.school-scale .ss-bar {
+  flex: 1; height: 7px; max-width: 220px;
+  border-radius: 999px;
+  background: linear-gradient(90deg,
+    color-mix(in srgb, var(--series-1) 12%, var(--surface-3)),
+    var(--series-1) 65%, var(--accent-2));
+}
+
+/* ------------------------------------------------------------
+   5. JADVAL QATORI -> YOZUV KARTASI
+   ------------------------------------------------------------ */
+
+.data-table tbody tr.row-open { cursor: pointer; }
+.data-table tbody tr.row-open:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.logo-chip {
+  position: relative;
+  width: var(--chip-size, 28px);
+  height: var(--chip-size, 28px);
+}
+.logo-chip .logo-mono { position: relative; font-size: calc(var(--chip-size, 28px) * .4); }
+.logo-chip img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+}
+
+/* ------------------------------------------------------------
+   6. YOZUV KARTASI (o'ng panel)
+   ------------------------------------------------------------ */
+
+.detail { position: fixed; inset: 0; z-index: 90; }
+
+.detail-backdrop {
+  position: absolute; inset: 0;
+  background: rgba(6, 8, 22, .52);
+  backdrop-filter: blur(3px);
+  opacity: 0;
+  transition: opacity 220ms var(--ease-out);
+}
+.detail.is-open .detail-backdrop { opacity: 1; }
+
+.detail-panel {
+  position: absolute;
+  top: 0; right: 0; bottom: 0;
+  width: min(428px, 100%);
+  display: flex; flex-direction: column;
+  background: var(--surface-raised);
+  border-left: 1px solid var(--border);
+  box-shadow: var(--shadow-lg);
+  transform: translateX(102%);
+  transition: transform 260ms var(--ease-out);
+}
+.detail.is-open .detail-panel { transform: none; }
+
+.detail-head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 10px;
+  padding: 16px 16px 14px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.detail-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 15px; font-weight: 700; letter-spacing: -.01em;
+}
+.detail-content { flex: 1; overflow-y: auto; }
+
+.dt-body { padding: 20px; display: grid; gap: 18px; }
+
+.dt-head { display: flex; align-items: center; gap: 13px; }
+.dt-avatar {
+  width: 54px; height: 54px; flex: none;
+  display: grid; place-items: center;
+  border-radius: 17px;
+  font-family: var(--font-display);
+  font-size: 18px; font-weight: 800; color: #fff;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  box-shadow: 0 10px 24px -10px var(--accent-glow);
+}
+.dt-head-text { min-width: 0; }
+.dt-head-text h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 16px; font-weight: 700; letter-spacing: -.02em;
+  line-height: 1.25;
+  word-break: break-word;
+}
+.dt-head-text p { margin: 4px 0 0; font-size: 12.5px; color: var(--text-secondary); }
+
+.dt-cert {
+  display: flex; align-items: center; gap: 16px;
+  padding: 16px;
+  border-radius: 18px;
+  background: var(--surface-3);
+  border: 1px solid var(--border);
+}
+.dt-gauge { position: relative; width: 84px; height: 84px; flex: none; }
+.dt-gauge svg { width: 100%; height: 100%; }
+.dt-gauge-val {
+  position: absolute; inset: 0;
+  display: grid; place-content: center; text-align: center; line-height: 1;
+}
+.dt-gauge-val b {
+  font-family: var(--font-display);
+  font-size: 19px; font-weight: 800; letter-spacing: -.04em;
+}
+.dt-gauge-val i {
+  display: block; margin-top: 4px;
+  font-style: normal; font-size: 8.5px; font-weight: 700;
+  letter-spacing: .1em; color: var(--text-muted);
+}
+.dt-cert-side { display: grid; gap: 6px; min-width: 0; }
+.dt-cert-logo {
+  width: 62px; height: 34px; object-fit: contain;
+  background: #fff; border-radius: 8px; padding: 3px;
+}
+.dt-cert-type { font-family: var(--font-display); font-size: 14px; font-weight: 700; }
+.dt-cert-date { font-size: 12px; color: var(--text-secondary); }
+.dt-tag {
+  justify-self: start;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 10.5px; font-weight: 800;
+  letter-spacing: .04em; text-transform: uppercase;
+  color: var(--good);
+  background: color-mix(in srgb, var(--good) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--good) 34%, transparent);
+}
+
+.dt-rows { display: grid; gap: 2px; }
+.dt-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 9px 2px;
+  border-bottom: 1px solid var(--border);
+}
+.dt-row:last-child { border-bottom: none; }
+.dt-ic {
+  position: relative;
+  width: 32px; height: 32px; flex: none;
+  display: grid; place-items: center;
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--surface-3);
+  border: 1px solid var(--border);
+  color: var(--accent);
+}
+.dt-ic svg { width: 16px; height: 16px; }
+.dt-ic img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%; object-fit: cover;
+}
+.dt-ic:has(img:not([data-broken])) svg { display: none; }
+.dt-text { display: grid; gap: 1px; min-width: 0; }
+.dt-text span { font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--text-muted); }
+.dt-text b { font-size: 13.5px; font-weight: 600; word-break: break-word; }
+
+.dt-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; }
+.dt-stat {
+  padding: 12px;
+  border-radius: 14px;
+  background: var(--surface-3);
+  border: 1px solid var(--border);
+  text-align: center;
+}
+.dt-stat b {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 20px; font-weight: 800; letter-spacing: -.03em;
+  font-variant-numeric: tabular-nums;
+}
+.dt-stat span { display: block; margin-top: 3px; font-size: 10.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--text-muted); }
+
+.dt-sec {
+  margin: 0 0 10px;
+  font-size: 11px; font-weight: 800;
+  letter-spacing: .08em; text-transform: uppercase;
+  color: var(--text-muted);
+}
+.dt-clubs { display: block; }
+.dt-club { margin-bottom: 11px; }
+.dt-club-top { display: flex; justify-content: space-between; gap: 10px; font-size: 12.5px; margin-bottom: 5px; }
+.dt-club-top b { font-variant-numeric: tabular-nums; }
+.dt-club-bar { height: 6px; border-radius: 999px; background: var(--surface-3); overflow: hidden; }
+.dt-club-bar b {
+  display: block; height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--series-3), var(--accent-2));
+}
+
+@media (max-width: 620px) {
+  .detail-panel {
+    top: auto; left: 0; right: 0; bottom: 0;
+    width: 100%; max-height: 86vh;
+    border-left: none;
+    border-top: 1px solid var(--border);
+    border-radius: 24px 24px 0 0;
+    transform: translateY(102%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gate-photo, .hero-rings, .gate-live { animation: none !important; }
+  .school-tile.is-pickable:hover { transform: none; }
+}
+
+/* ------------------------------------------------------------
+   7. FAOL FILTRLAR LENTASI
+   ------------------------------------------------------------ */
+
+.active-filters {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+  padding-bottom: 14px;
+  margin-top: -4px;
+  animation: af-in 260ms var(--ease-out) both;
+}
+@keyframes af-in {
+  from { opacity: 0; transform: translateY(-5px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.af-cap {
+  font-size: 11px; font-weight: 800;
+  letter-spacing: .07em; text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.af-chip {
+  display: inline-flex; align-items: center; gap: 7px;
+  height: 28px; padding: 0 8px 0 11px;
+  font: inherit; font-size: 12px;
+  color: var(--text-primary);
+  background: var(--accent-wash);
+  border: 1px solid color-mix(in srgb, var(--accent) 38%, transparent);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 160ms, border-color 160ms, transform 160ms var(--ease-spring);
+  animation: af-in 220ms var(--ease-out) both;
+}
+.af-chip:hover { background: color-mix(in srgb, var(--accent) 22%, transparent); transform: translateY(-1px); }
+.af-chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.af-key { color: var(--text-secondary); font-weight: 600; }
+.af-chip b { font-weight: 700; }
+.af-x {
+  width: 15px; height: 15px; flex: none;
+  padding: 2px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--accent) 26%, transparent);
+  fill: none; stroke: currentColor; stroke-width: 2.8; stroke-linecap: round;
+}
+
+.af-clear {
+  font: inherit; font-size: 11.5px; font-weight: 700;
+  color: var(--text-secondary);
+  background: none; border: none;
+  padding: 4px 2px;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--border-strong);
+}
+.af-clear:hover { color: var(--accent); }
+
+/* ------------------------------------------------------------
+   8. HERO RASMINING ALMASHISHI
+   ------------------------------------------------------------ */
+
+.hero-art img {
+  transition: opacity 320ms var(--ease-out);
+}
+.hero-art img.is-swapping { opacity: 0 !important; }

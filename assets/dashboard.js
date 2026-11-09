@@ -128,6 +128,162 @@ function certColor(id) {
 }
 
 // ============================================================
+//  MEDIA - bayroqlar, markaz logotiplari, sertifikat nishonlari
+//  Tashqi rasm yuklanmasa, hamma joyda matnli zaxira qoladi.
+// ============================================================
+
+/** Xorijiy til → mamlakat kodi (flagcdn.com) */
+const FLAG_CODES = {
+  "Ingliz tili": "gb", "Rus tili": "ru", "Nemis tili": "de", "Fransuz tili": "fr",
+  "Koreys tili": "kr", "Yapon tili": "jp", "Xitoy tili": "cn", "Arab tili": "sa",
+  "Turk tili": "tr", "Ispan tili": "es", "Italyan tili": "it", "Hind tili": "in"
+};
+
+/** Yuklanmagan rasmlar - qayta so'ralmaydi */
+const brokenMedia = new Set();
+
+function flagUrl(language, size = 40) {
+  const code = FLAG_CODES[String(language || "").trim()];
+  if (!code) return "";
+  const url = `https://flagcdn.com/w${size}/${code}.png`;
+  return brokenMedia.has(url) ? "" : url;
+}
+
+/** Drive havolasidan to'g'ridan-to'g'ri ko'rsatiladigan rasm manzili */
+function driveThumb(link, size = 96) {
+  const s = String(link || "");
+  const m = /\/d\/([a-zA-Z0-9_-]{16,})/.exec(s) || /[?&]id=([a-zA-Z0-9_-]{16,})/.exec(s);
+  if (!m) return "";
+  const url = `https://drive.google.com/thumbnail?id=${m[1]}&sz=w${size}`;
+  return brokenMedia.has(url) ? "" : url;
+}
+
+const CERT_BADGE = { IELTS: "assets/ielts-logog-2000x1200.png" };
+
+/** Rasm yuklanmasa: belgilab qo'yamiz, CSS uni yashiradi va zaxira ko'rinadi */
+document.addEventListener("error", (e) => {
+  const el = e.target;
+  if (!el || !el.dataset || !el.dataset.media) return;
+  const src = el.currentSrc || el.getAttribute("src") || el.getAttribute("href") || "";
+  if (src) brokenMedia.add(src);
+  el.setAttribute("data-broken", "1");
+  if (el.namespaceURI === SVG_NS) el.remove();
+}, true);
+
+/** Nomi bo'yicha markaz yozuvi (grafik yorliqlaridan logotip topish uchun) */
+function centerByName(name) {
+  return state.data.centers.find((c) => c.name === name) || null;
+}
+
+function centerLogoIcon(d) {
+  const c = centerByName(d.label);
+  return c ? driveThumb(c.logo, 64) : "";
+}
+
+/** Markaz nomidan ikki harfli monogramma */
+function monogram(name) {
+  return String(name || "")
+    .trim().split(/\s+/).slice(0, 2)
+    .map((w) => w[0] || "").join("").toUpperCase() || "?";
+}
+
+// ============================================================
+//  GRAFIKDAN FILTRGA - segmentni bosish filtrni yoqadi/o'chiradi
+// ============================================================
+
+const PICK_SELECTS = {
+  cert: "#f-cert", lang: "#f-lang", grade: "#f-grade",
+  school: "#f-school", center: "#f-center"
+};
+
+function pickFilter(key, raw) {
+  const node = $(PICK_SELECTS[key]);
+  if (!node) return;
+
+  // "Markaz" kesimi faqat Yoshlar ko'rinishida qo'llanadi
+  if (key === "center" && state.view !== "youth") return;
+
+  const value = String(raw ?? "").trim();
+  const next = state.filters[key] === value ? "" : value;
+
+  // Ro'yxatda bo'lmagan qiymat ("Boshqa", "Ko'rsatilmagan"...) filtrlanmaydi
+  if (next && ![...node.options].some((o) => o.value === next)) return;
+
+  state.filters[key] = next;
+  node.value = next;
+  renderAll();
+}
+
+// ---------- Faol filtrlar lentasi ----------
+
+const FILTER_LABELS = {
+  range: "Davr", cert: "Sertifikat", lang: "Til", grade: "Sinf",
+  school: "Maktab", center: "Markaz", social: "Reyestr", search: "Qidiruv"
+};
+
+const RANGE_LABELS = { "7": "7 kun", "30": "30 kun", "90": "90 kun", mtd: "Shu oy" };
+
+const FILTER_INPUTS = Object.assign({}, PICK_SELECTS, { social: "#f-social", search: "#f-search" });
+
+function filterChipValue(key, value) {
+  if (key === "range") return RANGE_LABELS[value] || value;
+  if (key === "grade") return value + "-sinf";
+  if (key === "school") return schoolLabel(value);
+  return value;
+}
+
+function clearFilter(key) {
+  if (key === "range") {
+    state.filters.range = "all";
+    $$(".chip[data-range]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.range === "all")));
+  } else {
+    state.filters[key] = "";
+    const node = $(FILTER_INPUTS[key]);
+    if (node) node.value = "";
+  }
+  renderAll();
+}
+
+/**
+ * Grafikdan qo'yilgan filtr ko'rinmay qolmasligi kerak:
+ * "Umumiy" sahifada filtr maydonlari yashirin, shuning uchun
+ * har bir faol shart shu lentada chipcha bo'lib turadi.
+ */
+function renderActiveFilters() {
+  const host = $("#active-filters");
+  if (!host) return;
+  host.replaceChildren();
+
+  const active = Object.keys(FILTER_LABELS).filter((k) => {
+    const v = state.filters[k];
+    return k === "range" ? !!v && v !== "all" : !!String(v || "").trim();
+  });
+
+  host.hidden = !active.length;
+  if (!active.length) return;
+
+  host.appendChild(elem("span", { class: "af-cap" }, "Faol filtrlar"));
+
+  active.forEach((k) => {
+    const chip = elem("button", { class: "af-chip", type: "button" });
+    chip.setAttribute("aria-label", `${FILTER_LABELS[k]} filtrini olib tashlash`);
+    chip.append(
+      elem("span", { class: "af-key" }, FILTER_LABELS[k]),
+      elem("b", {}, filterChipValue(k, state.filters[k]))
+    );
+    const x = svg("svg", { class: "af-x", viewBox: "0 0 24 24" });
+    x.appendChild(svg("path", { d: "M18 6 6 18M6 6l12 12" }));
+    chip.appendChild(x);
+    chip.addEventListener("click", () => clearFilter(k));
+    host.appendChild(chip);
+  });
+
+  const all = elem("button", { class: "af-clear", type: "button" }, "Hammasini tozalash");
+  all.addEventListener("click", () => $("#f-reset").click());
+  host.appendChild(all);
+}
+
+// ============================================================
 //  MA'LUMOT OLISH
 // ============================================================
 
@@ -569,9 +725,69 @@ function attachTip(target, viz, build) {
   target.addEventListener("blur", hide);
 }
 
+/** Segmentni bosiladigan qiladi (filtrni yoqadi/o'chiradi) */
+function makePickable(hit, pick, datum) {
+  if (typeof pick !== "function") return;
+  hit.setAttribute("class", (hit.getAttribute("class") || "") + " is-pickable");
+  hit.addEventListener("click", () => pick(datum));
+  hit.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(datum); }
+  });
+}
+
 // ============================================================
 //  GRAFIK PRIMITIVLARI
 // ============================================================
+
+/**
+ * Maktablar xaritasi - 1..61 va maxsus maktablar katakcha ko'rinishida.
+ * Rang to'yinganligi yozuvlar soniga bog'liq, bosilganda filtr qo'llanadi.
+ */
+function drawSchoolGrid(host, rows, opts = {}) {
+  const counts = countBy(rows, (r) => String(r.school || "").trim());
+  const numeric = [];
+  const special = [];
+  counts.forEach((v, k) => (/^\d+$/.test(k) ? numeric : special).push(k));
+
+  const maxSchool = Math.max(61, ...numeric.map(Number));
+  const max = Math.max(1, ...counts.values());
+  const total = rows.length;
+
+  const grid = elem("div", { class: "school-grid" });
+  const active = state.filters.school;
+
+  const addTile = (key, label, short) => {
+    const value = counts.get(key) || 0;
+    const tile = elem("button", { class: "school-tile", type: "button" });
+    tile.classList.toggle("is-empty", value === 0);
+    tile.classList.toggle("is-picked", !!active && active === key);
+    if (value > 0) {
+      // 0.16 dan 1 gacha - eng kam yozuv ham ko'rinib tursin
+      tile.style.setProperty("--heat", (0.16 + 0.84 * (value / max)).toFixed(3));
+    }
+    tile.appendChild(elem("span", { class: "st-n" }, short));
+    tile.appendChild(elem("span", { class: "st-v" }, value ? fmt(value) : "·"));
+    tile.setAttribute("aria-label", `${label}: ${value} ta yozuv`);
+
+    attachTip(tile, host, () => tipContent(label, [
+      { name: value ? `· ${pct(value, total)}` : "yozuv yo'q", value: fmt(value), color: cssVar("--series-1") }
+    ]));
+    if (value > 0) makePickable(tile, opts.pick, { raw: key, label });
+    grid.appendChild(tile);
+  };
+
+  for (let n = 1; n <= maxSchool; n++) addTile(String(n), `${n}-maktab`, String(n));
+  special.sort().forEach((k) => addTile(k, k, k.slice(0, 2).toUpperCase()));
+
+  const scale = elem("div", { class: "school-scale" });
+  scale.append(
+    elem("span", { class: "ss-cap" }, "Kam"),
+    elem("span", { class: "ss-bar" }),
+    elem("span", { class: "ss-cap" }, `Ko'p · ${fmt(max)}`)
+  );
+
+  host.replaceChildren(grid, scale);
+}
 
 function niceTicks(max, count = 4) {
   if (max <= 0) return { max: 1, ticks: [0, 1] };
@@ -995,6 +1211,7 @@ function drawDonut(host, parts, total, opts = {}) {
     attachTip(hit, host, () => tipContent(p.label, [
       { name: `· ${pct(p.value, total)}`, value: fmt(p.value), color: p.color }
     ]));
+    makePickable(hit, opts.pick, p);
 
     g.append(seg, hit);
     offset += C * frac;
@@ -1020,15 +1237,30 @@ function drawDonut(host, parts, total, opts = {}) {
   centerLbl.style.pointerEvents = "none";
   root.appendChild(centerLbl);
 
-  // Legenda - qiymat va ulush bilan
+  // Legenda - qiymat, ulush va (bor bo'lsa) logotip bilan
   const legend = elem("div", { class: "legend" });
   live.forEach((p) => {
-    const item = elem("div", { class: "legend-item" });
-    const key = elem("span", { class: "legend-key" });
-    key.style.background = p.color;
-    key.style.color = p.color;
+    const item = elem(opts.pick ? "button" : "div", { class: "legend-item" });
+    if (opts.pick) {
+      item.type = "button";
+      item.classList.add("is-pickable");
+      item.addEventListener("click", () => opts.pick(p));
+      if (state.filters[opts.pickKey] === (p.id || p.label)) item.classList.add("is-picked");
+    }
+
+    const badge = p.id && CERT_BADGE[p.id] ? CERT_BADGE[p.id] : null;
+    if (badge) {
+      const img = elem("img", { class: "legend-logo", src: badge, alt: "", loading: "lazy" });
+      img.dataset.media = "legend";
+      item.appendChild(img);
+    } else {
+      const key = elem("span", { class: "legend-key" });
+      key.style.background = p.color;
+      key.style.color = p.color;
+      item.appendChild(key);
+    }
+
     item.append(
-      key,
       elem("span", {}, p.label),
       elem("span", { class: "legend-value" }, `${fmt(p.value)} · ${pct(p.value, total)}`)
     );
@@ -1049,9 +1281,15 @@ function drawHBars(host, items, opts = {}) {
   const barH = 18;                                   // <= 24px
   const GUTTER = 12;
   const valueW = Math.max(42, measure(fmt(Math.max(...items.map((d) => d.value))), 11.5, 700) + 18);
+
+  // Ixtiyoriy chap ikonka (bayroq yoki markaz logotipi)
+  const ICON_W = 20;
+  const ICON_H = 14;
+  const iconGap = opts.icon ? ICON_W + 8 : 0;
+
   const labelW = Math.min(
-    Math.max(...items.map((d) => measure(d.label, 11.5, 500))) + GUTTER + 1,
-    Math.max(96, W * 0.42)
+    Math.max(...items.map((d) => measure(d.label, 11.5, 500))) + GUTTER + 1 + iconGap,
+    Math.max(96 + iconGap, W * 0.46)
   );
   const H = items.length * rowH;
   const trackW = Math.max(40, W - labelW - valueW);
@@ -1076,9 +1314,21 @@ function drawHBars(host, items, opts = {}) {
     const w = max ? Math.max(2, (d.value / max) * trackW) : 2;
     const color = d.isOther ? cssVar("--series-de") : baseColor;
 
+    if (opts.icon) {
+      const href = opts.icon(d);
+      if (href) {
+        const img = svg("image", {
+          class: "bar-icon", href, x: 0, y: i * rowH + (rowH - ICON_H) / 2,
+          width: ICON_W, height: ICON_H, preserveAspectRatio: "xMidYMid slice"
+        });
+        img.dataset.media = "bar";
+        root.appendChild(img);
+      }
+    }
+
     root.appendChild(svg("text", {
       class: "label-text", x: labelW - GUTTER, y: i * rowH + rowH / 2 + 4, "text-anchor": "end"
-    }, truncate(d.label, labelW - GUTTER, 11.5, 500)));
+    }, truncate(d.label, labelW - GUTTER - iconGap, 11.5, 500)));
 
     // Bo'sh yo'lak - barning to'liq uzunligini ko'rsatadi
     root.appendChild(svg("path", {
@@ -1110,6 +1360,7 @@ function drawHBars(host, items, opts = {}) {
     attachTip(hit, host, () => tipContent(d.label, [
       { name: opts.unit ? `${opts.unit} · ${pct(d.value, total)}` : `· ${pct(d.value, total)}`, value: fmt(d.value), color }
     ]));
+    makePickable(hit, opts.pick, d);
     root.appendChild(hit);
   });
 
@@ -1191,6 +1442,7 @@ function drawColumns(host, items, opts = {}) {
     attachTip(hit, host, () => tipContent((opts.labelPrefix || "") + d.label, [
       { name: `· ${pct(d.value, total)}`, value: fmt(d.value), color }
     ]));
+    makePickable(hit, opts.pick, d);
     root.appendChild(hit);
   });
 
@@ -1335,7 +1587,8 @@ function youthChartSpecs(rows, opts = {}) {
     title: "Sertifikat turlari",
     sub: "Yozuvlarning turlar bo'yicha ulushi",
     chart: (h) => drawDonut(h, certParts, rows.length, {
-      title: "Sertifikat turlari", centerLabel: "Yozuv"
+      title: "Sertifikat turlari", centerLabel: "Yozuv",
+      pickKey: "cert", pick: (p) => pickFilter("cert", p.id || p.label)
     }),
     table: (h) => h.replaceChildren(buildTable(
       ["Sertifikat turi", "Yozuvlar", "Ulush"],
@@ -1344,13 +1597,17 @@ function youthChartSpecs(rows, opts = {}) {
       [false, true, true]))
   });
 
-  // Xorijiy tillar
+  // Xorijiy tillar - yorliq yonida mamlakat bayrog'i
   const langItems = topN(countBy(rows, (r) => r.language), 7);
   specs.push({
     id: "lang",
     title: "Xorijiy tillar",
-    sub: "Yozuvlar soni bo'yicha",
-    chart: (h) => drawHBars(h, langItems, { title: "Xorijiy tillar" }),
+    sub: "Bayroqni bosib filtrlang",
+    chart: (h) => drawHBars(h, langItems, {
+      title: "Xorijiy tillar",
+      icon: (d) => flagUrl(d.label),
+      pick: (d) => pickFilter("lang", d.label)
+    }),
     table: (h) => h.replaceChildren(buildTable(["Xorijiy til", "Yozuvlar", "Ulush"],
       langItems.map((d) => [d.label, fmt(d.value), pct(d.value, rows.length)]), [false, true, true]))
   });
@@ -1358,12 +1615,14 @@ function youthChartSpecs(rows, opts = {}) {
   // Sinflar
   const gradeItems = [...countBy(rows, (r) => r.grade).entries()]
     .sort((a, b) => Number(a[0]) - Number(b[0]))
-    .map(([label, value]) => ({ label: label + "-sinf", value }));
+    .map(([raw, value]) => ({ label: raw + "-sinf", raw, value }));
   specs.push({
     id: "grade",
     title: "Sinflar kesimida",
-    sub: "Har bir sinfdagi yozuvlar soni",
-    chart: (h) => drawColumns(h, gradeItems, { title: "Sinflar" }),
+    sub: "Ustunni bosib filtrlang",
+    chart: (h) => drawColumns(h, gradeItems, {
+      title: "Sinflar", pick: (d) => pickFilter("grade", d.raw)
+    }),
     table: (h) => h.replaceChildren(buildTable(["Sinf", "Yozuvlar", "Ulush"],
       gradeItems.map((d) => [d.label, fmt(d.value), pct(d.value, rows.length)]), [false, true, true]))
   });
@@ -1372,14 +1631,30 @@ function youthChartSpecs(rows, opts = {}) {
   const schoolItems = [...countBy(rows, (r) => r.school).entries()]
     .sort((a, b) => b[1] - a[1] || Number(a[0]) - Number(b[0]))
     .slice(0, 10)
-    .map(([label, value]) => ({ label: schoolLabel(label), value }));
+    .map(([raw, value]) => ({ label: schoolLabel(raw), raw, value }));
   specs.push({
     id: "school",
     title: "Eng faol maktablar",
-    sub: "Birinchi 10 ta",
-    chart: (h) => drawHBars(h, schoolItems, { title: "Maktablar" }),
+    sub: "Birinchi 10 ta · bosib filtrlang",
+    chart: (h) => drawHBars(h, schoolItems, {
+      title: "Maktablar", pick: (d) => pickFilter("school", d.raw)
+    }),
     table: (h) => h.replaceChildren(buildTable(["Maktab", "Yozuvlar", "Ulush"],
       schoolItems.map((d) => [d.label, fmt(d.value), pct(d.value, rows.length)]), [false, true, true]))
+  });
+
+  // Maktablar xaritasi - butun tuman bitta ko'rinishda
+  const schoolRank = [...countBy(rows, (r) => r.school).entries()]
+    .sort((a, b) => b[1] - a[1] || Number(a[0]) - Number(b[0]));
+  specs.push({
+    id: "schoolmap", wide: true,
+    title: "Maktablar xaritasi",
+    sub: `Tumandagi har bir maktab · ${fmt(schoolRank.length)} tasida yozuv bor`,
+    chart: (h) => drawSchoolGrid(h, rows, { pick: (d) => pickFilter("school", d.raw) }),
+    table: (h) => h.replaceChildren(schoolRank.length
+      ? buildTable(["Maktab", "Yozuvlar", "Ulush"],
+          schoolRank.map(([k, v]) => [schoolLabel(k), fmt(v), pct(v, rows.length)]), [false, true, true])
+      : elem("p", { class: "mini-empty" }, "Ma'lumot yo'q."))
   });
 
   // O'quv markazlari kesimi (faqat Yoshlar)
@@ -1389,7 +1664,10 @@ function youthChartSpecs(rows, opts = {}) {
       id: "bycenter",
       title: "O'quv markazlari kesimida",
       sub: "Yoshlar qaysi markazga a'zo",
-      chart: (h) => drawHBars(h, centerItems, { title: "Markazlar" }),
+      chart: (h) => drawHBars(h, centerItems, {
+        title: "Markazlar", icon: centerLogoIcon,
+        pick: (d) => pickFilter("center", d.label)
+      }),
       table: (h) => h.replaceChildren(buildTable(["Markaz", "Yoshlar", "Ulush"],
         centerItems.map((d) => [d.label, fmt(d.value), pct(d.value, rows.length)]), [false, true, true]))
     });
@@ -1494,7 +1772,7 @@ function overviewCenterSpecs() {
     id: "ov-centers",
     title: "Eng yirik markazlar",
     sub: "O'quvchilar soni bo'yicha birinchi 8 ta",
-    chart: (h) => drawHBars(h, byStudents, { title: "Markazlar", unit: "o'quvchi" }),
+    chart: (h) => drawHBars(h, byStudents, { title: "Markazlar", unit: "o'quvchi", icon: centerLogoIcon }),
     table: (h) => h.replaceChildren(buildTable(["Markaz", "O'quvchilar", "Ulush"],
       byStudents.map((d) => [d.label, fmt(d.value), pct(d.value, studentsTotal)]), [false, true, true]))
   });
@@ -1537,7 +1815,7 @@ function centerChartSpecs(rows) {
     id: "cstudents",
     title: "Markazlar bo'yicha o'quvchilar",
     sub: "Birinchi 10 ta",
-    chart: (h) => drawHBars(h, byStudents, { title: "Markazlar", unit: "o'quvchi" }),
+    chart: (h) => drawHBars(h, byStudents, { title: "Markazlar", unit: "o'quvchi", icon: centerLogoIcon }),
     table: (h) => h.replaceChildren(buildTable(["Markaz", "O'quvchilar", "Ulush"],
       byStudents.map((d) => [d.label, fmt(d.value), pct(d.value, studentsTotal)]), [false, true, true]))
   });
@@ -1549,7 +1827,7 @@ function centerChartSpecs(rows) {
     id: "cstaff",
     title: "Markazlar bo'yicha xodimlar",
     sub: "Birinchi 10 ta",
-    chart: (h) => drawHBars(h, byStaff, { title: "Xodimlar", unit: "xodim" }),
+    chart: (h) => drawHBars(h, byStaff, { title: "Xodimlar", unit: "xodim", icon: centerLogoIcon }),
     table: (h) => h.replaceChildren(buildTable(["Markaz", "Xodimlar", "Ulush"],
       byStaff.map((d) => [d.label, fmt(d.value), pct(d.value, staffTotal)]), [false, true, true]))
   });
@@ -1607,9 +1885,43 @@ function statCard({ label, value, note, color }) {
   return card;
 }
 
+/**
+ * Har bir ko'rinishning o'z rasmi bor - qaysi bo'limdasiz, darhol ko'rinadi.
+ * Fotosuratlar: Pexels (bepul litsenziya) va tuman hokimligi arxivi.
+ */
+const HERO_ART = {
+  overview:     { src: "assets/yoshlar-rasmi.jpg",     pos: "52% 38%" },
+  applications: { src: "assets/edu-study-pair.jpg",    pos: "46% 42%" },
+  youth:        { src: "assets/edu-library-trio.jpg",  pos: "50% 36%" },
+  centers:      { src: "assets/edu-robotics.jpg",      pos: "52% 46%" }
+};
+
+function renderHeroArt() {
+  const img = $("#hero-photo");
+  if (!img) return;
+  const art = HERO_ART[state.view] || HERO_ART.overview;
+  if (img.getAttribute("data-art") === art.src) return;
+
+  img.setAttribute("data-art", art.src);
+  img.style.objectPosition = art.pos;
+  img.classList.add("is-swapping");
+  const show = () => img.classList.remove("is-swapping");
+
+  const next = new Image();
+  next.onload = next.onerror = () => {
+    // Tez almashtirishda eski rasm yangisini bosib ketmasligi kerak
+    if (img.getAttribute("data-art") !== art.src) return;
+    img.src = art.src;
+    requestAnimationFrame(show);
+  };
+  next.src = art.src;
+  setTimeout(show, 600);                 // rasm kelmasa ham karta ochiq qoladi
+}
+
 function renderHero(rows) {
   const v = view();
   $("#hero-label").textContent = v.heroLabel;
+  renderHeroArt();
   countUp($("#hero-value"), rows.length, 1100);
 
   const dated = rows.filter((r) => r.ts).map((r) => r.ts).sort((a, b) => a - b);
@@ -1716,11 +2028,23 @@ function certPill(type) {
   return pill;
 }
 
+function centerChip(center, size = 28) {
+  const chip = elem("span", { class: "logo-chip" });
+  chip.style.setProperty("--chip-size", size + "px");
+  chip.appendChild(elem("span", { class: "logo-mono" }, monogram(center.name)));
+
+  const src = driveThumb(center.logo, Math.max(96, size * 3));
+  if (src) {
+    const img = elem("img", { src, alt: "", loading: "lazy", decoding: "async" });
+    img.dataset.media = "logo";
+    chip.appendChild(img);
+  }
+  return chip;
+}
+
 function logoCell(center) {
   const wrap = elem("span", { class: "logo-cell" });
-  const chip = elem("span", { class: "logo-chip" });
-  chip.textContent = center.name.slice(0, 1).toUpperCase();
-  wrap.append(chip, document.createTextNode(center.name));
+  wrap.append(centerChip(center), document.createTextNode(center.name));
   return wrap;
 }
 
@@ -1817,13 +2141,18 @@ function renderTable() {
   const body = $("#table-body");
   body.replaceChildren();
   slice.forEach((r) => {
-    const tr = elem("tr");
+    const tr = elem("tr", { class: "row-open", tabindex: "0", role: "button" });
+    tr.setAttribute("aria-label", (isCenters() ? r.name : r.fish) + " - kartani ochish");
     cols.forEach((col) => {
       const td = elem("td", { class: col.cls || null });
       const content = col.cell(r);
       if (content instanceof Node) td.appendChild(content);
       else td.textContent = content;
       tr.appendChild(td);
+    });
+    tr.addEventListener("click", () => openDetail(r));
+    tr.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openDetail(r); }
     });
     body.appendChild(tr);
   });
@@ -1835,6 +2164,205 @@ function renderTable() {
   $("#table-sub").textContent = `${v.tableSub} · ${fmt(rows.length)} ta ${unit}`;
   $("#page-prev").disabled = state.page === 0;
   $("#page-next").disabled = state.page >= pages - 1;
+}
+
+// ============================================================
+//  YOZUV KARTASI - jadval qatorini bosganda o'ngdan ochiladi
+// ============================================================
+
+/** Natijani 0..1 oralig'iga keltiradi - halqa shu bo'yicha to'ladi */
+const RESULT_SCALE = {
+  CEFR: (v) => ({ pct: { B2: 0.72, C1: 0.86, C2: 1 }[v] || 0.6, unit: "DARAJA" }),
+  IELTS: (v) => ({ pct: Math.min(1, (parseFloat(v) || 0) / 9), unit: "BAND" }),
+  SAT: (v) => ({ pct: Math.max(0, Math.min(1, 0.7 + 0.3 * (((parseFloat(v) || 1400) - 1400) / 200))), unit: "BALL" })
+};
+
+function gaugeNode(certType, result) {
+  const R = 34;
+  const C = 2 * Math.PI * R;
+  const scale = RESULT_SCALE[certType];
+  const info = result && scale ? scale(result) : { pct: 0, unit: "NATIJA" };
+  const color = certColor(certType);
+
+  const wrap = elem("div", { class: "dt-gauge" });
+  const root = svg("svg", { viewBox: "0 0 80 80" });
+  root.appendChild(svg("circle", {
+    cx: 40, cy: 40, r: R, fill: "none", stroke: cssVar("--surface-3"), "stroke-width": 8
+  }));
+  const fg = svg("circle", {
+    cx: 40, cy: 40, r: R, fill: "none", stroke: color, "stroke-width": 8,
+    "stroke-linecap": "round", transform: "rotate(-90 40 40)",
+    "stroke-dasharray": C.toFixed(1),
+    "stroke-dashoffset": (C * (1 - info.pct)).toFixed(1)
+  });
+  if (!reducedMotion()) {
+    fg.setAttribute("stroke-dashoffset", C.toFixed(1));
+    fg.appendChild(svg("animate", {
+      attributeName: "stroke-dashoffset",
+      from: C.toFixed(1), to: (C * (1 - info.pct)).toFixed(1),
+      dur: "820ms", begin: "80ms", fill: "freeze",
+      calcMode: "spline", keySplines: "0.22 1 0.36 1", keyTimes: "0;1"
+    }));
+  }
+  root.appendChild(fg);
+
+  const val = elem("div", { class: "dt-gauge-val" });
+  val.append(
+    elem("b", {}, result || "—"),
+    elem("i", {}, info.unit)
+  );
+  wrap.append(root, val);
+  return wrap;
+}
+
+function detailRow(iconPath, label, value, imgSrc) {
+  const row = elem("div", { class: "dt-row" });
+  const ic = elem("span", { class: "dt-ic" });
+  if (imgSrc) {
+    const img = elem("img", { src: imgSrc, alt: "", loading: "lazy" });
+    img.dataset.media = "row";
+    ic.appendChild(img);
+  }
+  const icon = svg("svg", { viewBox: "0 0 24 24", fill: "none", stroke: "currentColor",
+    "stroke-width": "1.8", "stroke-linecap": "round", "stroke-linejoin": "round" });
+  icon.appendChild(svg("path", { d: iconPath }));
+  ic.appendChild(icon);
+
+  const text = elem("div", { class: "dt-text" });
+  text.append(elem("span", {}, label), elem("b", {}, value || "—"));
+  row.append(ic, text);
+  return row;
+}
+
+const DT_ICON = {
+  globe: "M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20",
+  calendar: "M7 2v4M17 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z",
+  building: "M3 21h18M5 21V7l7-4 7 4v14M10 21v-5h4v5",
+  shield: "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z",
+  phone: "M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7A2 2 0 0 1 22 16.9z",
+  doc: "M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6",
+  users: "M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 3a4 4 0 1 1 0 8 4 4 0 0 1 0-8",
+  spark: "M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"
+};
+
+function youthDetail(r) {
+  const box = elem("div", { class: "dt-body" });
+
+  const head = elem("div", { class: "dt-head" });
+  const av = elem("span", { class: "dt-avatar" }, monogram(r.fish));
+  const ht = elem("div", { class: "dt-head-text" });
+  ht.append(
+    elem("h3", {}, r.fish || "—"),
+    elem("p", {}, [schoolLabel(r.school), r.grade ? r.grade + "-sinf" : ""].filter(Boolean).join(" · ") || "—")
+  );
+  head.append(av, ht);
+
+  const cert = elem("div", { class: "dt-cert" });
+  cert.appendChild(gaugeNode(r.certType, r.result));
+
+  const certSide = elem("div", { class: "dt-cert-side" });
+  const badge = CERT_BADGE[r.certType];
+  if (badge) {
+    const img = elem("img", { class: "dt-cert-logo", src: badge, alt: r.certType, loading: "lazy" });
+    img.dataset.media = "cert";
+    certSide.appendChild(img);
+  }
+  certSide.append(
+    elem("span", { class: "dt-cert-type" }, r.certType || "Sertifikat ko'rsatilmagan"),
+    elem("span", { class: "dt-cert-date" }, r.certDate ? `Berilgan ${fullDate(r.certDate)}` : "Sana yo'q")
+  );
+  if (isHighLevel(r)) {
+    const tag = elem("span", { class: "dt-tag" }, "Yuqori daraja");
+    certSide.appendChild(tag);
+  }
+  cert.appendChild(certSide);
+
+  const rows = elem("div", { class: "dt-rows" });
+  rows.append(
+    detailRow(DT_ICON.globe, "Xorijiy til", r.language, flagUrl(r.language)),
+    detailRow(DT_ICON.calendar, "Ro'yxatga olingan", r.ts ? fullDate(r.ts) : "—"),
+    detailRow(DT_ICON.phone, "Telefon", maskPhone(r.phone))
+  );
+  if (r.source === "youth") {
+    rows.append(
+      detailRow(DT_ICON.building, "O'quv markaz", r.center),
+      detailRow(DT_ICON.shield, "Ijtimoiy reyestr", r.social)
+    );
+  }
+  rows.appendChild(detailRow(DT_ICON.doc, "Manba", (SOURCES[r.source] || {}).label || r.source));
+
+  box.append(head, cert, rows);
+  return box;
+}
+
+function centerDetail(c) {
+  const box = elem("div", { class: "dt-body" });
+
+  const head = elem("div", { class: "dt-head" });
+  head.append(centerChip(c, 54));
+  const ht = elem("div", { class: "dt-head-text" });
+  ht.append(
+    elem("h3", {}, c.name),
+    elem("p", {}, c.ts ? `Ro'yxatga olingan ${fullDate(c.ts)}` : "—")
+  );
+  head.append(ht);
+
+  const stats = elem("div", { class: "dt-stats" });
+  [["Xodim", c.staff], ["To'garak", c.clubCount], ["O'quvchi", c.students]].forEach(([label, value]) => {
+    const s = elem("div", { class: "dt-stat" });
+    s.append(elem("b", {}, fmt(value)), elem("span", {}, label));
+    stats.appendChild(s);
+  });
+
+  const rows = elem("div", { class: "dt-rows" });
+  rows.appendChild(detailRow(DT_ICON.phone, "Telefon", maskPhone(c.phone)));
+
+  const clubs = elem("div", { class: "dt-clubs" });
+  clubs.appendChild(elem("p", { class: "dt-sec" }, "To'garaklar"));
+  const max = Math.max(1, ...c.clubs.map((x) => x.count));
+  if (!c.clubs.length) {
+    clubs.appendChild(elem("p", { class: "mini-empty" }, "To'garak kiritilmagan."));
+  }
+  c.clubs.slice().sort((a, b) => b.count - a.count).forEach((club) => {
+    const row = elem("div", { class: "dt-club" });
+    const top = elem("div", { class: "dt-club-top" });
+    top.append(elem("span", {}, club.name), elem("b", {}, fmt(club.count)));
+    const bar = elem("div", { class: "dt-club-bar" });
+    const fill = elem("b");
+    fill.style.width = Math.max(6, (club.count / max) * 100) + "%";
+    bar.appendChild(fill);
+    row.append(top, bar);
+    clubs.appendChild(row);
+  });
+
+  box.append(head, stats, rows, clubs);
+  return box;
+}
+
+let detailOpener = null;
+
+function openDetail(row) {
+  const panel = $("#detail");
+  if (!panel) return;
+  detailOpener = document.activeElement;
+
+  $("#detail-title").textContent = isCenters() ? "Markaz kartasi" : "Yozuv kartasi";
+  $("#detail-content").replaceChildren(isCenters() ? centerDetail(row) : youthDetail(row));
+
+  panel.hidden = false;
+  requestAnimationFrame(() => panel.classList.add("is-open"));
+  $("#detail-close").focus();
+}
+
+function closeDetail() {
+  const panel = $("#detail");
+  if (!panel || panel.hidden) return;
+  panel.classList.remove("is-open");
+  const done = () => { panel.hidden = true; $("#detail-content").replaceChildren(); };
+  if (reducedMotion()) done();
+  else setTimeout(done, 220);
+  if (detailOpener && detailOpener.isConnected) detailOpener.focus();
+  detailOpener = null;
 }
 
 function exportCsv() {
@@ -1896,6 +2424,7 @@ function fillFilterOptions() {
 function renderAll({ animate = false } = {}) {
   state.rows = view().rows();
   applyFilters();
+  renderActiveFilters();
 
   const hasRows = state.rows.length > 0;
   const hasMatch = state.filtered.length > 0;
@@ -2100,6 +2629,13 @@ function bindEvents() {
 
   $("#refresh").addEventListener("click", () => refresh({ silent: true }));
   $("#theme").addEventListener("click", () => applyTheme(currentTheme() === "dark" ? "light" : "dark"));
+
+  // Yozuv kartasi
+  $("#detail-close").addEventListener("click", closeDetail);
+  $("#detail-backdrop").addEventListener("click", closeDetail);
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeDetail();
+  });
   $("#error-retry").addEventListener("click", () => refresh());
   $("#error-demo").addEventListener("click", startDemo);
 

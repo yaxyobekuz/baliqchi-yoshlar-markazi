@@ -8,6 +8,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://flagcdn.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet" />
 
   <link rel="stylesheet" href="assets/dashboard.css" />
@@ -19,16 +20,62 @@
 
 <!-- ================= KIRISH ================= -->
 <div id="gate" class="gate" hidden>
-  <form id="gate-form" class="gate-card">
-    <img src="assets/emblem-of-uzbekistan.png" alt="" class="gate-emblem" />
-    <h1 class="gate-title">Statistika paneli</h1>
-    <p class="gate-sub">Davom etish uchun kirish kalitini kiriting.</p>
-    <label class="gate-label" for="gate-key">Kirish kaliti</label>
-    <input id="gate-key" type="password" class="gate-input" autocomplete="current-password" required />
-    <p id="gate-error" class="gate-error" hidden>Kalit noto'g'ri.</p>
-    <button type="submit" class="btn btn-primary gate-btn">Kirish</button>
-    <button type="button" id="gate-demo" class="btn btn-ghost gate-btn">Demo ma'lumotlar bilan ko'rish</button>
-  </form>
+  <div class="gate-shell">
+
+    <!-- Chap taraf: rasm va loyiha haqida -->
+    <aside class="gate-visual">
+      <img class="gate-photo" src="assets/edu-library-hall.jpg" alt="Kutubxonada o'qiyotgan talabalar" />
+      <span class="gate-veil" aria-hidden="true"></span>
+      <span class="gate-grain" aria-hidden="true"></span>
+
+      <div class="gate-copy">
+        <span class="gate-kicker">
+          <span class="gate-live" aria-hidden="true"></span>
+          Baliqchi tumani kelajak markazi
+        </span>
+        <h2 class="gate-head">Raqamlar ortida<br /><em>iqtidorlar</em> turadi</h2>
+        <p class="gate-lead">
+          Arizalar, iqtidorli yoshlar va o'quv markazlari bo'yicha yagona statistika paneli.
+        </p>
+
+        <ul class="gate-points">
+          <li>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 4-6"/></svg>
+            Jonli grafiklar va kesimlar
+          </li>
+          <li>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+            61 ta maktab bo'yicha xarita
+          </li>
+          <li>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 11l5 5 5-5M4 20h16"/></svg>
+            CSV ga yuklab olish
+          </li>
+        </ul>
+
+        <div class="gate-flags" aria-hidden="true">
+          <img src="https://flagcdn.com/w40/gb.png" srcset="https://flagcdn.com/w80/gb.png 2x" alt="" data-media="gate" loading="lazy" />
+          <img src="https://flagcdn.com/w40/de.png" srcset="https://flagcdn.com/w80/de.png 2x" alt="" data-media="gate" loading="lazy" />
+          <img src="https://flagcdn.com/w40/kr.png" srcset="https://flagcdn.com/w80/kr.png 2x" alt="" data-media="gate" loading="lazy" />
+          <img src="https://flagcdn.com/w40/jp.png" srcset="https://flagcdn.com/w80/jp.png 2x" alt="" data-media="gate" loading="lazy" />
+          <img src="https://flagcdn.com/w40/tr.png" srcset="https://flagcdn.com/w80/tr.png 2x" alt="" data-media="gate" loading="lazy" />
+          <span class="gate-flags-more">+5</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- O'ng taraf: kirish -->
+    <form id="gate-form" class="gate-card">
+      <img src="assets/emblem-of-uzbekistan.png" alt="" class="gate-emblem" />
+      <h1 class="gate-title">Statistika paneli</h1>
+      <p class="gate-sub">Davom etish uchun kirish kalitini kiriting.</p>
+      <label class="gate-label" for="gate-key">Kirish kaliti</label>
+      <input id="gate-key" type="password" class="gate-input" autocomplete="current-password" required />
+      <p id="gate-error" class="gate-error" hidden>Kalit noto'g'ri.</p>
+      <button type="submit" class="btn btn-primary gate-btn">Kirish</button>
+      <button type="button" id="gate-demo" class="btn btn-ghost gate-btn">Demo ma'lumotlar bilan ko'rish</button>
+    </form>
+  </div>
 </div>
 
 <!-- ================= PANEL ================= -->
@@ -139,6 +186,9 @@
 
       <button id="f-reset" class="btn btn-ghost btn-reset" hidden>Tozalash</button>
     </div>
+
+    <!-- Grafikdan qo'yilgan filtrlar shu yerda ko'rinadi -->
+    <div id="active-filters" class="shell active-filters" hidden></div>
   </div>
 
   <main class="shell main">
@@ -185,6 +235,11 @@
 
       <section class="hero-row" aria-label="Asosiy ko'rsatkichlar">
         <div class="hero-card">
+          <div class="hero-art" aria-hidden="true">
+            <img id="hero-photo" src="assets/yoshlar-rasmi.jpg" alt="" decoding="async" />
+            <span class="hero-veil"></span>
+            <span class="hero-rings"></span>
+          </div>
           <div class="hero-head">
             <p id="hero-label" class="hero-label">Jami</p>
             <span id="hero-chip" class="chip-stat" hidden></span>
@@ -240,6 +295,20 @@
       </p>
     </div>
   </main>
+</div>
+
+<!-- ================= YOZUV KARTASI ================= -->
+<div id="detail" class="detail" hidden>
+  <div id="detail-backdrop" class="detail-backdrop"></div>
+  <aside class="detail-panel" role="dialog" aria-modal="true" aria-labelledby="detail-title">
+    <header class="detail-head">
+      <h2 id="detail-title" class="detail-title">Yozuv kartasi</h2>
+      <button id="detail-close" class="btn btn-ghost btn-icon" aria-label="Yopish">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </header>
+    <div id="detail-content" class="detail-content"></div>
+  </aside>
 </div>
 
 <div id="tooltip" class="tooltip" role="status" aria-live="polite" hidden></div>

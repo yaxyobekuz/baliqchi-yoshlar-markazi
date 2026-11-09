@@ -4,7 +4,7 @@ const i18n = {
     meta_title: "Baliqchi tumani - Iqtidorli yoshlar ro'yxati",
     meta_desc: "Baliqchi tuman hokimligi iqtidorli yoshlarni ro'yxatga olish markazi. Iqtidoring - kelajaging tayanchi.",
 
-    nav_brand: "Baliqchi tumani hokimligi",
+    nav_brand: "Baliqchi tumani kelajak markazi",
     nav_sub: "Iqtidorli yoshlar markazi",
     nav_about: "Loyiha haqida",
     nav_benefits: "Imkoniyatlar",
@@ -89,7 +89,7 @@ const i18n = {
     form_success: "Rahmat! Ma'lumotlaringiz qabul qilindi.",
     form_error: "Xatolik yuz berdi. Iltimos, qaytadan urinib ko'ring.",
 
-    footer_about_title: "Baliqchi tumani hokimligi",
+    footer_about_title: "Baliqchi tumani kelajak markazi",
     footer_about_desc: "Iqtidorli yoshlarni qo'llab-quvvatlash markazi.",
     footer_contact_title: "Aloqa",
     footer_address: "Andijon viloyati, Baliqchi tumani",
@@ -97,7 +97,7 @@ const i18n = {
     footer_telegram: "@sarax_88",
     footer_email: "info@baliqchi.uz",
     footer_links_title: "Sahifa",
-    footer_copy: "© 2025 Baliqchi tumani hokimligi. Barcha huquqlar himoyalangan."
+    footer_copy: "© 2025 Baliqchi tumani kelajak markazi. Barcha huquqlar himoyalangan."
   },
 
   ru: {

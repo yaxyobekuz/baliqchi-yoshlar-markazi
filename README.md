@@ -297,4 +297,4 @@ URL o'zgarmaydi - `script.js` ni o'zgartirish shart emas.
 
 ## Litsenziya
 
-Davlat loyihasi - Baliqchi tumani hokimligi (2025).
+Davlat loyihasi - Baliqchi tumani kelajak markazi (2025).

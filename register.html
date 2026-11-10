@@ -551,14 +551,43 @@
                       </span>
                       <select id="y-cert-type" name="certType" required data-prog="Sertifikat turi" class="field-select">
                         <option value="">Tanlang...</option>
-                        <option value="CEFR">CEFR (Milliy sertifikat)</option>
-                        <option value="IELTS">IELTS</option>
-                        <option value="SAT">SAT</option>
+                        <optgroup label="Xorijiy til sertifikatlari">
+                          <option value="CEFR">CEFR (Milliy sertifikat)</option>
+                          <option value="IELTS">IELTS</option>
+                          <option value="TOPIK">TOPIK (koreys tili)</option>
+                        </optgroup>
+                        <optgroup label="Xalqaro imtihonlar">
+                          <option value="SAT">SAT</option>
+                        </optgroup>
+                        <option value="Boshqa">Boshqa (o'zim yozaman)</option>
                       </select>
                       <span class="f-ok" aria-hidden="true">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                       </span>
                     </div>
+                  </div>
+
+                  <!-- Sertifikat nomi - faqat "Boshqa" tanlanganda -->
+                  <div id="cert-other-wrap" class="sm:col-span-2" hidden>
+                    <label for="y-cert-other" class="field-label">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9 13h6M9 17h4"/></svg>
+                      Sertifikat nomi <span class="req">*</span>
+                    </label>
+                    <div class="f-wrap has-ico">
+                      <span class="f-ico" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9 13h6M9 17h4"/></svg>
+                      </span>
+                      <input id="y-cert-other" name="certOther" type="text" maxlength="20" disabled
+                        data-prog="Sertifikat nomi"
+                        placeholder="Masalan: SKA, HSK, JLPT, Goethe" class="field-input" />
+                      <span class="f-ok" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                      </span>
+                    </div>
+                    <p class="field-hint">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+                      Ro'yxatda yo'q sertifikat nomini qisqa yozing (20 ta belgigacha)
+                    </p>
                   </div>
 
                   <!-- Sana -->
@@ -593,6 +622,9 @@
                       <input id="y-result-sat" name="resultSat" type="number" min="1400" max="1600" step="10" disabled
                         data-prog="Sertifikat natijasi"
                         placeholder="1400 - 1600" class="field-input hidden" />
+                      <input id="y-result-text" name="resultText" type="text" maxlength="20" disabled
+                        data-prog="Sertifikat natijasi"
+                        placeholder="Masalan: 4-daraja, B2, 180 ball" class="field-input hidden" />
                       <span class="f-ok" aria-hidden="true">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                       </span>

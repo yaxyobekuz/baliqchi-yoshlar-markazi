@@ -20,8 +20,20 @@ const CERT_DATE_MAX = CERT_YEAR + "-12-31";
 
 const RESULT_OPTIONS = {
   CEFR: ["B2", "C1", "C2"],
-  IELTS: ["5.5", "6.0", "6.5", "7.0", "7.5", "8.0", "8.5", "9.0"]
+  IELTS: ["5.5", "6.0", "6.5", "7.0", "7.5", "8.0", "8.5", "9.0"],
+  // TOPIK natijasi daraja bilan beriladi: TOPIK I → 1-2, TOPIK II → 3-6
+  TOPIK: [
+    { value: "1", label: "1-daraja (TOPIK I)" },
+    { value: "2", label: "2-daraja (TOPIK I)" },
+    { value: "3", label: "3-daraja (TOPIK II)" },
+    { value: "4", label: "4-daraja (TOPIK II)" },
+    { value: "5", label: "5-daraja (TOPIK II)" },
+    { value: "6", label: "6-daraja (TOPIK II)" }
+  ]
 };
+
+/** Ro'yxatda yo'q sertifikat - nomi va natijasi qo'lda yoziladi */
+const CERT_OTHER = "Boshqa";
 
 const SAT_RANGE = { min: 1400, max: 1600, step: 10 };
 
@@ -564,21 +576,52 @@ function buildYouthOptions() {
 }
 
 /** Natija maydoni sertifikat turiga qarab o'zgaradi */
+/** Maydonni ko'rsatadi/yashiradi va yashirilganda tozalaydi */
+function toggleResultInput(el, on) {
+  el.classList.toggle("hidden", !on);
+  el.disabled = !on;
+  el.required = on;
+  if (!on) el.value = "";
+}
+
 function renderResultField() {
   const type = youth.certType.value;
   const isSat = type === "SAT";
+  const isOther = type === CERT_OTHER;
+  const isList = !!type && !isSat && !isOther;
 
-  youth.resultSat.classList.toggle("hidden", !isSat);
-  youth.resultSat.disabled = !isSat;
-  youth.resultSat.required = isSat;
-  if (!isSat) youth.resultSat.value = "";
+  // "Boshqa" tanlansa - sertifikat nomi maydoni ochiladi
+  youth.certOtherWrap.hidden = !isOther;
+  youth.certOther.disabled = !isOther;
+  youth.certOther.required = isOther;
+  if (!isOther) youth.certOther.value = "";
 
-  youth.result.classList.toggle("hidden", isSat);
-  youth.result.disabled = isSat || !type;
-  youth.result.required = !isSat;
+  toggleResultInput(youth.resultSat, isSat);
+  toggleResultInput(youth.resultText, isOther);
 
-  const options = (RESULT_OPTIONS[type] || []).map((v) => ({ value: v, label: v }));
+  youth.result.classList.toggle("hidden", isSat || isOther);
+  youth.result.disabled = !isList;
+  youth.result.required = isList;
+  if (!isList) youth.result.value = "";
+
+  const options = (RESULT_OPTIONS[type] || [])
+    .map((v) => (typeof v === "string" ? { value: v, label: v } : v));
   fillSelect(youth.result, options, type ? "Tanlang..." : "Avval sertifikat turini tanlang");
+}
+
+/** Yuboriladigan sertifikat nomi: "Boshqa" bo'lsa - qo'lda yozilgani */
+function certTypeValue() {
+  return youth.certType.value === CERT_OTHER
+    ? youth.certOther.value.trim()
+    : youth.certType.value;
+}
+
+/** Yuboriladigan natija: turga qarab uchta maydondan biri */
+function certResultValue() {
+  const type = youth.certType.value;
+  if (type === "SAT") return youth.resultSat.value.trim();
+  if (type === CERT_OTHER) return youth.resultText.value.trim();
+  return youth.result.value;
 }
 
 /** Markazlar ro'yxati Sheets'dagi "Markazlar" sahifasidan keladi */
@@ -617,6 +660,9 @@ function bindYouthForm() {
   youth.certDate = $("#y-cert-date");
   youth.result = $("#y-result");
   youth.resultSat = $("#y-result-sat");
+  youth.resultText = $("#y-result-text");
+  youth.certOther = $("#y-cert-other");
+  youth.certOtherWrap = $("#cert-other-wrap");
   youth.phone = $("#y-phone");
   youth.social = $("#y-social");
   youth.center = $("#y-center");
@@ -651,6 +697,17 @@ function bindYouthForm() {
       return;
     }
 
+    if (youth.certType.value === CERT_OTHER && !youth.certOther.value.trim()) {
+      showToast("Sertifikat nomini yozing.", false);
+      youth.certOther.focus();
+      return;
+    }
+
+    if (!certResultValue()) {
+      showToast("Sertifikat natijasini kiriting.", false);
+      return;
+    }
+
     const payload = {
       type: "youth",
       timestamp: new Date().toISOString(),
@@ -658,9 +715,9 @@ function bindYouthForm() {
       grade: youth.grade.value,
       fish: youth.fish.value.trim(),
       language: youth.language.value,
-      certType: youth.certType.value,
+      certType: certTypeValue(),
       certDate: youth.certDate.value,
-      result: youth.certType.value === "SAT" ? youth.resultSat.value.trim() : youth.result.value,
+      result: certResultValue(),
       phone: youth.phone.value.trim(),
       social: youth.social.value,
       center: youth.center.value,

@@ -193,8 +193,12 @@
   var CERT_LOGO = {
     IELTS: '<img src="assets/ielts-logog-2000x1200.png" alt="IELTS" />',
     CEFR:  '<span class="txt">CEFR</span>',
-    SAT:   '<span class="txt">SAT</span>'
+    SAT:   '<span class="txt">SAT</span>',
+    TOPIK: '<span class="txt">TOPIK</span>'
   };
+
+  /** Maydon ichidagi qisqa nishon: IELTS -> IEL, TOPIK -> TPK */
+  var CERT_SHORT = { IELTS: "IEL", TOPIK: "TPK", CEFR: "CEFR", SAT: "SAT" };
 
   function syncDynamicIcons() {
     // xorijiy til → bayroq
@@ -214,7 +218,8 @@
 
     // sertifikat turi → nishon
     var ct = val("#y-cert-type");
-    setIco("#y-cert-type", ct ? miniBadge(ct === "IELTS" ? "IEL" : ct) : ICON.award, false);
+    var ctShort = ct === "Boshqa" ? (val("#y-cert-other").slice(0, 4) || "···") : (CERT_SHORT[ct] || ct);
+    setIco("#y-cert-type", ct ? miniBadge(ctShort) : ICON.award, false);
   }
 
   /** Bitta o'ramda ikkita boshqaruv bo'lishi mumkin (natija: select / SAT raqami) */
@@ -308,6 +313,9 @@
     var items = [];
 
     all("[data-prog]", form).forEach(function (el) {
+      // Yashirilgan bo'lim ("Boshqa" sertifikat nomi) talab qilinmaydi
+      if (el.closest("[hidden]")) return;
+
       var label = el.dataset.prog;
       var ok = !!String(el.value || "").trim();
       if (el.dataset.progType === "phone") ok = digitsOf(el.value).length === 9;
@@ -464,7 +472,11 @@
       var p = 0.7 + 0.3 * ((n - 1400) / 200);
       return { pct: Math.max(0, Math.min(1, p)), label: raw, scale: "SAT" };
     }
-    return { pct: 0, label: String(raw), scale: "NATIJA" };
+    if (type === "TOPIK") {
+      return { pct: Math.min(1, (Number(raw) || 0) / 6), label: raw, scale: "DARAJA" };
+    }
+    // Ro'yxatda yo'q sertifikat: halqa to'la, natija matn ko'rinishida
+    return { pct: raw ? 1 : 0, label: String(raw).slice(0, 7), scale: "NATIJA" };
   }
 
   function renderCertPreview() {
@@ -475,7 +487,10 @@
     var type = val("#y-cert-type");
     var date = val("#y-cert-date");
     var center = val("#y-center");
-    var raw = type === "SAT" ? val("#y-result-sat") : val("#y-result");
+    var other = val("#y-cert-other");
+    var raw = type === "SAT" ? val("#y-result-sat")
+            : type === "Boshqa" ? val("#y-result-text")
+            : val("#y-result");
 
     var nameEl = one("#cv-name");
     if (nameEl) {
@@ -493,7 +508,9 @@
 
     var logo = one("#cv-logo");
     if (logo) {
-      var lhtml = CERT_LOGO[type] || '<span class="txt">—</span>';
+      var lhtml = type === "Boshqa"
+        ? (other ? '<span class="txt">' + esc(other.slice(0, 8)) + "</span>" : '<span class="txt">—</span>')
+        : (CERT_LOGO[type] || '<span class="txt">—</span>');
       if (logo.getAttribute("data-html") !== lhtml) {
         logo.setAttribute("data-html", lhtml);
         logo.innerHTML = lhtml;
@@ -541,7 +558,8 @@
 
     var seal = one("#cv-seal");
     if (seal) {
-      var ready = !!(fish && school && grade && lang && type && date && raw && center);
+      var ready = !!(fish && school && grade && lang && type && date && raw && center
+        && (type !== "Boshqa" || other));
       seal.classList.toggle("idle", !ready);
       var p = one("#cv-seal-text");
       if (p) {

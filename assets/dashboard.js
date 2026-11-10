@@ -16,7 +16,8 @@ const VIEW_STORAGE = "dash_view";
 const CERT_TYPES = [
   { id: "CEFR", label: "CEFR", varName: "--series-1" },
   { id: "IELTS", label: "IELTS", varName: "--series-2" },
-  { id: "SAT", label: "SAT", varName: "--series-3" }
+  { id: "SAT", label: "SAT", varName: "--series-3" },
+  { id: "TOPIK", label: "TOPIK", varName: "--series-4" }
 ];
 
 const SOURCES = {
@@ -26,7 +27,13 @@ const SOURCES = {
 
 const RESULT_ORDER = {
   CEFR: ["B2", "C1", "C2"],
-  IELTS: ["5.5", "6.0", "6.5", "7.0", "7.5", "8.0", "8.5", "9.0"]
+  IELTS: ["5.5", "6.0", "6.5", "7.0", "7.5", "8.0", "8.5", "9.0"],
+  TOPIK: ["1", "2", "3", "4", "5", "6"]
+};
+
+/** TOPIK natijasi "4" ko'rinishida saqlanadi - grafikda "4-daraja" bo'lib chiqadi */
+const RESULT_LABELS = {
+  TOPIK: (v) => v + "-daraja"
 };
 
 const state = {
@@ -404,12 +411,14 @@ function demoPayload() {
     ts.setHours(9 + Math.floor(Math.random() * 10), Math.floor(Math.random() * 60), 0, 0);
 
     const roll = Math.random();
-    const certType = roll < 0.62 ? "CEFR" : roll < 0.9 ? "IELTS" : "SAT";
+    const certType = roll < 0.55 ? "CEFR" : roll < 0.80 ? "IELTS" : roll < 0.92 ? "TOPIK" : "SAT";
     const result = certType === "CEFR"
       ? pick(["B2", "B2", "B2", "B2", "C1", "C1", "C2"])
       : certType === "IELTS"
         ? pick(["5.5", "6.0", "6.0", "6.5", "6.5", "7.0", "7.0", "7.5", "8.0"])
-        : pick(["1400", "1410", "1430", "1450", "1450", "1480", "1500", "1520", "1560"]);
+        : certType === "TOPIK"
+          ? pick(["2", "3", "3", "4", "4", "4", "5", "6"])
+          : pick(["1400", "1410", "1430", "1450", "1450", "1480", "1500", "1520", "1560"]);
 
     const certDate = new Date(ts);
     certDate.setDate(certDate.getDate() - Math.floor(Math.random() * 60));
@@ -643,6 +652,7 @@ function isHighLevel(r) {
   if (r.certType === "CEFR") return r.result === "C1" || r.result === "C2";
   if (r.certType === "IELTS") return parseFloat(r.result) >= 7;
   if (r.certType === "SAT") return parseFloat(r.result) >= 1500;
+  if (r.certType === "TOPIK") return parseFloat(r.result) >= 4;
   return false;
 }
 
@@ -1731,9 +1741,10 @@ function resultItems(subset, certId) {
     return [...bins.entries()].sort((a, b) => a[0] - b[0]).map(([lo, value]) => ({ label: `${lo}+`, value }));
   }
   const order = RESULT_ORDER[certId] || [];
-  const known = order.filter((k) => counts.has(k)).map((k) => ({ label: k, value: counts.get(k) }));
+  const nice = RESULT_LABELS[certId] || ((v) => v);
+  const known = order.filter((k) => counts.has(k)).map((k) => ({ label: nice(k), value: counts.get(k) }));
   const extra = [...counts.entries()].filter(([k]) => !order.includes(k))
-    .sort((a, b) => b[1] - a[1]).map(([label, value]) => ({ label, value }));
+    .sort((a, b) => b[1] - a[1]).map(([label, value]) => ({ label: nice(label), value }));
   return known.concat(extra);
 }
 

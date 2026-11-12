@@ -329,10 +329,30 @@
               <select id="f-cert-type" name="certType" required
                 class="mt-2 w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/10 outline-none transition">
                 <option value="" data-i18n="form_opt_select">Tanlang...</option>
-                <option value="CEFR" data-i18n="form_cert_cefr">CEFR (Milliy sertifikat)</option>
-                <option value="IELTS">IELTS</option>
-                <option value="SAT">SAT</option>
+                <optgroup data-i18n-label="form_cert_group_lang" label="Xorijiy til sertifikatlari">
+                  <option value="CEFR" data-i18n="form_cert_cefr">CEFR (Milliy sertifikat)</option>
+                  <option value="IELTS">IELTS</option>
+                  <option value="TOPIK" data-i18n="form_cert_topik">TOPIK (koreys tili)</option>
+                </optgroup>
+                <optgroup data-i18n-label="form_cert_group_intl" label="Xalqaro imtihonlar">
+                  <option value="SAT">SAT</option>
+                </optgroup>
+                <option value="Boshqa" data-i18n="form_cert_other">Boshqa (o'zim yozaman)</option>
               </select>
+            </div>
+
+            <!-- 5b. Sertifikat nomi - faqat "Boshqa" tanlanganda -->
+            <div id="cert-other-wrap" class="sm:col-span-2" hidden>
+              <label for="f-cert-other" class="block text-sm font-semibold text-brand-ink">
+                <span data-i18n="form_label_cert_other">Sertifikat nomi</span>
+                <span class="text-brand-red">*</span>
+              </label>
+              <input id="f-cert-other" name="certOther" type="text" maxlength="20" disabled
+                data-i18n-ph="form_ph_cert_other" placeholder="Masalan: SKA, HSK, JLPT, Goethe"
+                class="mt-2 w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/10 outline-none transition" />
+              <p class="mt-2 text-xs text-brand-muted" data-i18n="form_hint_cert_other">
+                Ro'yxatda yo'q sertifikat nomini qisqa yozing (20 ta belgigacha)
+              </p>
             </div>
 
             <!-- 6. Sertifikat berilgan sana -->
@@ -361,6 +381,11 @@
               <!-- SAT uchun -->
               <input id="f-result-sat" name="resultSat" type="number" min="1400" max="1600" step="10" disabled
                 data-i18n-ph="form_ph_result_sat" placeholder="1400 - 1600"
+                class="mt-2 hidden w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/10 outline-none transition" />
+
+              <!-- "Boshqa" sertifikat uchun -->
+              <input id="f-result-text" name="resultText" type="text" maxlength="20" disabled
+                data-i18n-ph="form_ph_result_text" placeholder="Masalan: 4-daraja, B2, 180 ball"
                 class="mt-2 hidden w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/10 outline-none transition" />
 
             </div>

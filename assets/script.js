@@ -39,6 +39,11 @@ function applyLang(lang) {
     if (dict[key] != null) el.setAttribute("placeholder", dict[key]);
   });
 
+  document.querySelectorAll("[data-i18n-label]").forEach((el) => {
+    const key = el.getAttribute("data-i18n-label");
+    if (dict[key] != null) el.setAttribute("label", dict[key]);
+  });
+
   document.querySelectorAll(".lang-option").forEach((btn) => {
     const active = btn.dataset.lang === lang;
     btn.classList.toggle("text-brand-blue", active);
@@ -78,10 +83,22 @@ const CERT_DATE_MIN = CERT_YEAR + "-01-01";
 const CERT_DATE_MAX = CERT_YEAR + "-12-31";
 
 // Sertifikat turi → qabul qilinadigan natijalar
+// TOPIK natijasi daraja bilan beriladi: TOPIK I → 1-2, TOPIK II → 3-6
 const RESULT_OPTIONS = {
   CEFR: ["B2", "C1", "C2"],
-  IELTS: ["5.5", "6.0", "6.5", "7.0", "7.5", "8.0", "8.5", "9.0"]
+  IELTS: ["5.5", "6.0", "6.5", "7.0", "7.5", "8.0", "8.5", "9.0"],
+  TOPIK: [
+    { value: "1", key: "form_topik_1" },
+    { value: "2", key: "form_topik_2" },
+    { value: "3", key: "form_topik_3" },
+    { value: "4", key: "form_topik_4" },
+    { value: "5", key: "form_topik_5" },
+    { value: "6", key: "form_topik_6" }
+  ]
 };
+
+/** Ro'yxatda yo'q sertifikat - nomi va natijasi qo'lda yoziladi */
+const CERT_OTHER = "Boshqa";
 
 const SAT_RANGE = { min: 1400, max: 1600, step: 10 };
 
@@ -93,6 +110,9 @@ const certTypeSelect = document.getElementById("f-cert-type");
 const certDateInput = document.getElementById("f-cert-date");
 const resultSelect = document.getElementById("f-result");
 const resultSatInput = document.getElementById("f-result-sat");
+const resultTextInput = document.getElementById("f-result-text");
+const certOtherWrap = document.getElementById("cert-other-wrap");
+const certOtherInput = document.getElementById("f-cert-other");
 
 function todayISO() {
   const d = new Date();
@@ -138,21 +158,38 @@ function renderGradeOptions() {
   fillSelect(gradeSelect, items);
 }
 
+/** Maydonni ko'rsatadi/yashiradi va yashirilganda tozalaydi */
+function toggleResultInput(el, on) {
+  if (!el) return;
+  el.classList.toggle("hidden", !on);
+  el.disabled = !on;
+  el.required = on;
+  if (!on) el.value = "";
+}
+
 function renderResultField() {
   if (!certTypeSelect || !resultSelect || !resultSatInput) return;
 
   const type = certTypeSelect.value;
   const isSat = type === "SAT";
+  const isOther = type === CERT_OTHER;
+  const isList = !!type && !isSat && !isOther;
 
-  // SAT → raqamli input, qolganlari → select
-  resultSatInput.classList.toggle("hidden", !isSat);
-  resultSatInput.disabled = !isSat;
-  resultSatInput.required = isSat;
-  if (!isSat) resultSatInput.value = "";
+  // "Boshqa" tanlansa - sertifikat nomi maydoni ochiladi
+  if (certOtherWrap) certOtherWrap.hidden = !isOther;
+  if (certOtherInput) {
+    certOtherInput.disabled = !isOther;
+    certOtherInput.required = isOther;
+    if (!isOther) certOtherInput.value = "";
+  }
 
-  resultSelect.classList.toggle("hidden", isSat);
-  resultSelect.disabled = isSat || !type;
-  resultSelect.required = !isSat;
+  // SAT → raqamli input, "Boshqa" → matn, qolganlari → select
+  toggleResultInput(resultSatInput, isSat);
+  toggleResultInput(resultTextInput, isOther);
+
+  resultSelect.classList.toggle("hidden", isSat || isOther);
+  resultSelect.disabled = !isList;
+  resultSelect.required = isList;
 
   const prev = resultSelect.value;
   resultSelect.innerHTML = "";
@@ -162,15 +199,21 @@ function renderResultField() {
   placeholder.textContent = type ? t("form_opt_select") : t("form_result_pick_type");
   resultSelect.appendChild(placeholder);
 
-  (RESULT_OPTIONS[type] || []).forEach((value) => {
+  const options = (RESULT_OPTIONS[type] || []).map((v) =>
+    typeof v === "string" ? { value: v, label: v } : { value: v.value, label: t(v.key) }
+  );
+
+  options.forEach(({ value, label }) => {
     const opt = document.createElement("option");
     opt.value = value;
-    opt.textContent = value;
+    opt.textContent = label;
     resultSelect.appendChild(opt);
   });
 
-  if (prev && RESULT_OPTIONS[type] && RESULT_OPTIONS[type].includes(prev)) {
+  if (prev && options.some((o) => o.value === prev)) {
     resultSelect.value = prev;
+  } else if (!isList) {
+    resultSelect.value = "";
   }
 }
 
@@ -309,10 +352,19 @@ function setLoading(loading) {
   btnLabel.textContent = loading ? t("form_sending") : t("form_submit");
 }
 
+/** Yuboriladigan sertifikat nomi: "Boshqa" bo'lsa - qo'lda yozilgani */
+function getCertTypeValue() {
+  return certTypeSelect.value === CERT_OTHER && certOtherInput
+    ? certOtherInput.value.trim()
+    : certTypeSelect.value;
+}
+
+/** Yuboriladigan natija: turga qarab uchta maydondan biri */
 function getResultValue() {
-  return certTypeSelect.value === "SAT"
-    ? resultSatInput.value.trim()
-    : resultSelect.value;
+  const type = certTypeSelect.value;
+  if (type === "SAT") return resultSatInput.value.trim();
+  if (type === CERT_OTHER) return resultTextInput ? resultTextInput.value.trim() : "";
+  return resultSelect.value;
 }
 
 /** Brauzer min/max ni qo'llab-quvvatlamasa ham sanani tekshiramiz:
@@ -349,7 +401,7 @@ form.addEventListener("submit", async (e) => {
     grade: gradeSelect.value,
     fish: fishInput.value.trim(),
     language: languageSelect.value,
-    certType: certTypeSelect.value,
+    certType: getCertTypeValue(),
     certDate: certDateInput.value,
     result: getResultValue(),
     phone: phoneInput.value.trim(),

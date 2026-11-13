@@ -74,6 +74,13 @@ function t(key, vars) {
 const SCHOOL_MIN = 1;
 const SCHOOL_MAX = 61;
 const SPECIAL_SCHOOL = "Ixtisoslashtirilgan maktab";
+// Raqamli maktablardan tashqari qo'shimcha ta'lim muassasalari
+const EXTRA_SCHOOLS = [
+  { value: SPECIAL_SCHOOL, key: "form_school_special" },
+  { value: "1-son politexnikum", key: "form_school_polytech_1" },
+  { value: "2-son politexnikum", key: "form_school_polytech_2" },
+  { value: "Abu Ali Ibn Sino nomidagi tibbiyot politexnikum", key: "form_school_polytech_med" },
+];
 const GRADE_MIN = 5;
 const GRADE_MAX = 11;
 
@@ -146,7 +153,7 @@ function renderSchoolOptions() {
   for (let n = SCHOOL_MIN; n <= SCHOOL_MAX; n++) {
     items.push({ value: String(n), label: t("form_school_item", { n }) });
   }
-  items.push({ value: SPECIAL_SCHOOL, label: t("form_school_special") });
+  EXTRA_SCHOOLS.forEach(({ value, key }) => items.push({ value, label: t(key) }));
   fillSelect(schoolSelect, items);
 }
 

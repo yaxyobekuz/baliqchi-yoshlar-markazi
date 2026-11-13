@@ -50,6 +50,9 @@ const i18n = {
     form_label_school: "Maktab raqami",
     form_school_item: "{n}-maktab",
     form_school_special: "Ixtisoslashtirilgan maktab",
+    form_school_polytech_1: "1-son politexnikum",
+    form_school_polytech_2: "2-son politexnikum",
+    form_school_polytech_med: "Abu Ali Ibn Sino nomidagi tibbiyot politexnikum",
 
     form_label_grade: "Sinfi",
     form_grade_item: "{n}-sinf",
@@ -165,6 +168,9 @@ const i18n = {
     form_label_school: "Номер школы",
     form_school_item: "школа №{n}",
     form_school_special: "Специализированная школа",
+    form_school_polytech_1: "Политехникум №1",
+    form_school_polytech_2: "Политехникум №2",
+    form_school_polytech_med: "Медицинский политехникум имени Абу Али Ибн Сино",
 
     form_label_grade: "Класс",
     form_grade_item: "{n} класс",
@@ -280,6 +286,9 @@ const i18n = {
     form_label_school: "School number",
     form_school_item: "School #{n}",
     form_school_special: "Specialized school",
+    form_school_polytech_1: "Polytechnic #1",
+    form_school_polytech_2: "Polytechnic #2",
+    form_school_polytech_med: "Abu Ali Ibn Sino Medical Polytechnic",
 
     form_label_grade: "Grade",
     form_grade_item: "Grade {n}",

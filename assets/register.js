@@ -10,6 +10,13 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxOsfh4if4NsK4p
 const SCHOOL_MIN = 1;
 const SCHOOL_MAX = 61;
 const SPECIAL_SCHOOL = "Ixtisoslashtirilgan maktab";
+// Raqamli maktablardan tashqari qo'shimcha ta'lim muassasalari
+const EXTRA_SCHOOLS = [
+  SPECIAL_SCHOOL,
+  "1-son politexnikum",
+  "2-son politexnikum",
+  "Abu Ali Ibn Sino nomidagi tibbiyot politexnikum",
+];
 const GRADE_MIN = 5;
 const GRADE_MAX = 11;
 
@@ -556,7 +563,7 @@ function buildYouthOptions() {
   for (let n = SCHOOL_MIN; n <= SCHOOL_MAX; n++) {
     schools.push({ value: String(n), label: `${n}-maktab` });
   }
-  schools.push({ value: SPECIAL_SCHOOL, label: SPECIAL_SCHOOL });
+  EXTRA_SCHOOLS.forEach((name) => schools.push({ value: name, label: name }));
   fillSelect(youth.school, schools);
 
   const grades = [];
